@@ -57,7 +57,7 @@ main{flex:1;overflow-y:auto;padding:4px 16px 150px}
 .item.done .chk{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .item.done .chk svg{opacity:1}
 .item.done .t{text-decoration:line-through;color:var(--muted)}
-.body{flex:1;min-width:0;text-align:left}
+.body{flex:1;min-width:0;text-align:left;padding:0}
 .t{font-weight:600;overflow-wrap:anywhere}
 .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .pill{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--bg);color:var(--muted);display:inline-flex;align-items:center;gap:5px}
@@ -136,6 +136,20 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
   transition:all .2s;z-index:60;max-width:calc(100% - 32px)}
 .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .toast button{color:var(--accent);font-weight:800;filter:brightness(1.4)}
+.item,.tab,.grp-h{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.item{transition:transform .15s}
+.item.lp{transform:scale(.97)}
+.tab.drag{position:relative;z-index:2;box-shadow:0 0 0 2px var(--accent),var(--shadow)}
+.tab.plus{width:40px;padding:0;justify-content:center;font-size:22px;font-weight:600}
+.grp{margin:4px 0 20px}
+.grp-h{display:flex;align-items:center;gap:9px;width:100%;text-align:left;font-weight:800;font-size:17px;padding:8px 6px 2px}
+.grp-h .dot{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.grp-h .n{color:var(--muted);font-size:14px;font-weight:700}
+.grp-empty{color:var(--muted);font-size:14px;padding:6px 6px 0}
+.mv-t{font-weight:700;font-size:17px;margin-bottom:14px;overflow-wrap:anywhere}
+.chips.big .chip{height:48px;padding:0 18px;font-size:16px}
+.mvb{width:34px;height:38px;border-radius:999px;background:var(--bg);flex:none;font-weight:800}
+.mvb:disabled{opacity:.3}
 </style>
 </head>
 <body>
@@ -183,19 +197,29 @@ const ICON_TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 /* ---------- state ---------- */
 const COLORS = ['#0FB894', '#3D5AFE', '#12A594', '#F5A524', '#E5484D', '#8E4EC6', '#0091FF', '#6B7488'];
 const DEF_BOARDS = [
-  { id: 'todo', name: 'Зробити', color: '#0FB894' },
-  { id: 'buy', name: 'Купити', color: '#12A594' },
+  { id: 'todo', name: 'Завдання', color: '#0FB894' },
   { id: 'progress', name: 'В процесі', color: '#F5A524' },
   { id: 'events', name: 'Події', color: '#E5484D' },
-  { id: 'strategic', name: 'Стратегічні', color: '#8E4EC6' }
+  { id: 'buy', name: 'Купити', color: '#3D5AFE' }
 ];
 const KEY = 'planner.v1';
-let S = load();
+let S = load(); save();
 function load() {
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.boards)) return s; } catch (e) {}
-  return { boards: DEF_BOARDS.map(b => ({ ...b })), items: [], active: 'todo',
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.boards)) return migrate(s); } catch (e) {}
+  return { v: 2, boards: DEF_BOARDS.map(b => ({ ...b })), items: [], active: 'all',
     settings: { clientId: '', gConnected: false, autoSave: false, duration: 60 } };
 }
+function migrate(s) {
+  if (s.v >= 2) return s;
+  const t = s.boards.find(b => b.id === 'todo'); if (t && t.name === 'Зробити') t.name = 'Завдання';
+  const st = s.boards.find(b => b.id === 'strategic');
+  if (st && !s.items.some(i => i.boardId === 'strategic')) s.boards = s.boards.filter(b => b !== st);
+  const order = ['todo', 'progress', 'events', 'buy'];
+  s.boards = [...order.map(id => s.boards.find(b => b.id === id)).filter(Boolean), ...s.boards.filter(b => !order.includes(b.id))];
+  const buy = s.boards.find(b => b.id === 'buy'); if (buy && buy.color === '#12A594') buy.color = '#3D5AFE';
+  s.active = 'all'; s.v = 2; return s;
+}
+const curBoard = () => (S.active !== 'all' && board(S.active)) ? S.active : (S.boards[0] ? S.boards[0].id : null);
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const board = id => S.boards.find(b => b.id === id);
 
@@ -271,45 +295,141 @@ function parse(raw) {
 
   let title = t.replace(/\s+/g, ' ').replace(/\s(о|об|на|в|у|і|та)\s*$/i, ' ').replace(/^[\s,.:;-]+|[\s,.:;-]+$/g, '').trim();
   title = title.charAt(0).toUpperCase() + title.slice(1);
-  if (!boardId) boardId = (time && board('events')) ? 'events' : S.active;
+  if (!boardId) boardId = (time && board('events')) ? 'events' : curBoard();
   return { title: title || raw.trim(), date, time, boardId };
 }
 
 /* ---------- render ---------- */
 function render() {
-  if (!board(S.active)) S.active = S.boards[0] ? S.boards[0].id : null;
+  if (S.active !== 'all' && !board(S.active)) S.active = 'all';
   const d = new Date();
   $('#today').textContent = WDAYS[d.getDay()] + ', ' + d.getDate() + ' ' + MONTHS[d.getMonth()];
+  const openCount = id => S.items.filter(i => i.boardId === id && !i.done).length;
 
-  const tabs = $('#tabs'); tabs.innerHTML = '';
-  S.boards.forEach(b => {
-    const n = S.items.filter(i => i.boardId === b.id && !i.done).length;
-    const el = document.createElement('button');
-    el.className = 'tab' + (b.id === S.active ? ' on' : ''); el.style.setProperty('--c', b.color);
-    el.innerHTML = `<span class="dot"></span>${esc(b.name)}${n ? `<span class="cnt">${n}</span>` : ''}`;
-    el.onclick = () => { S.active = b.id; save(); render(); };
-    tabs.appendChild(el);
-  });
-  const add = document.createElement('button'); add.className = 'tab ghost'; add.textContent = 'Керувати дошками';
-  add.onclick = openBoards; tabs.appendChild(add);
+  const tabs = $('#tabs');
+  tabs.innerHTML = `<button class="tab${S.active === 'all' ? ' on' : ''}" data-v="all">Усі</button>` +
+    S.boards.map(b => { const n = openCount(b.id);
+      return `<button class="tab${b.id === S.active ? ' on' : ''}" data-v="${b.id}" data-id="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}${n ? `<span class="cnt">${n}</span>` : ''}</button>`; }).join('') +
+    `<button class="tab ghost plus" id="t-add" aria-label="Нова дошка">+</button><button class="tab ghost" id="t-edit">Змінити</button>`;
+  tabs.querySelectorAll('[data-v]').forEach(el => el.onclick = () => { if (!tabDragged) go(el.dataset.v); });
+  tabs.querySelectorAll('[data-id]').forEach(bindTabDrag);
+  $('#t-add').onclick = addBoardSheet; $('#t-edit').onclick = openBoards;
   const on = tabs.querySelector('.on'); if (on) on.scrollIntoView({ inline: 'nearest', block: 'nearest' });
 
   const list = $('#list');
-  const items = S.items.filter(i => i.boardId === S.active);
-  const open = items.filter(i => !i.done).sort((a, b) => {
+  if (!S.boards.length) { list.innerHTML = `<div class="empty"><b>Немає жодної дошки</b>Натисни «+», щоб створити першу.</div>`; return; }
+  const sortOpen = arr => arr.filter(i => !i.done).sort((a, b) => {
     if (a.date && b.date) return (a.date + (a.time || '99')).localeCompare(b.date + (b.time || '99'));
     if (a.date) return -1; if (b.date) return 1; return b.created - a.created;
   });
+
+  if (S.active === 'all') {
+    list.innerHTML = S.boards.map(b => {
+      const its = sortOpen(S.items.filter(i => i.boardId === b.id));
+      return `<section class="grp"><button class="grp-h" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}<span class="n">${its.length || ''}</span></button>
+        ${its.length ? its.map(row).join('') : '<div class="grp-empty">Порожньо</div>'}</section>`;
+    }).join('');
+    list.querySelectorAll('.grp-h').forEach(h => h.onclick = () => go(h.dataset.b, 1));
+    bindItems(list); return;
+  }
+
+  const items = S.items.filter(i => i.boardId === S.active);
+  const open = sortOpen(items);
   const done = items.filter(i => i.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
-  if (!S.boards.length) { list.innerHTML = `<div class="empty"><b>Немає жодної дошки</b>Натисни «Керувати дошками», щоб створити першу.</div>`; return; }
   if (!items.length) { list.innerHTML = `<div class="empty"><b>Тут порожньо</b>Натисни «Надиктувати» і скажи, що треба зробити.</div>`; return; }
   list.innerHTML = open.map(row).join('') +
     (done.length ? `<details class="donebox"><summary>Виконано · ${done.length}</summary>${done.map(row).join('')}</details>` : '');
-  list.querySelectorAll('.item').forEach(el => {
+  bindItems(list);
+}
+function go(v, dir) {
+  S.active = v; save(); render();
+  const l = $('#list'); l.scrollTop = 0;
+  if (dir && l.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+    l.animate([{ transform: `translateX(${dir * 28}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 180, easing: 'ease-out' });
+}
+let lpFired = false;
+function bindItems(root) {
+  root.querySelectorAll('.item').forEach(el => {
     const it = S.items.find(i => i.id === el.dataset.id);
-    el.querySelector('.chk').onclick = () => toggleDone(it);
-    el.querySelector('.body').onclick = () => openEdit(it);
+    el.querySelector('.chk').onclick = () => { if (lpFired) { lpFired = false; return; } toggleDone(it); };
+    el.querySelector('.body').onclick = () => { if (lpFired) { lpFired = false; return; } openEdit(it); };
+    longPress(el, () => openMove(it));
   });
+}
+function longPress(el, fn) {
+  let t = null, x = 0, y = 0;
+  el.addEventListener('pointerdown', e => { x = e.clientX; y = e.clientY; lpFired = false; clearTimeout(t);
+    t = setTimeout(() => { lpFired = true; if (navigator.vibrate) navigator.vibrate(15);
+      el.classList.add('lp'); setTimeout(() => el.classList.remove('lp'), 200); fn(); }, 480); });
+  el.addEventListener('pointermove', e => { if (Math.abs(e.clientX - x) > 10 || Math.abs(e.clientY - y) > 10) clearTimeout(t); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => el.addEventListener(ev, () => clearTimeout(t)));
+  el.addEventListener('contextmenu', e => e.preventDefault());
+}
+function openMove(it) {
+  openSheet(`<div class="sh-h"><h2>Перемістити</h2><button class="x" data-close aria-label="Закрити">✕</button></div>
+    <div class="mv-t">${esc(it.title)}</div>
+    <div class="chips big" id="mv">${S.boards.map(b => `<button class="chip${b.id === it.boardId ? ' on' : ''}" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}</button>`).join('')}</div>
+    <div class="acts"><button class="btn danger" id="mv-del">Видалити</button><button class="btn" id="mv-edit">Редагувати</button></div>`,
+  () => {
+    $('#mv').onclick = e => { const c = e.target.closest('.chip'); if (!c) return;
+      const from = it.boardId; it.boardId = c.dataset.b; save(); closeSheet(); render();
+      if (from !== it.boardId) toast('Переміщено в «' + board(it.boardId).name + '»', 'Повернути', () => { it.boardId = from; save(); render(); }); };
+    $('#mv-edit').onclick = () => openEdit(it);
+    $('#mv-del').onclick = () => deleteItem(it);
+  });
+}
+function deleteItem(it) {
+  const idx = S.items.indexOf(it); if (idx < 0) return;
+  S.items.splice(idx, 1); save(); closeSheet(); render();
+  let undone = false;
+  toast('Видалено', 'Повернути', () => { undone = true; S.items.splice(idx, 0, it); save(); render(); });
+  setTimeout(() => { if (!undone && it.gid) calDelete(it); }, 4800);
+}
+
+/* tab reorder: long press, then drag */
+let tabDragged = false;
+function bindTabDrag(el) {
+  let t = null, sx = 0, sy = 0, drag = false, base = 0;
+  const sib = d => { const s = d > 0 ? el.nextElementSibling : el.previousElementSibling; return s && s.dataset.id ? s : null; };
+  el.addEventListener('touchstart', e => { const p = e.touches[0]; sx = p.clientX; sy = p.clientY; drag = false; tabDragged = false; clearTimeout(t);
+    t = setTimeout(() => { drag = true; tabDragged = true; base = sx; el.classList.add('drag'); if (navigator.vibrate) navigator.vibrate(15); }, 420); }, { passive: true });
+  el.addEventListener('touchmove', e => {
+    const p = e.touches[0];
+    if (!drag) { if (Math.abs(p.clientX - sx) > 8 || Math.abs(p.clientY - sy) > 8) clearTimeout(t); return; }
+    e.preventDefault();
+    let dx = p.clientX - base; const nx = sib(1), pv = sib(-1);
+    if (nx && dx > nx.offsetWidth / 2) { el.parentNode.insertBefore(nx, el); base += nx.offsetWidth + 8; dx = p.clientX - base; }
+    else if (pv && dx < -pv.offsetWidth / 2) { el.parentNode.insertBefore(el, pv); base -= pv.offsetWidth + 8; dx = p.clientX - base; }
+    el.style.transform = `translateX(${dx}px)`;
+  }, { passive: false });
+  const end = () => { clearTimeout(t); if (!drag) return; drag = false;
+    const ids = [...$('#tabs').querySelectorAll('[data-id]')].map(x => x.dataset.id);
+    S.boards.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id)); save(); render();
+    setTimeout(() => { tabDragged = false; }, 60); };
+  el.addEventListener('touchend', end); el.addEventListener('touchcancel', end);
+  el.addEventListener('contextmenu', e => e.preventDefault());
+}
+
+/* swipe between boards */
+(() => {
+  let sx = 0, sy = 0, ok = false; const m = $('#list');
+  m.addEventListener('touchstart', e => { ok = e.touches.length === 1; if (ok) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; } }, { passive: true });
+  m.addEventListener('touchend', e => {
+    if (!ok || lpFired) return; ok = false;
+    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
+    const views = ['all', ...S.boards.map(b => b.id)]; const i = views.indexOf(S.active) + (dx < 0 ? 1 : -1);
+    if (i >= 0 && i < views.length) go(views[i], dx < 0 ? 1 : -1);
+  }, { passive: true });
+})();
+
+function addBoardSheet() {
+  openSheet(`<div class="sh-h"><h2>Нова дошка</h2><button class="x" data-close aria-label="Закрити">✕</button></div>
+    <input type="text" id="nb" placeholder="Назва дошки"><div class="acts"><button class="btn primary" id="nb-save">Створити</button></div>`,
+  () => { const i = $('#nb'); setTimeout(() => i.focus(), 250);
+    const mk = () => { const v = i.value.trim(); if (!v) { i.focus(); return; }
+      const nb = { id: uid(), name: v, color: COLORS[S.boards.length % COLORS.length] }; S.boards.push(nb); save(); closeSheet(); go(nb.id); };
+    $('#nb-save').onclick = mk; i.onkeydown = e => { if (e.key === 'Enter') mk(); }; });
 }
 function row(i) {
   let meta = '';
@@ -346,7 +466,7 @@ function toast(msg, action, fn) {
 /* ---------- edit ---------- */
 function openEdit(it, pre) {
   const isNew = !it;
-  const d = it ? { ...it } : { boardId: S.active, title: '', date: null, time: null, cal: false, ...(pre || {}) };
+  const d = it ? { ...it } : { boardId: curBoard(), title: '', date: null, time: null, cal: false, ...(pre || {}) };
   if (isNew && pre) d.cal = !!(d.date && (d.time || d.boardId === 'events'));
   openSheet(`
     <div class="sh-h"><h2>${isNew ? 'Нове завдання' : 'Завдання'}</h2><button class="x" data-close aria-label="Закрити">✕</button></div>
@@ -377,12 +497,7 @@ function openEdit(it, pre) {
       if (!it) S.items.push(rec);
       save(); closeSheet(); render(); afterSave(rec, true);
     };
-    if (!isNew) $('#f-del').onclick = () => {
-      const idx = S.items.indexOf(it); S.items.splice(idx, 1); save(); closeSheet(); render();
-      let undone = false;
-      toast('Видалено', 'Повернути', () => { undone = true; S.items.splice(idx, 0, it); save(); render(); });
-      setTimeout(() => { if (!undone && it.gid) calDelete(it); }, 4800);
-    };
+    if (!isNew) $('#f-del').onclick = () => deleteItem(it);
   });
 }
 function afterSave(rec, gesture) {
@@ -397,14 +512,18 @@ function openBoards() {
     <div id="b-list">${S.boards.map(b => `<div class="brow" data-id="${b.id}">
       <button class="swatch" style="--c:${b.color}" aria-label="Змінити колір"></button>
       <input type="text" value="${esc(b.name)}" aria-label="Назва дошки">
+      <button class="mvb" data-d="-1" aria-label="Вище" ${S.boards[0] === b ? 'disabled' : ''}>↑</button>
+      <button class="mvb" data-d="1" aria-label="Нижче" ${S.boards[S.boards.length - 1] === b ? 'disabled' : ''}>↓</button>
       <button class="del" aria-label="Видалити дошку">${ICON_TRASH}</button></div>`).join('')}</div>
     <div class="brow" style="margin-top:14px"><input type="text" id="b-new" placeholder="Нова дошка"><button class="btn primary small" id="b-add">Додати</button></div>
-    <div class="note">Торкнись кольорового кола, щоб змінити колір.</div>`,
+    <div class="note">Торкнись кольорового кола, щоб змінити колір. Порядок можна міняти стрілками або довгим натиском на дошку вгорі.</div>`,
   () => {
     $('#b-list').querySelectorAll('.brow').forEach(r => {
       const b = board(r.dataset.id);
       r.querySelector('.swatch').onclick = () => { b.color = COLORS[(COLORS.indexOf(b.color) + 1) % COLORS.length]; save(); render(); draw(); };
       r.querySelector('input').onchange = e => { const v = e.target.value.trim(); if (v) { b.name = v; save(); render(); } else e.target.value = b.name; };
+      r.querySelectorAll('.mvb').forEach(x => x.onclick = () => { const i = S.boards.indexOf(b), j = i + +x.dataset.d;
+        if (j < 0 || j >= S.boards.length) return; [S.boards[i], S.boards[j]] = [S.boards[j], S.boards[i]]; save(); render(); draw(); });
       r.querySelector('.del').onclick = () => {
         const n = S.items.filter(i => i.boardId === b.id).length;
         if (!confirm(`Видалити дошку «${b.name}»${n ? ` разом із ${n} завдан${n === 1 ? 'ням' : 'нями'}` : ''}?`)) return;
@@ -414,7 +533,7 @@ function openBoards() {
       };
     });
     const addB = () => { const v = $('#b-new').value.trim(); if (!v) return;
-      const nb = { id: uid(), name: v, color: COLORS[S.boards.length % COLORS.length] }; S.boards.push(nb); S.active = nb.id; save(); render(); draw(); };
+      const nb = { id: uid(), name: v, color: COLORS[S.boards.length % COLORS.length] }; S.boards.push(nb); save(); render(); draw(); };
     $('#b-add').onclick = addB; $('#b-new').onkeydown = e => { if (e.key === 'Enter') addB(); };
   });
   draw();
@@ -570,7 +689,7 @@ function startVoice() {
     const p = parse(text);
     if (S.settings.autoSave) {
       const it = { id: uid(), created: Date.now(), done: false, ...p, cal: !!(p.date && (p.time || p.boardId === 'events')) };
-      S.items.push(it); S.active = it.boardId; save(); render(); afterSave(it, false);
+      S.items.push(it); if (S.active !== 'all') S.active = it.boardId; save(); render(); afterSave(it, false);
       toast('Додано в «' + board(it.boardId).name + '»', 'Змінити', () => openEdit(it));
     } else openEdit(null, p);
   };
