@@ -150,6 +150,14 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
 .chips.big .chip{height:48px;padding:0 18px;font-size:16px}
 .mvb{width:34px;height:38px;border-radius:999px;background:var(--bg);flex:none;font-weight:800}
 .mvb:disabled{opacity:.3}
+.pal{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:6px}
+.sw{aspect-ratio:1;border-radius:50%;background:var(--c);position:relative;border:3px solid var(--surface);box-shadow:0 0 0 1.5px var(--line);cursor:pointer}
+.sw.on{box-shadow:0 0 0 3px var(--ink)}
+.sw.custom{background:conic-gradient(#E5484D,#F5A524,#FFD60A,#30A46C,#0091FF,#8E4EC6,#E5484D);display:grid;place-items:center;overflow:hidden}
+.sw.custom.on{background:var(--c)}
+.sw.custom::after{content:"+";color:#fff;font-weight:800;font-size:18px;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.sw.custom input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+#list{touch-action:pan-y;will-change:transform}
 </style>
 </head>
 <body>
@@ -195,7 +203,27 @@ const ICON_CAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const ICON_TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
 
 /* ---------- state ---------- */
-const COLORS = ['#0FB894', '#3D5AFE', '#12A594', '#F5A524', '#E5484D', '#8E4EC6', '#0091FF', '#6B7488'];
+const COLORS = [
+  '#E5484D','#FF6B6B','#F76B8A','#E93D82','#D6409F','#AB4ABA',
+  '#8E4EC6','#6E56CF','#5B5BD6','#3D5AFE','#0091FF','#0EA5E9',
+  '#05A2C2','#12A594','#0FB894','#2EE6BE','#30A46C','#46A758',
+  '#84CC16','#BDEE63','#FFD60A','#F5A524','#F76808','#E54D2E',
+  '#AD7F58','#978365','#8D8D86','#6B7488','#475569','#1F2937',
+  '#FDA4AF','#C4B5FD','#93C5FD','#99F6E4','#FDE68A','#FDBA74'
+];
+const nextColor = () => COLORS.find(c => !S.boards.some(b => b.color.toLowerCase() === c.toLowerCase())) || COLORS[S.boards.length % COLORS.length];
+function paletteHTML(sel) {
+  const s = (sel || '').toLowerCase(); const custom = s && !COLORS.some(c => c.toLowerCase() === s);
+  return `<div class="pal">${COLORS.map(c => `<button class="sw${c.toLowerCase() === s ? ' on' : ''}" data-c="${c}" style="--c:${c}" aria-label="Колір ${c}"></button>`).join('')}
+    <label class="sw custom${custom ? ' on' : ''}" style="--c:${custom ? sel : 'transparent'}" aria-label="Свій колір"><input type="color" value="${custom ? sel : '#0FB894'}"></label></div>`;
+}
+function bindPalette(root, onPick) {
+  const pal = root.querySelector('.pal');
+  const mark = el => pal.querySelectorAll('.sw').forEach(x => x.classList.toggle('on', x === el));
+  pal.querySelectorAll('button.sw').forEach(b => b.onclick = () => { mark(b); onPick(b.dataset.c); });
+  const cu = pal.querySelector('.custom'), inp = cu.querySelector('input');
+  inp.oninput = () => { cu.style.setProperty('--c', inp.value); mark(cu); onPick(inp.value); };
+}
 const DEF_BOARDS = [
   { id: 'todo', name: 'Завдання', color: '#0FB894' },
   { id: 'progress', name: 'В процесі', color: '#F5A524' },
@@ -313,7 +341,7 @@ function render() {
     `<button class="tab ghost plus" id="t-add" aria-label="Нова дошка">+</button><button class="tab ghost" id="t-edit">Змінити</button>`;
   tabs.querySelectorAll('[data-v]').forEach(el => el.onclick = () => { if (!tabDragged) go(el.dataset.v); });
   tabs.querySelectorAll('[data-id]').forEach(bindTabDrag);
-  $('#t-add').onclick = addBoardSheet; $('#t-edit').onclick = openBoards;
+  $('#t-add').onclick = () => addBoardSheet(); $('#t-edit').onclick = openBoards;
   const on = tabs.querySelector('.on'); if (on) on.scrollIntoView({ inline: 'nearest', block: 'nearest' });
 
   const list = $('#list');
@@ -341,11 +369,21 @@ function render() {
     (done.length ? `<details class="donebox"><summary>Виконано · ${done.length}</summary>${done.map(row).join('')}</details>` : '');
   bindItems(list);
 }
+const views = () => ['all', ...S.boards.map(b => b.id)];
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const EASE = 'cubic-bezier(.2,.8,.2,1)';
+function slideIn(dir) {
+  const l = $('#list'); if (!dir || reduceMotion()) { l.style.transition = 'none'; l.style.transform = ''; l.style.opacity = ''; return; }
+  const w = l.clientWidth;
+  l.style.transition = 'none'; l.style.transform = `translateX(${dir * w * 0.35}px)`; l.style.opacity = '0';
+  l.getBoundingClientRect();
+  l.style.transition = `transform 240ms ${EASE}, opacity 180ms ease-out`; l.style.transform = 'translateX(0)'; l.style.opacity = '1';
+}
 function go(v, dir) {
+  if (dir === undefined) { const vs = views(); dir = Math.sign(vs.indexOf(v) - vs.indexOf(S.active)); }
   S.active = v; save(); render();
-  const l = $('#list'); l.scrollTop = 0;
-  if (dir && l.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches)
-    l.animate([{ transform: `translateX(${dir * 28}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 180, easing: 'ease-out' });
+  $('#list').scrollTop = 0; slideIn(dir);
+  const on = $('#tabs .on'); if (on) on.scrollIntoView({ inline: 'center', block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
 }
 let lpFired = false;
 function bindItems(root) {
@@ -410,25 +448,51 @@ function bindTabDrag(el) {
   el.addEventListener('contextmenu', e => e.preventDefault());
 }
 
-/* swipe between boards */
+/* swipe between boards: content follows the finger, then snaps */
 (() => {
-  let sx = 0, sy = 0, ok = false; const m = $('#list');
-  m.addEventListener('touchstart', e => { ok = e.touches.length === 1; if (ok) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; } }, { passive: true });
-  m.addEventListener('touchend', e => {
-    if (!ok || lpFired) return; ok = false;
-    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
-    if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
-    const views = ['all', ...S.boards.map(b => b.id)]; const i = views.indexOf(S.active) + (dx < 0 ? 1 : -1);
-    if (i >= 0 && i < views.length) go(views[i], dx < 0 ? 1 : -1);
+  const m = $('#list');
+  let sx = 0, sy = 0, dx = 0, mode = null, on = false, busy = false, px = 0, pt = 0, vel = 0;
+  const set = (x, t) => { m.style.transition = t || 'none'; m.style.transform = x ? `translateX(${x}px)` : 'translateX(0)';
+    m.style.opacity = String(1 - Math.min(Math.abs(x) / m.clientWidth, 1) * 0.5); };
+  const back = () => set(0, `transform 220ms ${EASE}, opacity 220ms ${EASE}`);
+  m.addEventListener('touchstart', e => {
+    on = e.touches.length === 1 && !busy; if (!on) return;
+    sx = px = e.touches[0].clientX; sy = e.touches[0].clientY; pt = performance.now(); dx = 0; vel = 0; mode = null;
   }, { passive: true });
+  m.addEventListener('touchmove', e => {
+    if (!on) return; const x = e.touches[0].clientX, y = e.touches[0].clientY;
+    if (!mode) {
+      if (Math.abs(x - sx) > 10 && Math.abs(x - sx) > Math.abs(y - sy) * 1.2) { mode = 'h'; sx = x; px = x; }
+      else if (Math.abs(y - sy) > 10) { mode = 'v'; on = false; }
+      return;
+    }
+    if (lpFired) { on = false; back(); return; }
+    const now = performance.now(); if (now > pt) vel = 0.7 * ((x - px) / (now - pt)) + 0.3 * vel; px = x; pt = now;
+    const vs = views(), i = vs.indexOf(S.active); dx = x - sx;
+    if ((dx > 0 && i === 0) || (dx < 0 && i === vs.length - 1)) dx *= 0.25;
+    set(dx);
+  }, { passive: true });
+  const end = () => {
+    if (!on || mode !== 'h') { on = false; return; } on = false;
+    const vs = views(), dir = dx < 0 ? 1 : -1, j = vs.indexOf(S.active) + dir, w = m.clientWidth;
+    const fling = Math.abs(vel) > 0.35 && Math.sign(vel) === -dir && Math.abs(dx) > 24;
+    if (j < 0 || j >= vs.length || !(Math.abs(dx) > w * 0.28 || fling)) { back(); return; }
+    busy = true;
+    const dur = Math.max(90, Math.min(170, (w - Math.abs(dx)) / Math.max(Math.abs(vel), 1.2)));
+    set(-dir * w, `transform ${dur}ms cubic-bezier(.3,.6,.4,1), opacity ${dur}ms linear`);
+    setTimeout(() => { go(vs[j], dir); busy = false; }, dur);
+  };
+  m.addEventListener('touchend', end); m.addEventListener('touchcancel', () => { if (on && mode === 'h') back(); on = false; });
 })();
 
-function addBoardSheet() {
+function addBoardSheet(back) {
+  let color = nextColor();
   openSheet(`<div class="sh-h"><h2>Нова дошка</h2><button class="x" data-close aria-label="Закрити">✕</button></div>
-    <input type="text" id="nb" placeholder="Назва дошки"><div class="acts"><button class="btn primary" id="nb-save">Створити</button></div>`,
-  () => { const i = $('#nb'); setTimeout(() => i.focus(), 250);
+    <input type="text" id="nb" placeholder="Назва дошки"><div class="lbl">Колір</div>${paletteHTML(color)}
+    <div class="acts"><button class="btn primary" id="nb-save">Створити</button></div>`,
+  () => { const i = $('#nb'); bindPalette($('#sheet-c'), c => { color = c; });
     const mk = () => { const v = i.value.trim(); if (!v) { i.focus(); return; }
-      const nb = { id: uid(), name: v, color: COLORS[S.boards.length % COLORS.length] }; S.boards.push(nb); save(); closeSheet(); go(nb.id); };
+      const nb = { id: uid(), name: v, color }; S.boards.push(nb); save(); closeSheet(); if (back) back(); else go(nb.id); };
     $('#nb-save').onclick = mk; i.onkeydown = e => { if (e.key === 'Enter') mk(); }; });
 }
 function row(i) {
@@ -515,12 +579,12 @@ function openBoards() {
       <button class="mvb" data-d="-1" aria-label="Вище" ${S.boards[0] === b ? 'disabled' : ''}>↑</button>
       <button class="mvb" data-d="1" aria-label="Нижче" ${S.boards[S.boards.length - 1] === b ? 'disabled' : ''}>↓</button>
       <button class="del" aria-label="Видалити дошку">${ICON_TRASH}</button></div>`).join('')}</div>
-    <div class="brow" style="margin-top:14px"><input type="text" id="b-new" placeholder="Нова дошка"><button class="btn primary small" id="b-add">Додати</button></div>
-    <div class="note">Торкнись кольорового кола, щоб змінити колір. Порядок можна міняти стрілками або довгим натиском на дошку вгорі.</div>`,
+    <div class="acts" style="margin-top:14px"><button class="btn" id="b-add">+ Нова дошка</button></div>
+    <div class="note">Торкнись кольорового кола, щоб вибрати колір. Порядок можна міняти стрілками або довгим натиском на дошку вгорі.</div>`,
   () => {
     $('#b-list').querySelectorAll('.brow').forEach(r => {
       const b = board(r.dataset.id);
-      r.querySelector('.swatch').onclick = () => { b.color = COLORS[(COLORS.indexOf(b.color) + 1) % COLORS.length]; save(); render(); draw(); };
+      r.querySelector('.swatch').onclick = () => openColor(b, draw);
       r.querySelector('input').onchange = e => { const v = e.target.value.trim(); if (v) { b.name = v; save(); render(); } else e.target.value = b.name; };
       r.querySelectorAll('.mvb').forEach(x => x.onclick = () => { const i = S.boards.indexOf(b), j = i + +x.dataset.d;
         if (j < 0 || j >= S.boards.length) return; [S.boards[i], S.boards[j]] = [S.boards[j], S.boards[i]]; save(); render(); draw(); });
@@ -532,11 +596,16 @@ function openBoards() {
         save(); render(); draw();
       };
     });
-    const addB = () => { const v = $('#b-new').value.trim(); if (!v) return;
-      const nb = { id: uid(), name: v, color: COLORS[S.boards.length % COLORS.length] }; S.boards.push(nb); save(); render(); draw(); };
-    $('#b-add').onclick = addB; $('#b-new').onkeydown = e => { if (e.key === 'Enter') addB(); };
+    $('#b-add').onclick = () => addBoardSheet(() => { render(); draw(); });
   });
   draw();
+}
+
+function openColor(b, back) {
+  openSheet(`<div class="sh-h"><h2>Колір: ${esc(b.name)}</h2><button class="x" id="c-back" aria-label="Назад">✕</button></div>
+    ${paletteHTML(b.color)}<div class="acts"><button class="btn primary" id="c-ok">Готово</button></div>`,
+  () => { bindPalette($('#sheet-c'), c => { b.color = c; save(); render(); });
+    $('#c-ok').onclick = $('#c-back').onclick = () => back(); });
 }
 
 /* ---------- settings ---------- */
