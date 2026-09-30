@@ -52,7 +52,7 @@ header .sub{color:var(--muted);font-size:14px;font-weight:500;margin-top:4px}
 
 main{flex:1;overflow-y:auto;padding:4px 16px 150px}
 .item{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border-radius:20px;padding:14px 14px 14px 12px;margin:8px 0}
-.chk{flex:none;width:28px;height:28px;border-radius:999px;border:2px solid var(--line);display:grid;place-items:center;margin-top:-1px}
+.chk{flex:none;width:28px;height:28px;padding:0;border-radius:999px;border:2px solid var(--line);display:grid;place-items:center;margin-top:-1px}
 .chk svg{width:16px;height:16px;opacity:0}
 .item.done .chk{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .item.done .chk svg{opacity:1}
@@ -158,6 +158,10 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
 .sw.custom::after{content:"+";color:#fff;font-weight:800;font-size:18px;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 .sw.custom input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
 #list{touch-action:pan-y;will-change:transform}
+.done-acts{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 6px 4px;font-size:13px;color:var(--muted)}
+.clear-done{color:var(--rec);font-weight:700;font-size:14px;padding:8px 0}
+.all-clear{display:block;margin:4px auto 0;padding:10px 18px;border-radius:999px;background:var(--surface);color:var(--rec);font-weight:700;font-size:14px}
+.item.swiping{transition:none}
 </style>
 </head>
 <body>
@@ -357,7 +361,10 @@ function render() {
       return `<section class="grp"><button class="grp-h" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}<span class="n">${its.length || ''}</span></button>
         ${its.length ? its.map(row).join('') : '<div class="grp-empty">Порожньо</div>'}</section>`;
     }).join('');
+    const allDone = S.items.filter(i => i.done && board(i.boardId));
+    if (allDone.length) list.insertAdjacentHTML('beforeend', `<button class="all-clear" id="all-clear">Видалити всі виконані · ${allDone.length}</button>`);
     list.querySelectorAll('.grp-h').forEach(h => h.onclick = () => go(h.dataset.b, 1));
+    if (allDone.length) $('#all-clear').onclick = () => removeItems(allDone, `Видалено виконаних: ${allDone.length}`);
     bindItems(list); return;
   }
 
@@ -366,8 +373,12 @@ function render() {
   const done = items.filter(i => i.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
   if (!items.length) { list.innerHTML = `<div class="empty"><b>Тут порожньо</b>Натисни «Надиктувати» і скажи, що треба зробити.</div>`; return; }
   list.innerHTML = open.map(row).join('') +
-    (done.length ? `<details class="donebox"><summary>Виконано · ${done.length}</summary>${done.map(row).join('')}</details>` : '');
+    (done.length ? `<details class="donebox"${doneOpen ? ' open' : ''}><summary>Виконано · ${done.length}</summary>
+      <div class="done-acts"><span>Свайп убік видаляє</span><button class="clear-done">Видалити всі виконані</button></div>${done.map(row).join('')}</details>` : '');
   bindItems(list);
+  const db = list.querySelector('.donebox');
+  if (db) { db.ontoggle = () => { doneOpen = db.open; };
+    db.querySelector('.clear-done').onclick = () => removeItems(done, `Видалено виконаних: ${done.length}`); }
 }
 const views = () => ['all', ...S.boards.map(b => b.id)];
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -385,7 +396,12 @@ function go(v, dir) {
   $('#list').scrollTop = 0; slideIn(dir);
   const on = $('#tabs .on'); if (on) on.scrollIntoView({ inline: 'center', block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
 }
-let lpFired = false;
+let lpFired = false, doneOpen = false;
+function removeItems(arr, msg) {
+  if (!arr.length) return;
+  S.items = S.items.filter(i => !arr.includes(i)); save(); render();
+  toast(msg, 'Повернути', () => { S.items.push(...arr.filter(i => !S.items.includes(i))); save(); render(); });
+}
 function bindItems(root) {
   root.querySelectorAll('.item').forEach(el => {
     const it = S.items.find(i => i.id === el.dataset.id);
@@ -451,13 +467,14 @@ function bindTabDrag(el) {
 /* swipe between boards: content follows the finger, then snaps */
 (() => {
   const m = $('#list');
-  let sx = 0, sy = 0, dx = 0, mode = null, on = false, busy = false, px = 0, pt = 0, vel = 0;
+  let sx = 0, sy = 0, dx = 0, mode = null, on = false, busy = false, px = 0, pt = 0, vel = 0, tgt = null;
   const set = (x, t) => { m.style.transition = t || 'none'; m.style.transform = x ? `translateX(${x}px)` : 'translateX(0)';
     m.style.opacity = String(1 - Math.min(Math.abs(x) / m.clientWidth, 1) * 0.5); };
   const back = () => set(0, `transform 220ms ${EASE}, opacity 220ms ${EASE}`);
   m.addEventListener('touchstart', e => {
     on = e.touches.length === 1 && !busy; if (!on) return;
     sx = px = e.touches[0].clientX; sy = e.touches[0].clientY; pt = performance.now(); dx = 0; vel = 0; mode = null;
+    tgt = e.target.closest('.item.done');
   }, { passive: true });
   m.addEventListener('touchmove', e => {
     if (!on) return; const x = e.touches[0].clientX, y = e.touches[0].clientY;
@@ -468,12 +485,16 @@ function bindTabDrag(el) {
     }
     if (lpFired) { on = false; back(); return; }
     const now = performance.now(); if (now > pt) vel = 0.7 * ((x - px) / (now - pt)) + 0.3 * vel; px = x; pt = now;
-    const vs = views(), i = vs.indexOf(S.active); dx = x - sx;
+    dx = x - sx;
+    if (tgt) { tgt.classList.add('swiping'); tgt.style.transform = `translateX(${dx}px)`;
+      tgt.style.opacity = String(1 - Math.min(Math.abs(dx) / tgt.offsetWidth, 1) * 0.7); return; }
+    const vs = views(), i = vs.indexOf(S.active);
     if ((dx > 0 && i === 0) || (dx < 0 && i === vs.length - 1)) dx *= 0.25;
     set(dx);
   }, { passive: true });
   const end = () => {
     if (!on || mode !== 'h') { on = false; return; } on = false;
+    if (tgt) { swipeItemEnd(tgt, dx, vel); tgt = null; return; }
     const vs = views(), dir = dx < 0 ? 1 : -1, j = vs.indexOf(S.active) + dir, w = m.clientWidth;
     const fling = Math.abs(vel) > 0.35 && Math.sign(vel) === -dir && Math.abs(dx) > 24;
     if (j < 0 || j >= vs.length || !(Math.abs(dx) > w * 0.28 || fling)) { back(); return; }
@@ -482,7 +503,24 @@ function bindTabDrag(el) {
     set(-dir * w, `transform ${dur}ms cubic-bezier(.3,.6,.4,1), opacity ${dur}ms linear`);
     setTimeout(() => { go(vs[j], dir); busy = false; }, dur);
   };
-  m.addEventListener('touchend', end); m.addEventListener('touchcancel', () => { if (on && mode === 'h') back(); on = false; });
+  m.addEventListener('touchend', end);
+  m.addEventListener('touchcancel', () => { if (on && mode === 'h') { if (tgt) swipeItemEnd(tgt, 0, 0); else back(); } on = false; tgt = null; });
+  function swipeItemEnd(el, dx, vel) {
+    const w = el.offsetWidth, fling = Math.abs(vel) > 0.4 && Math.sign(vel) === Math.sign(dx) && Math.abs(dx) > 30;
+    el.classList.remove('swiping');
+    if (!(Math.abs(dx) > w * 0.35 || fling)) {
+      el.style.transition = `transform 220ms ${EASE}, opacity 220ms ${EASE}`; el.style.transform = ''; el.style.opacity = ''; return;
+    }
+    const it = S.items.find(i => i.id === el.dataset.id);
+    el.style.transition = 'transform 150ms ease-out, opacity 150ms linear';
+    el.style.transform = `translateX(${Math.sign(dx) * w}px)`; el.style.opacity = '0';
+    setTimeout(() => {
+      el.style.height = el.offsetHeight + 'px'; el.getBoundingClientRect();
+      el.style.transition = 'height 160ms ease-out, margin 160ms ease-out, padding 160ms ease-out';
+      el.style.height = '0'; el.style.margin = '0'; el.style.paddingTop = el.style.paddingBottom = '0'; el.style.overflow = 'hidden';
+      setTimeout(() => { if (it) removeItems([it], 'Видалено'); }, 160);
+    }, 150);
+  }
 })();
 
 function addBoardSheet(back) {
@@ -631,6 +669,7 @@ function openSettings() {
       <li>У Authorized JavaScript origins додай адресу, де відкритий цей додаток: <b>${esc(location.origin)}</b></li>
       <li>Скопіюй Client ID сюди й натисни «Підключити».</li></ol></details>
     <hr>
+    <button class="btn danger" id="s-clear" style="width:100%;margin-bottom:10px">Видалити всі виконані (${S.items.filter(i => i.done).length})</button>
     <div class="acts" style="margin-top:0"><button class="btn" id="s-exp">Експорт</button><button class="btn" id="s-imp">Імпорт</button></div>
     <input type="file" id="s-file" accept="application/json" hidden>`,
   () => {
@@ -645,6 +684,8 @@ function openSettings() {
       } catch (e) { toast('Не вдалося підключитися: ' + e.message); }
     };
     if ($('#s-off')) $('#s-off').onclick = () => { st.gConnected = false; token = null; save(); openSettings(); };
+    $('#s-clear').onclick = () => { const d = S.items.filter(i => i.done); if (!d.length) { toast('Виконаних завдань немає'); return; }
+      closeSheet(); removeItems(d, `Видалено виконаних: ${d.length}`); };
     $('#s-exp').onclick = () => {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([JSON.stringify({ boards: S.boards, items: S.items }, null, 2)], { type: 'application/json' }));
