@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F4F9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141824" media="(prefers-color-scheme: dark)">
+<title>Planner</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F4F9; --surface:#FFFFFF; --ink:#172033; --muted:#6B7488; --line:#E1E5EE;
+  --accent:#0FB894; --accent-ink:#04211B; --rec:#E5484D; --warn:#D9480F;
+  --shadow:0 8px 28px rgba(23,32,51,.10);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#141824; --surface:#1E2433; --ink:#EEF1F8; --muted:#98A1B6; --line:#2C3346;
+    --accent:#2EE6BE; --shadow:0 8px 28px rgba(0,0,0,.35); }
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.app{max-width:640px;margin:0 auto;height:100%;display:flex;flex-direction:column}
+header{display:flex;align-items:flex-end;justify-content:space-between;padding:18px 20px 6px}
+header h1{font-size:28px;line-height:1.1;font-weight:800;letter-spacing:-.02em;margin:0}
+header .sub{color:var(--muted);font-size:14px;font-weight:500;margin-top:4px}
+.icon-btn{width:44px;height:44px;border-radius:999px;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow)}
+.icon-btn svg{width:22px;height:22px}
+
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:14px 20px 10px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:999px;
+  background:var(--surface);font-weight:600;font-size:15px;white-space:nowrap;border:1.5px solid transparent}
+.tab .dot,.chip .dot{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.tab.on{background:var(--ink);color:var(--bg)}
+.tab .cnt{font-size:12px;font-weight:700;min-width:20px;height:20px;padding:0 6px;border-radius:999px;display:grid;place-items:center;
+  background:var(--bg);color:var(--ink)}
+.tab.ghost{background:transparent;border-color:var(--line);color:var(--muted)}
+
+main{flex:1;overflow-y:auto;padding:4px 16px 150px}
+.item{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border-radius:20px;padding:14px 14px 14px 12px;margin:8px 0}
+.chk{flex:none;width:28px;height:28px;border-radius:999px;border:2px solid var(--line);display:grid;place-items:center;margin-top:-1px}
+.chk svg{width:16px;height:16px;opacity:0}
+.item.done .chk{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.item.done .chk svg{opacity:1}
+.item.done .t{text-decoration:line-through;color:var(--muted)}
+.body{flex:1;min-width:0;text-align:left}
+.t{font-weight:600;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pill{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--bg);color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+.pill.late{color:var(--warn)}
+.pill.today{color:var(--accent)}
+.pill svg{width:13px;height:13px}
+.empty{text-align:center;color:var(--muted);padding:56px 24px;max-width:34ch;margin:0 auto}
+.empty b{display:block;color:var(--ink);font-size:18px;margin-bottom:6px}
+details.donebox{margin-top:18px}
+details.donebox summary{list-style:none;color:var(--muted);font-weight:600;padding:8px 6px;cursor:pointer}
+details.donebox summary::-webkit-details-marker{display:none}
+
+.dock{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(to top,var(--bg) 70%,transparent)}
+.dock-in{max-width:608px;margin:0 auto;display:flex;gap:10px}
+.mic{flex:1;height:64px;border-radius:999px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;gap:12px;
+  font-size:18px;font-weight:700;box-shadow:0 10px 30px rgba(15,184,148,.35)}
+.mic svg{width:26px;height:26px}
+.mic:active{transform:scale(.98)}
+.type{width:64px;height:64px;border-radius:999px;background:var(--surface);display:grid;place-items:center;box-shadow:var(--shadow)}
+.type svg{width:24px;height:24px}
+
+/* voice overlay */
+.voice{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;z-index:30;text-align:center}
+.voice.show{display:flex}
+.ring{width:132px;height:132px;border-radius:50%;background:var(--rec);display:grid;place-items:center;color:#fff;position:relative}
+.ring svg{width:48px;height:48px}
+.ring::before,.ring::after{content:"";position:absolute;inset:0;border-radius:50%;border:3px solid var(--rec);animation:pulse 1.6s ease-out infinite}
+.ring::after{animation-delay:.8s}
+@keyframes pulse{from{transform:scale(1);opacity:.6}to{transform:scale(1.7);opacity:0}}
+@media (prefers-reduced-motion: reduce){.ring::before,.ring::after{animation:none;opacity:0}}
+.vtext{font-size:24px;font-weight:700;line-height:1.3;margin:40px 0 12px;min-height:3.9em;max-width:22ch;overflow-wrap:anywhere}
+.vhint{color:var(--muted);font-size:14px;max-width:32ch}
+.vacts{display:flex;gap:10px;margin-top:36px;width:100%;max-width:360px}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(10,14,24,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+.scrim.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;transform:translateY(105%);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.sheet.show{transform:none}
+.panel{max-width:640px;margin:0 auto;background:var(--surface);border-radius:28px 28px 0 0;padding:10px 20px calc(20px + env(safe-area-inset-bottom,0px));
+  max-height:88vh;overflow-y:auto}
+.grab{width:40px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 12px}
+.sh-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sh-h h2{margin:0;font-size:20px;font-weight:800}
+.x{width:36px;height:36px;border-radius:999px;background:var(--bg);font-size:15px}
+textarea,input[type=text],input[type=date],input[type=time],select{width:100%;border:1.5px solid var(--line);background:var(--bg);border-radius:18px;padding:12px 14px;font-size:16px}
+textarea{resize:none;font-weight:600;font-size:18px}
+.lbl{font-size:13px;font-weight:700;color:var(--muted);margin:16px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:999px;background:var(--bg);font-weight:600;font-size:14px;border:1.5px solid transparent}
+.chip.on{border-color:var(--c);background:var(--surface)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.fld span{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.tgl{display:flex;align-items:center;gap:12px;margin-top:16px;font-weight:600;cursor:pointer}
+.tgl input{width:22px;height:22px;accent-color:var(--accent)}
+.acts{display:flex;gap:10px;margin-top:22px}
+.btn{height:52px;padding:0 20px;border-radius:999px;font-weight:700;background:var(--bg);flex:1}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--rec);flex:0 0 auto}
+.btn.small{height:40px;flex:0 0 auto;padding:0 16px;font-size:14px}
+.link{color:var(--accent);font-weight:700;padding:8px 0}
+.note{font-size:13.5px;color:var(--muted);margin-top:8px}
+.note ol{padding-left:20px;margin:6px 0}
+.brow{display:flex;align-items:center;gap:8px;margin:8px 0}
+.brow input{flex:1;padding:10px 14px}
+.swatch{width:38px;height:38px;border-radius:999px;flex:none;background:var(--c);border:3px solid var(--surface);box-shadow:0 0 0 1.5px var(--line)}
+.del{width:38px;height:38px;border-radius:999px;flex:none;background:var(--bg);color:var(--rec);display:grid;place-items:center}
+.del svg{width:18px;height:18px}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--bg)}
+.status.ok{color:#12A594}
+hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:999px;font-weight:600;font-size:14.5px;display:flex;gap:14px;align-items:center;
+  transition:all .2s;z-index:60;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{color:var(--accent);font-weight:800;filter:brightness(1.4)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div><h1 id="title">Planner</h1><div class="sub" id="today"></div></div>
+    <button class="icon-btn" id="btn-settings" aria-label="Налаштування">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </header>
+  <nav class="tabs" id="tabs" aria-label="Дошки"></nav>
+  <main id="list"></main>
+</div>
+
+<div class="dock"><div class="dock-in">
+  <button class="type" id="btn-type" aria-label="Додати текстом">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+  <button class="mic" id="btn-mic">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg>
+    Надиктувати
+  </button>
+</div></div>
+
+<div class="voice" id="voice" role="dialog" aria-label="Голосове введення">
+  <div class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg></div>
+  <div class="vtext" id="vtext">Слухаю…</div>
+  <div class="vhint">Наприклад: «Купити молоко і хліб» або «Зустріч з Олегом завтра о 15:00»</div>
+  <div class="vacts"><button class="btn" id="v-cancel">Скасувати</button><button class="btn primary" id="v-done">Готово</button></div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet"><div class="panel"><div class="grab"></div><div id="sheet-c"></div></div></div>
+<div class="toast" id="toast"><span id="toast-t"></span><button id="toast-a"></button></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const ICON_CAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
+const ICON_TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
+
+/* ---------- state ---------- */
+const COLORS = ['#0FB894', '#3D5AFE', '#12A594', '#F5A524', '#E5484D', '#8E4EC6', '#0091FF', '#6B7488'];
+const DEF_BOARDS = [
+  { id: 'todo', name: 'Зробити', color: '#0FB894' },
+  { id: 'buy', name: 'Купити', color: '#12A594' },
+  { id: 'progress', name: 'В процесі', color: '#F5A524' },
+  { id: 'events', name: 'Події', color: '#E5484D' },
+  { id: 'strategic', name: 'Стратегічні', color: '#8E4EC6' }
+];
+const KEY = 'planner.v1';
+let S = load();
+function load() {
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.boards)) return s; } catch (e) {}
+  return { boards: DEF_BOARDS.map(b => ({ ...b })), items: [], active: 'todo',
+    settings: { clientId: '', gConnected: false, autoSave: false, duration: 60 } };
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+const board = id => S.boards.find(b => b.id === id);
+
+/* ---------- dates ---------- */
+const MONTHS = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+const MSHORT = ['січ','лют','бер','квіт','трав','черв','лип','серп','вер','жовт','лист','груд'];
+const WDAYS = ['неділя','понеділок','вівторок','середа','четвер',"п'ятниця",'субота'];
+function dayDiff(dstr) { const t = new Date(); t.setHours(0,0,0,0); return Math.round((new Date(dstr + 'T00:00') - t) / 864e5); }
+function dateLabel(dstr) {
+  const n = dayDiff(dstr);
+  if (n === 0) return 'Сьогодні'; if (n === 1) return 'Завтра'; if (n === -1) return 'Вчора';
+  const d = new Date(dstr + 'T00:00');
+  if (n > 1 && n < 7) return WDAYS[d.getDay()][0].toUpperCase() + WDAYS[d.getDay()].slice(1);
+  return d.getDate() + ' ' + MSHORT[d.getMonth()] + (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : '');
+}
+
+/* ---------- voice parser (Ukrainian) ---------- */
+function parse(raw) {
+  let t = ' ' + raw.replace(/[’ʼ`]/g, "'").replace(/\s+/g, ' ') + ' ';
+  let low = t.toLowerCase();
+  let date = null, time = null, boardId = null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const plus = n => { const d = new Date(today); d.setDate(d.getDate() + n); return ymd(d); };
+  const cut = re => { const m = low.match(re); if (m) { t = t.slice(0, m.index) + ' ' + t.slice(m.index + m[0].length); low = t.toLowerCase(); } return m; };
+
+  // explicit board: "на дошку купити", "в дошку стратегічні"
+  let m = cut(/\s(?:на|в|у|до)\s+дошк\S*\s+([^\s,.]+(?:\s+[^\s,.]+)?)/);
+  if (m) { const w = m[1]; const b = S.boards.find(b => { const n = b.name.toLowerCase(); return w.startsWith(n) || n.startsWith(w.split(' ')[0].slice(0, 4)); }); if (b) boardId = b.id; }
+  if (!boardId) {
+    const low0 = low.trim();
+    if (/^(купити|купи|придбати)\s/.test(low0) && board('buy')) { cut(/\s(купити|купи|придбати)\s/); boardId = 'buy'; }
+    else if (/^подія\s/.test(low0) && board('events')) { cut(/\sподія\s/); boardId = 'events'; }
+    else if (/^стратегічн/.test(low0) && board('strategic')) { cut(/\sстратегічн\S*(\s+(завдання|ціль|мета))?\s/); boardId = 'strategic'; }
+    else if (/^в процесі\s/.test(low0) && board('progress')) { cut(/\sв процесі\s/); boardId = 'progress'; }
+  }
+  cut(/\s(нагадай(\s+мені)?|треба|потрібно)\s/);
+
+  // dates
+  if (cut(/\sпіслязавтра\s/)) date = plus(2);
+  else if (cut(/\sзавтра\s/)) date = plus(1);
+  else if (cut(/\sсьогодні\s/)) date = plus(0);
+  if (!date && (m = cut(/\sчерез\s+(\d+|один|одну|два|дві|три|чотири|п'ять|тиждень)\s*(дн\S*|тижн\S*)?\s/))) {
+    const W = { 'один':1,'одну':1,'два':2,'дві':2,'три':3,'чотири':4,"п'ять":5 };
+    if (m[1] === 'тиждень') date = plus(7);
+    else { const n = W[m[1]] || parseInt(m[1]); date = plus(/тижн/.test(m[2] || '') ? n * 7 : n); }
+  }
+  if (!date && (m = cut(new RegExp('\\s(\\d{1,2})(?:-?го)?\\s+(' + MONTHS.join('|') + ')(?:\\s+(\\d{4}))?\\s')))) {
+    const d = new Date(m[3] ? +m[3] : today.getFullYear(), MONTHS.indexOf(m[2]), +m[1]);
+    if (!m[3] && d < today) d.setFullYear(d.getFullYear() + 1);
+    date = ymd(d);
+  }
+  if (!date && (m = cut(/\s(\d{1,2})[.\/](\d{1,2})(?:[.\/](\d{2,4}))?\s/))) {
+    let y = m[3] ? +m[3] : today.getFullYear(); if (y < 100) y += 2000;
+    const d = new Date(y, +m[2] - 1, +m[1]); if (!m[3] && d < today) d.setFullYear(d.getFullYear() + 1);
+    date = ymd(d);
+  }
+  if (!date && (m = cut(/\s(?:в|у|во)?\s*(?:наступн\S*\s+)?(понеділок|вівторок|середу|четвер|п'ятницю|пятницю|суботу|неділю)\s/))) {
+    const idx = { 'неділю':0,'понеділок':1,'вівторок':2,'середу':3,'четвер':4,"п'ятницю":5,'пятницю':5,'суботу':6 }[m[1]];
+    let n = (idx - today.getDay() + 7) % 7; if (n === 0) n = 7; date = plus(n);
+  }
+
+  // time
+  const tm = cut(/\s(?:о|об|на)\s+(\d{1,2})(?:[:.\s](\d{2}))?(?:\s*год\S*)?(?:\s+(ранку|дня|вечора|ночі))?\s/) || cut(/\s(\d{1,2}):(\d{2})()\s/);
+  if (tm) {
+    let h = +tm[1], mi = tm[2] ? +tm[2] : 0; const part = tm[3];
+    if ((part === 'вечора' || (part === 'дня' && h < 12)) && h < 12) h += 12;
+    if (part === 'ночі' && h === 12) h = 0;
+    if (h < 24 && mi < 60) {
+      time = pad(h) + ':' + pad(mi);
+      if (!date) { const now = new Date(); date = (h * 60 + mi > now.getHours() * 60 + now.getMinutes()) ? plus(0) : plus(1); }
+    }
+  }
+
+  let title = t.replace(/\s+/g, ' ').replace(/\s(о|об|на|в|у|і|та)\s*$/i, ' ').replace(/^[\s,.:;-]+|[\s,.:;-]+$/g, '').trim();
+  title = title.charAt(0).toUpperCase() + title.slice(1);
+  if (!boardId) boardId = (time && board('events')) ? 'events' : S.active;
+  return { title: title || raw.trim(), date, time, boardId };
+}
+
+/* ---------- render ---------- */
+function render() {
+  if (!board(S.active)) S.active = S.boards[0] ? S.boards[0].id : null;
+  const d = new Date();
+  $('#today').textContent = WDAYS[d.getDay()] + ', ' + d.getDate() + ' ' + MONTHS[d.getMonth()];
+
+  const tabs = $('#tabs'); tabs.innerHTML = '';
+  S.boards.forEach(b => {
+    const n = S.items.filter(i => i.boardId === b.id && !i.done).length;
+    const el = document.createElement('button');
+    el.className = 'tab' + (b.id === S.active ? ' on' : ''); el.style.setProperty('--c', b.color);
+    el.innerHTML = `<span class="dot"></span>${esc(b.name)}${n ? `<span class="cnt">${n}</span>` : ''}`;
+    el.onclick = () => { S.active = b.id; save(); render(); };
+    tabs.appendChild(el);
+  });
+  const add = document.createElement('button'); add.className = 'tab ghost'; add.textContent = 'Керувати дошками';
+  add.onclick = openBoards; tabs.appendChild(add);
+  const on = tabs.querySelector('.on'); if (on) on.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+
+  const list = $('#list');
+  const items = S.items.filter(i => i.boardId === S.active);
+  const open = items.filter(i => !i.done).sort((a, b) => {
+    if (a.date && b.date) return (a.date + (a.time || '99')).localeCompare(b.date + (b.time || '99'));
+    if (a.date) return -1; if (b.date) return 1; return b.created - a.created;
+  });
+  const done = items.filter(i => i.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
+  if (!S.boards.length) { list.innerHTML = `<div class="empty"><b>Немає жодної дошки</b>Натисни «Керувати дошками», щоб створити першу.</div>`; return; }
+  if (!items.length) { list.innerHTML = `<div class="empty"><b>Тут порожньо</b>Натисни «Надиктувати» і скажи, що треба зробити.</div>`; return; }
+  list.innerHTML = open.map(row).join('') +
+    (done.length ? `<details class="donebox"><summary>Виконано · ${done.length}</summary>${done.map(row).join('')}</details>` : '');
+  list.querySelectorAll('.item').forEach(el => {
+    const it = S.items.find(i => i.id === el.dataset.id);
+    el.querySelector('.chk').onclick = () => toggleDone(it);
+    el.querySelector('.body').onclick = () => openEdit(it);
+  });
+}
+function row(i) {
+  let meta = '';
+  if (i.date) {
+    const n = dayDiff(i.date); const cls = (!i.done && n < 0) ? ' late' : (n === 0 ? ' today' : '');
+    meta += `<span class="pill${cls}">${dateLabel(i.date)}${i.time ? ', ' + i.time : ''}</span>`;
+  }
+  if (i.gid) meta += `<span class="pill" title="У Google Календарі">${ICON_CAL}Календар</span>`;
+  return `<div class="item${i.done ? ' done' : ''}" data-id="${i.id}">
+    <button class="chk" aria-label="${i.done ? 'Повернути' : 'Виконано'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+    <button class="body"><div class="t">${esc(i.title)}</div>${meta ? `<div class="meta">${meta}</div>` : ''}</button></div>`;
+}
+function toggleDone(it) {
+  it.done = !it.done; it.doneAt = it.done ? Date.now() : null; save(); render();
+  if (it.done) toast('Виконано', 'Повернути', () => { it.done = false; it.doneAt = null; save(); render(); });
+}
+
+/* ---------- sheet & toast ---------- */
+function openSheet(html, mount) {
+  $('#sheet-c').innerHTML = html; $('#scrim').classList.add('show'); $('#sheet').classList.add('show');
+  $('#sheet-c').querySelectorAll('[data-close]').forEach(b => b.onclick = closeSheet);
+  if (mount) mount();
+}
+function closeSheet() { $('#scrim').classList.remove('show'); $('#sheet').classList.remove('show'); }
+$('#scrim').onclick = closeSheet;
+let tt;
+function toast(msg, action, fn) {
+  $('#toast-t').textContent = msg; const a = $('#toast-a');
+  a.style.display = action ? '' : 'none'; a.textContent = action || '';
+  a.onclick = () => { $('#toast').classList.remove('show'); fn && fn(); };
+  $('#toast').classList.add('show'); clearTimeout(tt); tt = setTimeout(() => $('#toast').classList.remove('show'), action ? 4500 : 2800);
+}
+
+/* ---------- edit ---------- */
+function openEdit(it, pre) {
+  const isNew = !it;
+  const d = it ? { ...it } : { boardId: S.active, title: '', date: null, time: null, cal: false, ...(pre || {}) };
+  if (isNew && pre) d.cal = !!(d.date && (d.time || d.boardId === 'events'));
+  openSheet(`
+    <div class="sh-h"><h2>${isNew ? 'Нове завдання' : 'Завдання'}</h2><button class="x" data-close aria-label="Закрити">✕</button></div>
+    <textarea id="f-title" rows="2" placeholder="Що треба зробити?">${esc(d.title)}</textarea>
+    <div class="lbl">Дошка</div>
+    <div class="chips" id="f-boards">${S.boards.map(b => `<button class="chip${b.id === d.boardId ? ' on' : ''}" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}</button>`).join('')}</div>
+    <div class="row2">
+      <label class="fld"><span>Дата</span><input type="date" id="f-date" value="${d.date || ''}"></label>
+      <label class="fld"><span>Час</span><input type="time" id="f-time" value="${d.time || ''}"></label>
+    </div>
+    <label class="tgl"><input type="checkbox" id="f-cal" ${d.cal ? 'checked' : ''}><span>Додати в Google Календар</span></label>
+    <div class="note" id="f-calnote"></div>
+    <div class="acts">${isNew ? '' : `<button class="btn danger" id="f-del">Видалити</button>`}<button class="btn primary" id="f-save">Зберегти</button></div>`,
+  () => {
+    let bId = d.boardId;
+    const ta = $('#f-title'); if (isNew && !pre) setTimeout(() => ta.focus(), 250);
+    $('#f-boards').onclick = e => { const c = e.target.closest('.chip'); if (!c) return; bId = c.dataset.b;
+      $('#f-boards').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c)); };
+    const note = () => { $('#f-calnote').textContent = !$('#f-cal').checked ? '' :
+      !$('#f-date').value ? 'Щоб додати в календар, вкажи дату.' :
+      calReady() ? 'Подія синхронізується автоматично.' : 'Після збереження відкриється Google Календар, щоб підтвердити подію. Автосинхронізацію можна увімкнути в налаштуваннях.'; };
+    ['#f-cal', '#f-date'].forEach(s => $(s).onchange = note); note();
+    $('#f-save').onclick = () => {
+      const title = ta.value.trim(); if (!title) { ta.focus(); return; }
+      const rec = it || { id: uid(), created: Date.now(), done: false };
+      Object.assign(rec, { title, boardId: bId, date: $('#f-date').value || null, time: $('#f-date').value ? ($('#f-time').value || null) : null });
+      rec.cal = $('#f-cal').checked && !!rec.date;
+      if (!it) S.items.push(rec);
+      save(); closeSheet(); render(); afterSave(rec, true);
+    };
+    if (!isNew) $('#f-del').onclick = () => {
+      const idx = S.items.indexOf(it); S.items.splice(idx, 1); save(); closeSheet(); render();
+      let undone = false;
+      toast('Видалено', 'Повернути', () => { undone = true; S.items.splice(idx, 0, it); save(); render(); });
+      setTimeout(() => { if (!undone && it.gid) calDelete(it); }, 4800);
+    };
+  });
+}
+function afterSave(rec, gesture) {
+  if (calReady()) { if (rec.cal || rec.gid) syncItem(rec); }
+  else if (rec.cal && gesture && !rec.linkOpened) { rec.linkOpened = true; save(); window.open(templateUrl(rec), '_blank'); }
+}
+
+/* ---------- boards manager ---------- */
+function openBoards() {
+  const draw = () => openSheet(`
+    <div class="sh-h"><h2>Дошки</h2><button class="x" data-close aria-label="Закрити">✕</button></div>
+    <div id="b-list">${S.boards.map(b => `<div class="brow" data-id="${b.id}">
+      <button class="swatch" style="--c:${b.color}" aria-label="Змінити колір"></button>
+      <input type="text" value="${esc(b.name)}" aria-label="Назва дошки">
+      <button class="del" aria-label="Видалити дошку">${ICON_TRASH}</button></div>`).join('')}</div>
+    <div class="brow" style="margin-top:14px"><input type="text" id="b-new" placeholder="Нова дошка"><button class="btn primary small" id="b-add">Додати</button></div>
+    <div class="note">Торкнись кольорового кола, щоб змінити колір.</div>`,
+  () => {
+    $('#b-list').querySelectorAll('.brow').forEach(r => {
+      const b = board(r.dataset.id);
+      r.querySelector('.swatch').onclick = () => { b.color = COLORS[(COLORS.indexOf(b.color) + 1) % COLORS.length]; save(); render(); draw(); };
+      r.querySelector('input').onchange = e => { const v = e.target.value.trim(); if (v) { b.name = v; save(); render(); } else e.target.value = b.name; };
+      r.querySelector('.del').onclick = () => {
+        const n = S.items.filter(i => i.boardId === b.id).length;
+        if (!confirm(`Видалити дошку «${b.name}»${n ? ` разом із ${n} завдан${n === 1 ? 'ням' : 'нями'}` : ''}?`)) return;
+        S.items.filter(i => i.boardId === b.id && i.gid).forEach(calDelete);
+        S.items = S.items.filter(i => i.boardId !== b.id); S.boards = S.boards.filter(x => x !== b);
+        save(); render(); draw();
+      };
+    });
+    const addB = () => { const v = $('#b-new').value.trim(); if (!v) return;
+      const nb = { id: uid(), name: v, color: COLORS[S.boards.length % COLORS.length] }; S.boards.push(nb); S.active = nb.id; save(); render(); draw(); };
+    $('#b-add').onclick = addB; $('#b-new').onkeydown = e => { if (e.key === 'Enter') addB(); };
+  });
+  draw();
+}
+
+/* ---------- settings ---------- */
+function openSettings() {
+  const st = S.settings;
+  openSheet(`
+    <div class="sh-h"><h2>Налаштування</h2><button class="x" data-close aria-label="Закрити">✕</button></div>
+    <label class="tgl"><input type="checkbox" id="s-auto" ${st.autoSave ? 'checked' : ''}><span>Зберігати одразу після диктування, без перевірки</span></label>
+    <hr>
+    <div class="sh-h" style="margin-bottom:6px"><h2 style="font-size:17px">Google Календар</h2>
+      <span class="status${calReady() ? ' ok' : ''}">${calReady() ? 'Підключено' : 'Не підключено'}</span></div>
+    <div class="lbl">Client ID</div>
+    <input type="text" id="s-cid" placeholder="xxxx.apps.googleusercontent.com" value="${esc(st.clientId)}" autocomplete="off" spellcheck="false">
+    <div class="acts" style="margin-top:12px"><button class="btn primary" id="s-connect">${calReady() ? 'Перепідключити' : 'Підключити'}</button>
+      ${st.gConnected ? '<button class="btn" id="s-off">Відключити</button>' : ''}</div>
+    <div class="lbl">Тривалість події за замовчуванням</div>
+    <select id="s-dur">${[15, 30, 60, 90, 120].map(v => `<option value="${v}"${+st.duration === v ? ' selected' : ''}>${v} хв</option>`).join('')}</select>
+    <details class="note" style="margin-top:14px"><summary class="link">Як отримати Client ID</summary><ol>
+      <li>Відкрий console.cloud.google.com і створи проєкт.</li>
+      <li>APIs &amp; Services → Library → увімкни Google Calendar API.</li>
+      <li>OAuth consent screen → External, додай свою пошту в Test users.</li>
+      <li>Credentials → Create credentials → OAuth client ID → Web application.</li>
+      <li>У Authorized JavaScript origins додай адресу, де відкритий цей додаток: <b>${esc(location.origin)}</b></li>
+      <li>Скопіюй Client ID сюди й натисни «Підключити».</li></ol></details>
+    <hr>
+    <div class="acts" style="margin-top:0"><button class="btn" id="s-exp">Експорт</button><button class="btn" id="s-imp">Імпорт</button></div>
+    <input type="file" id="s-file" accept="application/json" hidden>`,
+  () => {
+    $('#s-auto').onchange = e => { st.autoSave = e.target.checked; save(); };
+    $('#s-dur').onchange = e => { st.duration = +e.target.value; save(); };
+    $('#s-cid').onchange = e => { const v = e.target.value.trim(); if (v !== st.clientId) { st.clientId = v; st.gConnected = false; token = null; save(); } };
+    $('#s-connect').onclick = async () => {
+      st.clientId = $('#s-cid').value.trim(); save();
+      if (!st.clientId) { toast('Встав Client ID'); return; }
+      try { token = null; await getToken(true); toast('Google Календар підключено'); openSettings();
+        S.items.filter(i => i.cal && i.date && !i.gid && !i.done).forEach(syncItem);
+      } catch (e) { toast('Не вдалося підключитися: ' + e.message); }
+    };
+    if ($('#s-off')) $('#s-off').onclick = () => { st.gConnected = false; token = null; save(); openSettings(); };
+    $('#s-exp').onclick = () => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify({ boards: S.boards, items: S.items }, null, 2)], { type: 'application/json' }));
+      a.download = 'planner-backup-' + ymd(new Date()) + '.json'; a.click();
+    };
+    $('#s-imp').onclick = () => $('#s-file').click();
+    $('#s-file').onchange = async e => {
+      try { const j = JSON.parse(await e.target.files[0].text()); if (!Array.isArray(j.boards) || !Array.isArray(j.items)) throw 0;
+        if (!confirm('Замінити всі поточні дошки й завдання даними з файлу?')) return;
+        S.boards = j.boards; S.items = j.items; save(); render(); closeSheet(); toast('Дані імпортовано');
+      } catch (_) { toast('Файл не схожий на резервну копію Planner'); }
+    };
+  });
+}
+
+/* ---------- Google Calendar ---------- */
+let token = null, tokenExp = 0;
+try { const t = JSON.parse(sessionStorage.getItem('planner.tok')); if (t && t.exp > Date.now()) { token = t.v; tokenExp = t.exp; } } catch (e) {}
+const calReady = () => !!(S.settings.clientId && S.settings.gConnected);
+function gisLoad() {
+  return new Promise((res, rej) => {
+    if (window.google && google.accounts && google.accounts.oauth2) return res();
+    const s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client';
+    s.onload = res; s.onerror = () => rej(new Error('немає зʼєднання з Google')); document.head.appendChild(s);
+  });
+}
+async function getToken(interactive) {
+  if (token && Date.now() < tokenExp - 60000) return token;
+  await gisLoad();
+  return new Promise((res, rej) => {
+    const c = google.accounts.oauth2.initTokenClient({
+      client_id: S.settings.clientId, scope: 'https://www.googleapis.com/auth/calendar.events',
+      callback: r => {
+        if (r.error) return rej(new Error(r.error));
+        token = r.access_token; tokenExp = Date.now() + r.expires_in * 1000;
+        try { sessionStorage.setItem('planner.tok', JSON.stringify({ v: token, exp: tokenExp })); } catch (e) {}
+        S.settings.gConnected = true; save(); res(token);
+      },
+      error_callback: e => rej(new Error(e.type === 'popup_closed' ? 'вікно закрито' : (e.type || 'помилка')))
+    });
+    c.requestAccessToken({ prompt: interactive ? 'consent' : '' });
+  });
+}
+function evBody(it) {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if (it.time) {
+    const st = new Date(it.date + 'T' + it.time); const en = new Date(st.getTime() + (S.settings.duration || 60) * 60000);
+    const f = d => ymd(d) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':00';
+    return { summary: it.title, start: { dateTime: f(st), timeZone: tz }, end: { dateTime: f(en), timeZone: tz } };
+  }
+  const n = new Date(it.date + 'T00:00'); n.setDate(n.getDate() + 1);
+  return { summary: it.title, start: { date: it.date }, end: { date: ymd(n) } };
+}
+const API = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
+async function syncItem(it) {
+  if (!calReady()) return;
+  try {
+    const tk = await getToken(false);
+    if (it.cal && it.date) {
+      const r = await fetch(API + (it.gid ? '/' + it.gid : ''), { method: it.gid ? 'PATCH' : 'POST',
+        headers: { Authorization: 'Bearer ' + tk, 'Content-Type': 'application/json' }, body: JSON.stringify(evBody(it)) });
+      if ((r.status === 404 || r.status === 410) && it.gid) { it.gid = null; return syncItem(it); }
+      if (r.status === 401) { token = null; throw new Error('auth'); }
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      it.gid = (await r.json()).id;
+    } else if (it.gid) { await calDelete(it); }
+    save(); render();
+  } catch (e) { toast('Календар: не вдалося синхронізувати', 'Ще раз', () => syncItem(it)); }
+}
+async function calDelete(it) {
+  if (!it.gid || !calReady()) return;
+  try { const tk = await getToken(false); await fetch(API + '/' + it.gid, { method: 'DELETE', headers: { Authorization: 'Bearer ' + tk } }); it.gid = null; save(); }
+  catch (e) {}
+}
+function templateUrl(it) {
+  const c = s => s.replace(/[-:]/g, '');
+  let dates;
+  if (it.time) {
+    const st = new Date(it.date + 'T' + it.time); const en = new Date(st.getTime() + (S.settings.duration || 60) * 60000);
+    const f = d => ymd(d) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00';
+    dates = c(f(st)) + '/' + c(f(en));
+  } else { const n = new Date(it.date + 'T00:00'); n.setDate(n.getDate() + 1); dates = c(it.date) + '/' + c(ymd(n)); }
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(it.title) + '&dates=' + dates;
+}
+
+/* ---------- voice ---------- */
+let rec = null, finalTxt = '', interimTxt = '', cancelled = false;
+function startVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('Голосове введення працює в Chrome на Android'); openEdit(null); return; }
+  if (rec) return;
+  finalTxt = ''; interimTxt = ''; cancelled = false;
+  $('#vtext').textContent = 'Слухаю…'; $('#voice').classList.add('show');
+  rec = new SR(); rec.lang = 'uk-UA'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+  rec.onresult = e => {
+    interimTxt = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const r = e.results[i]; if (r.isFinal) finalTxt += r[0].transcript; else interimTxt += r[0].transcript;
+    }
+    $('#vtext').textContent = (finalTxt + interimTxt) || 'Слухаю…';
+  };
+  rec.onerror = e => {
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast('Дозволь доступ до мікрофона для цього сайту');
+    else if (e.error === 'no-speech') toast('Нічого не почув. Спробуй ще раз');
+    else if (e.error === 'network') toast('Для розпізнавання мови потрібен інтернет');
+  };
+  rec.onend = () => {
+    $('#voice').classList.remove('show'); rec = null;
+    const text = (finalTxt || interimTxt).trim();
+    if (cancelled || !text) return;
+    const p = parse(text);
+    if (S.settings.autoSave) {
+      const it = { id: uid(), created: Date.now(), done: false, ...p, cal: !!(p.date && (p.time || p.boardId === 'events')) };
+      S.items.push(it); S.active = it.boardId; save(); render(); afterSave(it, false);
+      toast('Додано в «' + board(it.boardId).name + '»', 'Змінити', () => openEdit(it));
+    } else openEdit(null, p);
+  };
+  try { rec.start(); } catch (e) { rec = null; $('#voice').classList.remove('show'); }
+}
+$('#btn-mic').onclick = startVoice;
+$('#v-done').onclick = () => rec && rec.stop();
+$('#v-cancel').onclick = () => { cancelled = true; rec ? rec.abort() : $('#voice').classList.remove('show'); };
+$('#btn-type').onclick = () => openEdit(null);
+$('#btn-settings').onclick = openSettings;
+
+/* ---------- boot ---------- */
+render();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+if (new URLSearchParams(location.search).get('voice') === '1') {
+  history.replaceState(null, '', location.pathname);
+  setTimeout(startVoice, 350);
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+</script>
+</body>
+</html>
