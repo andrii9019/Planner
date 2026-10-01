@@ -1,8 +1,8 @@
 {
   "name": "Planner",
   "short_name": "Planner",
-  "description": "Голосовий органайзер: дошки завдань і синхронізація з Google Календарем",
-  "lang": "uk",
+  "description": "Voice-first organizer: task boards with Google Calendar sync",
+  "lang": "en",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -31,8 +31,8 @@
   ],
   "shortcuts": [
     {
-      "name": "Надиктувати",
-      "short_name": "Голос",
+      "name": "Dictate",
+      "short_name": "Dictate",
       "url": "./?voice=1",
       "icons": [
         {
