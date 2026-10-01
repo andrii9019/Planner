@@ -369,14 +369,180 @@ const L = {
     mic_allow:'Permite el acceso al micrófono para este sitio', no_speech:'No te he entendido. Inténtalo de nuevo',
     need_net:'El reconocimiento de voz necesita conexión a internet', added_to:'Añadido a «{b}»', language:'Idioma', auto_lang:'Automático (teléfono)', close:'Cerrar'
   }
+  ,
+  pt: {
+    settings:'Configurações', boards:'Quadros', add_typing:'Adicionar digitando', dictate:'Ditar', voice_input:'Entrada de voz', listening:'Ouvindo…',
+    vhint:'Fale em ucraniano, ex.: «Купити молоко і хліб» ou «Зустріч з Олегом завтра о 15:00»',
+    cancel:'Cancelar', done:'Pronto', color_n:'Cor {c}', custom_color:'Cor personalizada',
+    board_todo:'Tarefas', board_progress:'Em andamento', board_events:'Eventos', board_buy:'Compras',
+    today:'Hoje', tomorrow:'Amanhã', yesterday:'Ontem', all:'Tudo', new_board:'Novo quadro', edit:'Editar',
+    no_boards:'<b>Nenhum quadro ainda</b>Toque em «+» para criar o primeiro.', empty:'Vazio',
+    del_all_done:'Excluir todas as concluídas', deleted_done:'Concluídas excluídas: {n}',
+    nothing_here:'<b>Nada aqui ainda</b>Toque em «Ditar» e diga o que precisa ser feito.',
+    completed:'Concluídas', swipe_del:'Deslize para o lado para excluir', move_to:'Mover para', delete:'Excluir', edit_item:'Editar',
+    moved_to:'Movido para «{b}»', deleted:'Excluído', undo:'Desfazer', board_name:'Nome do quadro', color:'Cor', create:'Criar',
+    in_cal:'No Google Agenda', calendar:'Agenda', mark_done:'Marcar como concluída', mark_undone:'Marcar como pendente', done_toast:'Concluída',
+    new_task:'Nova tarefa', task:'Tarefa', what_todo:'O que precisa ser feito?', board:'Quadro', date:'Data', time:'Hora',
+    add_to_cal:'Adicionar ao Google Agenda', save:'Salvar', need_date:'Defina uma data para adicionar à agenda.',
+    auto_sync:'O evento será sincronizado automaticamente.',
+    manual_sync:'Depois de salvar, o Google Agenda abrirá para você confirmar o evento. A sincronização automática pode ser ativada nas Configurações.',
+    change_color:'Mudar cor', move_up:'Mover para cima', move_down:'Mover para baixo', delete_board:'Excluir quadro',
+    boards_note:'Toque no círculo de cor para escolher uma cor. Reordene com as setas ou mantenha pressionado um quadro no topo e arraste.',
+    confirm_del_board:(b, n) => `Excluir o quadro «${b}»${n ? ` e suas ${n} tarefa${n === 1 ? '' : 's'}` : ''}?`,
+    color_of:'Cor: {b}', back:'Voltar', autosave:'Salvar logo após ditar, sem revisar',
+    gcal:'Google Agenda', connected:'Conectado', not_connected:'Não conectado', reconnect:'Reconectar', connect:'Conectar', disconnect:'Desconectar',
+    default_dur:'Duração padrão do evento', min:'min', how_client:'Como obter um Client ID',
+    steps:['Abra console.cloud.google.com e crie um projeto.', 'APIs &amp; Services → Library → ative a Google Calendar API.',
+      'OAuth consent screen → External, adicione seu e-mail em Test users.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'Em Authorized JavaScript origins, adicione o endereço onde este app roda: <b>{o}</b>', 'Cole o Client ID aqui e toque em «Conectar».'],
+    export:'Exportar', import:'Importar', paste_client:'Cole um Client ID primeiro', gcal_connected:'Google Agenda conectado',
+    cant_connect:'Não foi possível conectar: ', no_done:'Nenhuma tarefa concluída',
+    replace_confirm:'Substituir todos os quadros e tarefas atuais pelos dados deste arquivo?', imported:'Dados importados',
+    bad_backup:'Este arquivo não parece um backup do Planner', no_google:'sem conexão com o Google', win_closed:'janela fechada', error:'erro',
+    sync_failed:'Agenda: falha na sincronização', retry:'Tentar de novo', voice_chrome:'A entrada de voz funciona no Chrome para Android',
+    mic_allow:'Permita o acesso ao microfone para este site', no_speech:'Não entendi. Tente de novo',
+    need_net:'O reconhecimento de voz precisa de internet', added_to:'Adicionado a «{b}»', language:'Idioma', auto_lang:'Automático (telefone)', close:'Fechar'
+  },
+  id: {
+    settings:'Pengaturan', boards:'Papan', add_typing:'Tambah dengan mengetik', dictate:'Dikte', voice_input:'Input suara', listening:'Mendengarkan…',
+    vhint:'Bicara dalam bahasa Ukraina, mis. «Купити молоко і хліб» atau «Зустріч з Олегом завтра о 15:00»',
+    cancel:'Batal', done:'Selesai', color_n:'Warna {c}', custom_color:'Warna khusus',
+    board_todo:'Tugas', board_progress:'Sedang dikerjakan', board_events:'Acara', board_buy:'Belanja',
+    today:'Hari ini', tomorrow:'Besok', yesterday:'Kemarin', all:'Semua', new_board:'Papan baru', edit:'Ubah',
+    no_boards:'<b>Belum ada papan</b>Ketuk «+» untuk membuat yang pertama.', empty:'Kosong',
+    del_all_done:'Hapus semua yang selesai', deleted_done:'Tugas selesai dihapus: {n}',
+    nothing_here:'<b>Belum ada apa-apa</b>Ketuk «Dikte» dan sebutkan apa yang perlu dilakukan.',
+    completed:'Selesai', swipe_del:'Geser ke samping untuk menghapus', move_to:'Pindahkan ke', delete:'Hapus', edit_item:'Edit',
+    moved_to:'Dipindahkan ke «{b}»', deleted:'Dihapus', undo:'Urungkan', board_name:'Nama papan', color:'Warna', create:'Buat',
+    in_cal:'Di Google Kalender', calendar:'Kalender', mark_done:'Tandai selesai', mark_undone:'Tandai belum selesai', done_toast:'Selesai',
+    new_task:'Tugas baru', task:'Tugas', what_todo:'Apa yang perlu dilakukan?', board:'Papan', date:'Tanggal', time:'Waktu',
+    add_to_cal:'Tambahkan ke Google Kalender', save:'Simpan', need_date:'Tetapkan tanggal untuk menambahkannya ke kalender.',
+    auto_sync:'Acara akan disinkronkan otomatis.',
+    manual_sync:'Setelah disimpan, Google Kalender akan terbuka agar kamu bisa mengonfirmasi acara. Sinkronisasi otomatis bisa diaktifkan di Pengaturan.',
+    change_color:'Ubah warna', move_up:'Naikkan', move_down:'Turunkan', delete_board:'Hapus papan',
+    boards_note:'Ketuk lingkaran warna untuk memilih warna. Ubah urutan dengan panah, atau tekan lama papan di atas lalu seret.',
+    confirm_del_board:(b, n) => `Hapus papan «${b}»${n ? ` beserta ${n} tugasnya` : ''}?`,
+    color_of:'Warna: {b}', back:'Kembali', autosave:'Simpan langsung setelah dikte, tanpa ditinjau',
+    gcal:'Google Kalender', connected:'Terhubung', not_connected:'Tidak terhubung', reconnect:'Hubungkan ulang', connect:'Hubungkan', disconnect:'Putuskan',
+    default_dur:'Durasi acara default', min:'mnt', how_client:'Cara mendapatkan Client ID',
+    steps:['Buka console.cloud.google.com dan buat proyek.', 'APIs &amp; Services → Library → aktifkan Google Calendar API.',
+      'OAuth consent screen → External, tambahkan email kamu di Test users.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'Di Authorized JavaScript origins, tambahkan alamat tempat aplikasi ini berjalan: <b>{o}</b>', 'Tempel Client ID di sini lalu ketuk «Hubungkan».'],
+    export:'Ekspor', import:'Impor', paste_client:'Tempel Client ID terlebih dahulu', gcal_connected:'Google Kalender terhubung',
+    cant_connect:'Tidak dapat terhubung: ', no_done:'Tidak ada tugas yang selesai',
+    replace_confirm:'Ganti semua papan dan tugas saat ini dengan data dari file ini?', imported:'Data diimpor',
+    bad_backup:'File ini sepertinya bukan cadangan Planner', no_google:'tidak ada koneksi ke Google', win_closed:'jendela ditutup', error:'galat',
+    sync_failed:'Kalender: sinkronisasi gagal', retry:'Coba lagi', voice_chrome:'Input suara berfungsi di Chrome untuk Android',
+    mic_allow:'Izinkan akses mikrofon untuk situs ini', no_speech:'Tidak terdengar. Coba lagi',
+    need_net:'Pengenalan suara memerlukan koneksi internet', added_to:'Ditambahkan ke «{b}»', language:'Bahasa', auto_lang:'Otomatis (ponsel)', close:'Tutup'
+  },
+  tr: {
+    settings:'Ayarlar', boards:'Panolar', add_typing:'Yazarak ekle', dictate:'Dikte et', voice_input:'Sesli giriş', listening:'Dinleniyor…',
+    vhint:'Ukraynaca konuşun, ör. «Купити молоко і хліб» veya «Зустріч з Олегом завтра о 15:00»',
+    cancel:'İptal', done:'Bitti', color_n:'Renk {c}', custom_color:'Özel renk',
+    board_todo:'Görevler', board_progress:'Devam eden', board_events:'Etkinlikler', board_buy:'Alışveriş',
+    today:'Bugün', tomorrow:'Yarın', yesterday:'Dün', all:'Tümü', new_board:'Yeni pano', edit:'Düzenle',
+    no_boards:'<b>Henüz pano yok</b>İlkini oluşturmak için «+» simgesine dokunun.', empty:'Boş',
+    del_all_done:'Tamamlananların hepsini sil', deleted_done:'Silinen tamamlanmış görev: {n}',
+    nothing_here:'<b>Burada henüz bir şey yok</b>«Dikte et»e dokunun ve ne yapılması gerektiğini söyleyin.',
+    completed:'Tamamlanan', swipe_del:'Silmek için yana kaydırın', move_to:'Taşı', delete:'Sil', edit_item:'Düzenle',
+    moved_to:'«{b}» panosuna taşındı', deleted:'Silindi', undo:'Geri al', board_name:'Pano adı', color:'Renk', create:'Oluştur',
+    in_cal:'Google Takvim’de', calendar:'Takvim', mark_done:'Tamamlandı olarak işaretle', mark_undone:'Tamamlanmadı olarak işaretle', done_toast:'Tamamlandı',
+    new_task:'Yeni görev', task:'Görev', what_todo:'Ne yapılması gerekiyor?', board:'Pano', date:'Tarih', time:'Saat',
+    add_to_cal:'Google Takvim’e ekle', save:'Kaydet', need_date:'Takvime eklemek için bir tarih belirleyin.',
+    auto_sync:'Etkinlik otomatik olarak senkronize edilecek.',
+    manual_sync:'Kaydettikten sonra etkinliği onaylamanız için Google Takvim açılır. Otomatik senkronizasyon Ayarlar’dan açılabilir.',
+    change_color:'Rengi değiştir', move_up:'Yukarı taşı', move_down:'Aşağı taşı', delete_board:'Panoyu sil',
+    boards_note:'Renk seçmek için renk dairesine dokunun. Sıralamayı oklarla değiştirin ya da üstteki bir panoya uzun basıp sürükleyin.',
+    confirm_del_board:(b, n) => `«${b}» panosu${n ? ` ve içindeki ${n} görev` : ''} silinsin mi?`,
+    color_of:'Renk: {b}', back:'Geri', autosave:'Dikteden hemen sonra, gözden geçirmeden kaydet',
+    gcal:'Google Takvim', connected:'Bağlı', not_connected:'Bağlı değil', reconnect:'Yeniden bağlan', connect:'Bağlan', disconnect:'Bağlantıyı kes',
+    default_dur:'Varsayılan etkinlik süresi', min:'dk', how_client:'Client ID nasıl alınır',
+    steps:['console.cloud.google.com adresini açın ve bir proje oluşturun.', 'APIs &amp; Services → Library → Google Calendar API’yi etkinleştirin.',
+      'OAuth consent screen → External, e-postanızı Test users bölümüne ekleyin.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'Authorized JavaScript origins bölümüne uygulamanın çalıştığı adresi ekleyin: <b>{o}</b>', 'Client ID’yi buraya yapıştırın ve «Bağlan»a dokunun.'],
+    export:'Dışa aktar', import:'İçe aktar', paste_client:'Önce bir Client ID yapıştırın', gcal_connected:'Google Takvim bağlandı',
+    cant_connect:'Bağlanılamadı: ', no_done:'Tamamlanmış görev yok',
+    replace_confirm:'Mevcut tüm panolar ve görevler bu dosyadaki verilerle değiştirilsin mi?', imported:'Veriler içe aktarıldı',
+    bad_backup:'Bu dosya bir Planner yedeği gibi görünmüyor', no_google:'Google’a bağlantı yok', win_closed:'pencere kapatıldı', error:'hata',
+    sync_failed:'Takvim: senkronizasyon başarısız', retry:'Tekrar dene', voice_chrome:'Sesli giriş Android’de Chrome’da çalışır',
+    mic_allow:'Bu site için mikrofon erişimine izin verin', no_speech:'Anlaşılamadı. Tekrar deneyin',
+    need_net:'Ses tanıma için internet bağlantısı gerekir', added_to:'«{b}» panosuna eklendi', language:'Dil', auto_lang:'Otomatik (telefon)', close:'Kapat'
+  },
+  hi: {
+    settings:'सेटिंग्स', boards:'बोर्ड', add_typing:'टाइप करके जोड़ें', dictate:'बोलकर लिखें', voice_input:'वॉइस इनपुट', listening:'सुन रहा है…',
+    vhint:'यूक्रेनी में बोलें, जैसे «Купити молоко і хліб» या «Зустріч з Олегом завтра о 15:00»',
+    cancel:'रद्द करें', done:'हो गया', color_n:'रंग {c}', custom_color:'अपना रंग',
+    board_todo:'कार्य', board_progress:'जारी', board_events:'इवेंट', board_buy:'ख़रीदारी',
+    today:'आज', tomorrow:'कल', yesterday:'बीता कल', all:'सभी', new_board:'नया बोर्ड', edit:'बदलें',
+    no_boards:'<b>अभी कोई बोर्ड नहीं है</b>पहला बोर्ड बनाने के लिए «+» पर टैप करें।', empty:'खाली',
+    del_all_done:'सभी पूरे कार्य हटाएँ', deleted_done:'हटाए गए पूरे कार्य: {n}',
+    nothing_here:'<b>यहाँ अभी कुछ नहीं है</b>«बोलकर लिखें» पर टैप करें और बताएँ कि क्या करना है।',
+    completed:'पूरे हुए', swipe_del:'हटाने के लिए बगल में स्वाइप करें', move_to:'यहाँ ले जाएँ', delete:'हटाएँ', edit_item:'संपादित करें',
+    moved_to:'«{b}» में ले जाया गया', deleted:'हटाया गया', undo:'वापस लें', board_name:'बोर्ड का नाम', color:'रंग', create:'बनाएँ',
+    in_cal:'Google Calendar में', calendar:'कैलेंडर', mark_done:'पूरा मार्क करें', mark_undone:'अधूरा मार्क करें', done_toast:'पूरा हुआ',
+    new_task:'नया कार्य', task:'कार्य', what_todo:'क्या करना है?', board:'बोर्ड', date:'तारीख़', time:'समय',
+    add_to_cal:'Google Calendar में जोड़ें', save:'सेव करें', need_date:'कैलेंडर में जोड़ने के लिए तारीख़ चुनें।',
+    auto_sync:'इवेंट अपने-आप सिंक हो जाएगा।',
+    manual_sync:'सेव करने के बाद इवेंट की पुष्टि के लिए Google Calendar खुलेगा। अपने-आप सिंक सेटिंग्स में चालू किया जा सकता है।',
+    change_color:'रंग बदलें', move_up:'ऊपर ले जाएँ', move_down:'नीचे ले जाएँ', delete_board:'बोर्ड हटाएँ',
+    boards_note:'रंग चुनने के लिए रंग वाले गोले पर टैप करें। तीरों से क्रम बदलें, या ऊपर किसी बोर्ड को देर तक दबाकर खींचें।',
+    confirm_del_board:(b, n) => `बोर्ड «${b}»${n ? ` और उसके ${n} कार्य` : ''} हटाएँ?`,
+    color_of:'रंग: {b}', back:'वापस', autosave:'बोलने के तुरंत बाद, बिना जाँचे सेव करें',
+    gcal:'Google Calendar', connected:'कनेक्टेड', not_connected:'कनेक्ट नहीं है', reconnect:'फिर से कनेक्ट करें', connect:'कनेक्ट करें', disconnect:'डिस्कनेक्ट करें',
+    default_dur:'इवेंट की डिफ़ॉल्ट अवधि', min:'मिनट', how_client:'Client ID कैसे पाएँ',
+    steps:['console.cloud.google.com खोलें और एक प्रोजेक्ट बनाएँ।', 'APIs &amp; Services → Library → Google Calendar API चालू करें।',
+      'OAuth consent screen → External, Test users में अपना ईमेल जोड़ें।', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'Authorized JavaScript origins में वह पता जोड़ें जहाँ यह ऐप चलता है: <b>{o}</b>', 'Client ID यहाँ पेस्ट करें और «कनेक्ट करें» पर टैप करें।'],
+    export:'एक्सपोर्ट', import:'इंपोर्ट', paste_client:'पहले Client ID पेस्ट करें', gcal_connected:'Google Calendar कनेक्ट हो गया',
+    cant_connect:'कनेक्ट नहीं हो सका: ', no_done:'कोई पूरा कार्य नहीं है',
+    replace_confirm:'क्या सभी मौजूदा बोर्ड और कार्य इस फ़ाइल के डेटा से बदल दें?', imported:'डेटा इंपोर्ट हो गया',
+    bad_backup:'यह फ़ाइल Planner का बैकअप नहीं लगती', no_google:'Google से कनेक्शन नहीं है', win_closed:'विंडो बंद हो गई', error:'त्रुटि',
+    sync_failed:'कैलेंडर: सिंक नहीं हो सका', retry:'फिर से कोशिश करें', voice_chrome:'वॉइस इनपुट Android पर Chrome में काम करता है',
+    mic_allow:'इस साइट के लिए माइक्रोफ़ोन की अनुमति दें', no_speech:'सुनाई नहीं दिया। फिर से कोशिश करें',
+    need_net:'आवाज़ पहचानने के लिए इंटरनेट चाहिए', added_to:'«{b}» में जोड़ा गया', language:'भाषा', auto_lang:'अपने-आप (फ़ोन)', close:'बंद करें'
+  },
+  vi: {
+    settings:'Cài đặt', boards:'Bảng', add_typing:'Thêm bằng cách gõ', dictate:'Đọc chính tả', voice_input:'Nhập bằng giọng nói', listening:'Đang nghe…',
+    vhint:'Nói bằng tiếng Ukraina, ví dụ «Купити молоко і хліб» hoặc «Зустріч з Олегом завтра о 15:00»',
+    cancel:'Hủy', done:'Xong', color_n:'Màu {c}', custom_color:'Màu tùy chỉnh',
+    board_todo:'Việc cần làm', board_progress:'Đang làm', board_events:'Sự kiện', board_buy:'Mua sắm',
+    today:'Hôm nay', tomorrow:'Ngày mai', yesterday:'Hôm qua', all:'Tất cả', new_board:'Bảng mới', edit:'Sửa',
+    no_boards:'<b>Chưa có bảng nào</b>Chạm «+» để tạo bảng đầu tiên.', empty:'Trống',
+    del_all_done:'Xóa tất cả việc đã xong', deleted_done:'Đã xóa việc đã xong: {n}',
+    nothing_here:'<b>Chưa có gì ở đây</b>Chạm «Đọc chính tả» và nói việc cần làm.',
+    completed:'Đã xong', swipe_del:'Vuốt sang bên để xóa', move_to:'Chuyển đến', delete:'Xóa', edit_item:'Chỉnh sửa',
+    moved_to:'Đã chuyển đến «{b}»', deleted:'Đã xóa', undo:'Hoàn tác', board_name:'Tên bảng', color:'Màu', create:'Tạo',
+    in_cal:'Trong Google Lịch', calendar:'Lịch', mark_done:'Đánh dấu đã xong', mark_undone:'Đánh dấu chưa xong', done_toast:'Đã xong',
+    new_task:'Việc mới', task:'Việc', what_todo:'Cần làm gì?', board:'Bảng', date:'Ngày', time:'Giờ',
+    add_to_cal:'Thêm vào Google Lịch', save:'Lưu', need_date:'Hãy đặt ngày để thêm vào lịch.',
+    auto_sync:'Sự kiện sẽ được đồng bộ tự động.',
+    manual_sync:'Sau khi lưu, Google Lịch sẽ mở để bạn xác nhận sự kiện. Có thể bật đồng bộ tự động trong Cài đặt.',
+    change_color:'Đổi màu', move_up:'Lên trên', move_down:'Xuống dưới', delete_board:'Xóa bảng',
+    boards_note:'Chạm vào vòng tròn màu để chọn màu. Sắp xếp lại bằng mũi tên, hoặc nhấn giữ một bảng ở trên cùng rồi kéo.',
+    confirm_del_board:(b, n) => `Xóa bảng «${b}»${n ? ` cùng ${n} việc trong đó` : ''}?`,
+    color_of:'Màu: {b}', back:'Quay lại', autosave:'Lưu ngay sau khi đọc, không cần xem lại',
+    gcal:'Google Lịch', connected:'Đã kết nối', not_connected:'Chưa kết nối', reconnect:'Kết nối lại', connect:'Kết nối', disconnect:'Ngắt kết nối',
+    default_dur:'Thời lượng sự kiện mặc định', min:'phút', how_client:'Cách lấy Client ID',
+    steps:['Mở console.cloud.google.com và tạo một dự án.', 'APIs &amp; Services → Library → bật Google Calendar API.',
+      'OAuth consent screen → External, thêm email của bạn vào Test users.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'Trong Authorized JavaScript origins, thêm địa chỉ nơi ứng dụng này chạy: <b>{o}</b>', 'Dán Client ID vào đây rồi chạm «Kết nối».'],
+    export:'Xuất', import:'Nhập', paste_client:'Hãy dán Client ID trước', gcal_connected:'Đã kết nối Google Lịch',
+    cant_connect:'Không thể kết nối: ', no_done:'Không có việc nào đã xong',
+    replace_confirm:'Thay toàn bộ bảng và việc hiện tại bằng dữ liệu từ tệp này?', imported:'Đã nhập dữ liệu',
+    bad_backup:'Tệp này có vẻ không phải bản sao lưu của Planner', no_google:'không có kết nối tới Google', win_closed:'cửa sổ đã đóng', error:'lỗi',
+    sync_failed:'Lịch: đồng bộ thất bại', retry:'Thử lại', voice_chrome:'Nhập bằng giọng nói hoạt động trên Chrome cho Android',
+    mic_allow:'Hãy cho phép trang này dùng micrô', no_speech:'Không nghe rõ. Hãy thử lại',
+    need_net:'Nhận dạng giọng nói cần kết nối internet', added_to:'Đã thêm vào «{b}»', language:'Ngôn ngữ', auto_lang:'Tự động (theo điện thoại)', close:'Đóng'
+  }
 };
-const LANG_NAMES = { en: 'English', uk: 'Українська', es: 'Español' };
-const LOCALES = { en: 'en-US', uk: 'uk-UA', es: 'es-ES' };
+const LANG_NAMES = { en: 'English', uk: 'Українська', es: 'Español', pt: 'Português (Brasil)', id: 'Bahasa Indonesia', tr: 'Türkçe', hi: 'हिन्दी', vi: 'Tiếng Việt' };
+const LOCALES = { en: 'en-US', uk: 'uk-UA', es: 'es-ES', pt: 'pt-BR', id: 'id-ID', tr: 'tr-TR', hi: 'hi-IN', vi: 'vi-VN' };
 let LANG = 'en';
 function pickLang() {
   const s = S.settings && S.settings.lang;
   if (s && L[s]) return s;
-  for (const l of (navigator.languages || [navigator.language || 'en'])) { const k = String(l).slice(0, 2).toLowerCase(); if (L[k]) return k; }
+  for (const l of (navigator.languages || [navigator.language || 'en'])) { let k = String(l).slice(0, 2).toLowerCase(); if (k === 'in') k = 'id'; if (L[k]) return k; }
   return 'en';
 }
 function t(k, v) {
@@ -386,7 +552,7 @@ function t(k, v) {
 }
 const DEF_IDS = ['todo', 'progress', 'events', 'buy'];
 const bn = b => b ? (b.name || t('board_' + b.id)) : '';
-const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const cap = s => s.charAt(0).toLocaleUpperCase(LOCALES[LANG]) + s.slice(1);
 function applyStatic() {
   document.documentElement.lang = LANG;
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
@@ -809,7 +975,7 @@ function openSettings() {
     <button class="btn danger" id="s-clear" style="width:100%;margin-bottom:10px">${t('del_all_done')} (${S.items.filter(i => i.done).length})</button>
     <div class="acts" style="margin-top:0"><button class="btn" id="s-exp">${t('export')}</button><button class="btn" id="s-imp">${t('import')}</button></div>
     <input type="file" id="s-file" accept="application/json" hidden>
-    <div class="note" style="text-align:center;margin-top:16px">Planner v1.9</div>`,
+    <div class="note" style="text-align:center;margin-top:16px">Planner v2.0</div>`,
   () => {
     $('#s-lang').onchange = e => { st.lang = e.target.value; save(); LANG = pickLang(); applyStatic(); render(); openSettings(); };
     $('#s-auto').onchange = e => { st.autoSave = e.target.checked; save(); };
