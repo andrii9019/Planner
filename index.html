@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -168,29 +168,29 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
 <div class="app">
   <header>
     <div><h1 id="title">Planner</h1><div class="sub" id="today"></div></div>
-    <button class="icon-btn" id="btn-settings" aria-label="Налаштування">
+    <button class="icon-btn" id="btn-settings" aria-label="Settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
     </button>
   </header>
-  <nav class="tabs" id="tabs" aria-label="Дошки"></nav>
+  <nav class="tabs" id="tabs" aria-label="Boards"></nav>
   <main id="list"></main>
 </div>
 
 <div class="dock"><div class="dock-in">
-  <button class="type" id="btn-type" aria-label="Додати текстом">
+  <button class="type" id="btn-type" aria-label="Add by typing">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
   </button>
   <button class="mic" id="btn-mic">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg>
-    Надиктувати
+    Dictate
   </button>
 </div></div>
 
-<div class="voice" id="voice" role="dialog" aria-label="Голосове введення">
+<div class="voice" id="voice" role="dialog" aria-label="Voice input">
   <div class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg></div>
-  <div class="vtext" id="vtext">Слухаю…</div>
-  <div class="vhint">Наприклад: «Купити молоко і хліб» або «Зустріч з Олегом завтра о 15:00»</div>
-  <div class="vacts"><button class="btn" id="v-cancel">Скасувати</button><button class="btn primary" id="v-done">Готово</button></div>
+  <div class="vtext" id="vtext">Listening…</div>
+  <div class="vhint">Speak in Ukrainian, e.g. «Купити молоко і хліб» or «Зустріч з Олегом завтра о 15:00»</div>
+  <div class="vacts"><button class="btn" id="v-cancel">Cancel</button><button class="btn primary" id="v-done">Done</button></div>
 </div>
 
 <div class="scrim" id="scrim"></div>
@@ -218,8 +218,8 @@ const COLORS = [
 const nextColor = () => COLORS.find(c => !S.boards.some(b => b.color.toLowerCase() === c.toLowerCase())) || COLORS[S.boards.length % COLORS.length];
 function paletteHTML(sel) {
   const s = (sel || '').toLowerCase(); const custom = s && !COLORS.some(c => c.toLowerCase() === s);
-  return `<div class="pal">${COLORS.map(c => `<button class="sw${c.toLowerCase() === s ? ' on' : ''}" data-c="${c}" style="--c:${c}" aria-label="Колір ${c}"></button>`).join('')}
-    <label class="sw custom${custom ? ' on' : ''}" style="--c:${custom ? sel : 'transparent'}" aria-label="Свій колір"><input type="color" value="${custom ? sel : '#0FB894'}"></label></div>`;
+  return `<div class="pal">${COLORS.map(c => `<button class="sw${c.toLowerCase() === s ? ' on' : ''}" data-c="${c}" style="--c:${c}" aria-label="Color ${c}"></button>`).join('')}
+    <label class="sw custom${custom ? ' on' : ''}" style="--c:${custom ? sel : 'transparent'}" aria-label="Custom color"><input type="color" value="${custom ? sel : '#0FB894'}"></label></div>`;
 }
 function bindPalette(root, onPick) {
   const pal = root.querySelector('.pal');
@@ -229,16 +229,16 @@ function bindPalette(root, onPick) {
   inp.oninput = () => { cu.style.setProperty('--c', inp.value); mark(cu); onPick(inp.value); };
 }
 const DEF_BOARDS = [
-  { id: 'todo', name: 'Завдання', color: '#0FB894' },
-  { id: 'progress', name: 'В процесі', color: '#F5A524' },
-  { id: 'events', name: 'Події', color: '#E5484D' },
-  { id: 'buy', name: 'Купити', color: '#3D5AFE' }
+  { id: 'todo', name: 'Tasks', color: '#0FB894' },
+  { id: 'progress', name: 'In progress', color: '#F5A524' },
+  { id: 'events', name: 'Events', color: '#E5484D' },
+  { id: 'buy', name: 'Shopping', color: '#3D5AFE' }
 ];
 const KEY = 'planner.v1';
 let S = load(); save();
 function load() {
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.boards)) return migrate(s); } catch (e) {}
-  return { v: 2, boards: DEF_BOARDS.map(b => ({ ...b })), items: [], active: 'all',
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.boards)) return migrate3(migrate(s)); } catch (e) {}
+  return { v: 3, boards: DEF_BOARDS.map(b => ({ ...b })), items: [], active: 'all',
     settings: { clientId: '', gConnected: false, autoSave: false, duration: 60 } };
 }
 function migrate(s) {
@@ -251,21 +251,28 @@ function migrate(s) {
   const buy = s.boards.find(b => b.id === 'buy'); if (buy && buy.color === '#12A594') buy.color = '#3D5AFE';
   s.active = 'all'; s.v = 2; return s;
 }
+function migrate3(s) {
+  if (s.v >= 3) return s;
+  const EN = { todo: ['Завдання', 'Tasks'], progress: ['В процесі', 'In progress'], events: ['Події', 'Events'], buy: ['Купити', 'Shopping'] };
+  s.boards.forEach(b => { const e = EN[b.id]; if (e && b.name === e[0]) b.name = e[1]; });
+  s.v = 3; return s;
+}
 const curBoard = () => (S.active !== 'all' && board(S.active)) ? S.active : (S.boards[0] ? S.boards[0].id : null);
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const board = id => S.boards.find(b => b.id === id);
 
 /* ---------- dates ---------- */
-const MONTHS = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
-const MSHORT = ['січ','лют','бер','квіт','трав','черв','лип','серп','вер','жовт','лист','груд'];
-const WDAYS = ['неділя','понеділок','вівторок','середа','четвер',"п'ятниця",'субота'];
+const UA_MONTHS = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MSHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const WDAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 function dayDiff(dstr) { const t = new Date(); t.setHours(0,0,0,0); return Math.round((new Date(dstr + 'T00:00') - t) / 864e5); }
 function dateLabel(dstr) {
   const n = dayDiff(dstr);
-  if (n === 0) return 'Сьогодні'; if (n === 1) return 'Завтра'; if (n === -1) return 'Вчора';
+  if (n === 0) return 'Today'; if (n === 1) return 'Tomorrow'; if (n === -1) return 'Yesterday';
   const d = new Date(dstr + 'T00:00');
-  if (n > 1 && n < 7) return WDAYS[d.getDay()][0].toUpperCase() + WDAYS[d.getDay()].slice(1);
-  return d.getDate() + ' ' + MSHORT[d.getMonth()] + (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : '');
+  if (n > 1 && n < 7) return WDAYS[d.getDay()];
+  return MSHORT[d.getMonth()] + ' ' + d.getDate() + (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : '');
 }
 
 /* ---------- voice parser (Ukrainian) ---------- */
@@ -279,7 +286,8 @@ function parse(raw) {
 
   // explicit board: "на дошку купити", "в дошку стратегічні"
   let m = cut(/\s(?:на|в|у|до)\s+дошк\S*\s+([^\s,.]+(?:\s+[^\s,.]+)?)/);
-  if (m) { const w = m[1]; const b = S.boards.find(b => { const n = b.name.toLowerCase(); return w.startsWith(n) || n.startsWith(w.split(' ')[0].slice(0, 4)); }); if (b) boardId = b.id; }
+  if (m) { const w = m[1]; const UA = { todo: 'завдання', progress: 'в процесі', events: 'події', buy: 'купити' };
+    const b = S.boards.find(b => [b.name.toLowerCase(), UA[b.id]].filter(Boolean).some(n => w.startsWith(n) || n.startsWith(w.split(' ')[0].slice(0, 4))));  if (b) boardId = b.id; }
   if (!boardId) {
     const low0 = low.trim();
     if (/^(купити|купи|придбати)\s/.test(low0) && board('buy')) { cut(/\s(купити|купи|придбати)\s/); boardId = 'buy'; }
@@ -298,8 +306,8 @@ function parse(raw) {
     if (m[1] === 'тиждень') date = plus(7);
     else { const n = W[m[1]] || parseInt(m[1]); date = plus(/тижн/.test(m[2] || '') ? n * 7 : n); }
   }
-  if (!date && (m = cut(new RegExp('\\s(\\d{1,2})(?:-?го)?\\s+(' + MONTHS.join('|') + ')(?:\\s+(\\d{4}))?\\s')))) {
-    const d = new Date(m[3] ? +m[3] : today.getFullYear(), MONTHS.indexOf(m[2]), +m[1]);
+  if (!date && (m = cut(new RegExp('\\s(\\d{1,2})(?:-?го)?\\s+(' + UA_MONTHS.join('|') + ')(?:\\s+(\\d{4}))?\\s')))) {
+    const d = new Date(m[3] ? +m[3] : today.getFullYear(), UA_MONTHS.indexOf(m[2]), +m[1]);
     if (!m[3] && d < today) d.setFullYear(d.getFullYear() + 1);
     date = ymd(d);
   }
@@ -335,21 +343,21 @@ function parse(raw) {
 function render() {
   if (S.active !== 'all' && !board(S.active)) S.active = 'all';
   const d = new Date();
-  $('#today').textContent = WDAYS[d.getDay()] + ', ' + d.getDate() + ' ' + MONTHS[d.getMonth()];
+  $('#today').textContent = WDAYS[d.getDay()] + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate();
   const openCount = id => S.items.filter(i => i.boardId === id && !i.done).length;
 
   const tabs = $('#tabs');
-  tabs.innerHTML = `<button class="tab${S.active === 'all' ? ' on' : ''}" data-v="all">Усі</button>` +
+  tabs.innerHTML = `<button class="tab${S.active === 'all' ? ' on' : ''}" data-v="all">All</button>` +
     S.boards.map(b => { const n = openCount(b.id);
       return `<button class="tab${b.id === S.active ? ' on' : ''}" data-v="${b.id}" data-id="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}${n ? `<span class="cnt">${n}</span>` : ''}</button>`; }).join('') +
-    `<button class="tab ghost plus" id="t-add" aria-label="Нова дошка">+</button><button class="tab ghost" id="t-edit">Змінити</button>`;
+    `<button class="tab ghost plus" id="t-add" aria-label="New board">+</button><button class="tab ghost" id="t-edit">Edit</button>`;
   tabs.querySelectorAll('[data-v]').forEach(el => el.onclick = () => { if (!tabDragged) go(el.dataset.v); });
   tabs.querySelectorAll('[data-id]').forEach(bindTabDrag);
   $('#t-add').onclick = () => addBoardSheet(); $('#t-edit').onclick = openBoards;
   const on = tabs.querySelector('.on'); if (on) on.scrollIntoView({ inline: 'nearest', block: 'nearest' });
 
   const list = $('#list');
-  if (!S.boards.length) { list.innerHTML = `<div class="empty"><b>Немає жодної дошки</b>Натисни «+», щоб створити першу.</div>`; return; }
+  if (!S.boards.length) { list.innerHTML = `<div class="empty"><b>No boards yet</b>Tap «+» to create your first one.</div>`; return; }
   const sortOpen = arr => arr.filter(i => !i.done).sort((a, b) => {
     if (a.date && b.date) return (a.date + (a.time || '99')).localeCompare(b.date + (b.time || '99'));
     if (a.date) return -1; if (b.date) return 1; return b.created - a.created;
@@ -359,26 +367,26 @@ function render() {
     list.innerHTML = S.boards.map(b => {
       const its = sortOpen(S.items.filter(i => i.boardId === b.id));
       return `<section class="grp"><button class="grp-h" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}<span class="n">${its.length || ''}</span></button>
-        ${its.length ? its.map(row).join('') : '<div class="grp-empty">Порожньо</div>'}</section>`;
+        ${its.length ? its.map(row).join('') : '<div class="grp-empty">Empty</div>'}</section>`;
     }).join('');
     const allDone = S.items.filter(i => i.done && board(i.boardId));
-    if (allDone.length) list.insertAdjacentHTML('beforeend', `<button class="all-clear" id="all-clear">Видалити всі виконані · ${allDone.length}</button>`);
+    if (allDone.length) list.insertAdjacentHTML('beforeend', `<button class="all-clear" id="all-clear">Delete all completed · ${allDone.length}</button>`);
     list.querySelectorAll('.grp-h').forEach(h => h.onclick = () => go(h.dataset.b, 1));
-    if (allDone.length) $('#all-clear').onclick = () => removeItems(allDone, `Видалено виконаних: ${allDone.length}`);
+    if (allDone.length) $('#all-clear').onclick = () => removeItems(allDone, `Deleted completed: ${allDone.length}`);
     bindItems(list); return;
   }
 
   const items = S.items.filter(i => i.boardId === S.active);
   const open = sortOpen(items);
   const done = items.filter(i => i.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
-  if (!items.length) { list.innerHTML = `<div class="empty"><b>Тут порожньо</b>Натисни «Надиктувати» і скажи, що треба зробити.</div>`; return; }
+  if (!items.length) { list.innerHTML = `<div class="empty"><b>Nothing here yet</b>Tap «Dictate» and say what needs to be done.</div>`; return; }
   list.innerHTML = open.map(row).join('') +
-    (done.length ? `<details class="donebox"${doneOpen ? ' open' : ''}><summary>Виконано · ${done.length}</summary>
-      <div class="done-acts"><span>Свайп убік видаляє</span><button class="clear-done">Видалити всі виконані</button></div>${done.map(row).join('')}</details>` : '');
+    (done.length ? `<details class="donebox"${doneOpen ? ' open' : ''}><summary>Completed · ${done.length}</summary>
+      <div class="done-acts"><span>Swipe sideways to delete</span><button class="clear-done">Delete all completed</button></div>${done.map(row).join('')}</details>` : '');
   bindItems(list);
   const db = list.querySelector('.donebox');
   if (db) { db.ontoggle = () => { doneOpen = db.open; };
-    db.querySelector('.clear-done').onclick = () => removeItems(done, `Видалено виконаних: ${done.length}`); }
+    db.querySelector('.clear-done').onclick = () => removeItems(done, `Deleted completed: ${done.length}`); }
 }
 const views = () => ['all', ...S.boards.map(b => b.id)];
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -400,7 +408,7 @@ let lpFired = false, doneOpen = false;
 function removeItems(arr, msg) {
   if (!arr.length) return;
   S.items = S.items.filter(i => !arr.includes(i)); save(); render();
-  toast(msg, 'Повернути', () => { S.items.push(...arr.filter(i => !S.items.includes(i))); save(); render(); });
+  toast(msg, 'Undo', () => { S.items.push(...arr.filter(i => !S.items.includes(i))); save(); render(); });
 }
 function bindItems(root) {
   root.querySelectorAll('.item').forEach(el => {
@@ -420,14 +428,14 @@ function longPress(el, fn) {
   el.addEventListener('contextmenu', e => e.preventDefault());
 }
 function openMove(it) {
-  openSheet(`<div class="sh-h"><h2>Перемістити</h2><button class="x" data-close aria-label="Закрити">✕</button></div>
+  openSheet(`<div class="sh-h"><h2>Move to</h2><button class="x" data-close aria-label="Close">✕</button></div>
     <div class="mv-t">${esc(it.title)}</div>
     <div class="chips big" id="mv">${S.boards.map(b => `<button class="chip${b.id === it.boardId ? ' on' : ''}" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}</button>`).join('')}</div>
-    <div class="acts"><button class="btn danger" id="mv-del">Видалити</button><button class="btn" id="mv-edit">Редагувати</button></div>`,
+    <div class="acts"><button class="btn danger" id="mv-del">Delete</button><button class="btn" id="mv-edit">Edit</button></div>`,
   () => {
     $('#mv').onclick = e => { const c = e.target.closest('.chip'); if (!c) return;
       const from = it.boardId; it.boardId = c.dataset.b; save(); closeSheet(); render();
-      if (from !== it.boardId) toast('Переміщено в «' + board(it.boardId).name + '»', 'Повернути', () => { it.boardId = from; save(); render(); }); };
+      if (from !== it.boardId) toast('Moved to «' + board(it.boardId).name + '»', 'Undo', () => { it.boardId = from; save(); render(); }); };
     $('#mv-edit').onclick = () => openEdit(it);
     $('#mv-del').onclick = () => deleteItem(it);
   });
@@ -436,7 +444,7 @@ function deleteItem(it) {
   const idx = S.items.indexOf(it); if (idx < 0) return;
   S.items.splice(idx, 1); save(); closeSheet(); render();
   let undone = false;
-  toast('Видалено', 'Повернути', () => { undone = true; S.items.splice(idx, 0, it); save(); render(); });
+  toast('Deleted', 'Undo', () => { undone = true; S.items.splice(idx, 0, it); save(); render(); });
   setTimeout(() => { if (!undone && it.gid) calDelete(it); }, 4800);
 }
 
@@ -518,16 +526,16 @@ function bindTabDrag(el) {
       el.style.height = el.offsetHeight + 'px'; el.getBoundingClientRect();
       el.style.transition = 'height 160ms ease-out, margin 160ms ease-out, padding 160ms ease-out';
       el.style.height = '0'; el.style.margin = '0'; el.style.paddingTop = el.style.paddingBottom = '0'; el.style.overflow = 'hidden';
-      setTimeout(() => { if (it) removeItems([it], 'Видалено'); }, 160);
+      setTimeout(() => { if (it) removeItems([it], 'Deleted'); }, 160);
     }, 150);
   }
 })();
 
 function addBoardSheet(back) {
   let color = nextColor();
-  openSheet(`<div class="sh-h"><h2>Нова дошка</h2><button class="x" data-close aria-label="Закрити">✕</button></div>
-    <input type="text" id="nb" placeholder="Назва дошки"><div class="lbl">Колір</div>${paletteHTML(color)}
-    <div class="acts"><button class="btn primary" id="nb-save">Створити</button></div>`,
+  openSheet(`<div class="sh-h"><h2>New board</h2><button class="x" data-close aria-label="Close">✕</button></div>
+    <input type="text" id="nb" placeholder="Board name"><div class="lbl">Color</div>${paletteHTML(color)}
+    <div class="acts"><button class="btn primary" id="nb-save">Create</button></div>`,
   () => { const i = $('#nb'); bindPalette($('#sheet-c'), c => { color = c; });
     const mk = () => { const v = i.value.trim(); if (!v) { i.focus(); return; }
       const nb = { id: uid(), name: v, color }; S.boards.push(nb); save(); closeSheet(); if (back) back(); else go(nb.id); };
@@ -539,14 +547,14 @@ function row(i) {
     const n = dayDiff(i.date); const cls = (!i.done && n < 0) ? ' late' : (n === 0 ? ' today' : '');
     meta += `<span class="pill${cls}">${dateLabel(i.date)}${i.time ? ', ' + i.time : ''}</span>`;
   }
-  if (i.gid) meta += `<span class="pill" title="У Google Календарі">${ICON_CAL}Календар</span>`;
+  if (i.gid) meta += `<span class="pill" title="In Google Calendar">${ICON_CAL}Calendar</span>`;
   return `<div class="item${i.done ? ' done' : ''}" data-id="${i.id}">
-    <button class="chk" aria-label="${i.done ? 'Повернути' : 'Виконано'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+    <button class="chk" aria-label="${i.done ? 'Mark as not done' : 'Mark as done'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
     <button class="body"><div class="t">${esc(i.title)}</div>${meta ? `<div class="meta">${meta}</div>` : ''}</button></div>`;
 }
 function toggleDone(it) {
   it.done = !it.done; it.doneAt = it.done ? Date.now() : null; save(); render();
-  if (it.done) toast('Виконано', 'Повернути', () => { it.done = false; it.doneAt = null; save(); render(); });
+  if (it.done) toast('Completed', 'Undo', () => { it.done = false; it.doneAt = null; save(); render(); });
 }
 
 /* ---------- sheet & toast ---------- */
@@ -571,25 +579,25 @@ function openEdit(it, pre) {
   const d = it ? { ...it } : { boardId: curBoard(), title: '', date: null, time: null, cal: false, ...(pre || {}) };
   if (isNew && pre) d.cal = !!(d.date && (d.time || d.boardId === 'events'));
   openSheet(`
-    <div class="sh-h"><h2>${isNew ? 'Нове завдання' : 'Завдання'}</h2><button class="x" data-close aria-label="Закрити">✕</button></div>
-    <textarea id="f-title" rows="2" placeholder="Що треба зробити?">${esc(d.title)}</textarea>
-    <div class="lbl">Дошка</div>
+    <div class="sh-h"><h2>${isNew ? 'New task' : 'Task'}</h2><button class="x" data-close aria-label="Close">✕</button></div>
+    <textarea id="f-title" rows="2" placeholder="What needs to be done?">${esc(d.title)}</textarea>
+    <div class="lbl">Board</div>
     <div class="chips" id="f-boards">${S.boards.map(b => `<button class="chip${b.id === d.boardId ? ' on' : ''}" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}</button>`).join('')}</div>
     <div class="row2">
-      <label class="fld"><span>Дата</span><input type="date" id="f-date" value="${d.date || ''}"></label>
-      <label class="fld"><span>Час</span><input type="time" id="f-time" value="${d.time || ''}"></label>
+      <label class="fld"><span>Date</span><input type="date" id="f-date" value="${d.date || ''}"></label>
+      <label class="fld"><span>Time</span><input type="time" id="f-time" value="${d.time || ''}"></label>
     </div>
-    <label class="tgl"><input type="checkbox" id="f-cal" ${d.cal ? 'checked' : ''}><span>Додати в Google Календар</span></label>
+    <label class="tgl"><input type="checkbox" id="f-cal" ${d.cal ? 'checked' : ''}><span>Add to Google Calendar</span></label>
     <div class="note" id="f-calnote"></div>
-    <div class="acts">${isNew ? '' : `<button class="btn danger" id="f-del">Видалити</button>`}<button class="btn primary" id="f-save">Зберегти</button></div>`,
+    <div class="acts">${isNew ? '' : `<button class="btn danger" id="f-del">Delete</button>`}<button class="btn primary" id="f-save">Save</button></div>`,
   () => {
     let bId = d.boardId;
     const ta = $('#f-title'); if (isNew && !pre) setTimeout(() => ta.focus(), 250);
     $('#f-boards').onclick = e => { const c = e.target.closest('.chip'); if (!c) return; bId = c.dataset.b;
       $('#f-boards').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c)); };
     const note = () => { $('#f-calnote').textContent = !$('#f-cal').checked ? '' :
-      !$('#f-date').value ? 'Щоб додати в календар, вкажи дату.' :
-      calReady() ? 'Подія синхронізується автоматично.' : 'Після збереження відкриється Google Календар, щоб підтвердити подію. Автосинхронізацію можна увімкнути в налаштуваннях.'; };
+      !$('#f-date').value ? 'Set a date to add it to the calendar.' :
+      calReady() ? 'The event will sync automatically.' : 'After saving, Google Calendar opens so you can confirm the event. Auto-sync can be turned on in Settings.'; };
     ['#f-cal', '#f-date'].forEach(s => $(s).onchange = note); note();
     $('#f-save').onclick = () => {
       const title = ta.value.trim(); if (!title) { ta.focus(); return; }
@@ -610,15 +618,15 @@ function afterSave(rec, gesture) {
 /* ---------- boards manager ---------- */
 function openBoards() {
   const draw = () => openSheet(`
-    <div class="sh-h"><h2>Дошки</h2><button class="x" data-close aria-label="Закрити">✕</button></div>
+    <div class="sh-h"><h2>Boards</h2><button class="x" data-close aria-label="Close">✕</button></div>
     <div id="b-list">${S.boards.map(b => `<div class="brow" data-id="${b.id}">
-      <button class="swatch" style="--c:${b.color}" aria-label="Змінити колір"></button>
-      <input type="text" value="${esc(b.name)}" aria-label="Назва дошки">
-      <button class="mvb" data-d="-1" aria-label="Вище" ${S.boards[0] === b ? 'disabled' : ''}>↑</button>
-      <button class="mvb" data-d="1" aria-label="Нижче" ${S.boards[S.boards.length - 1] === b ? 'disabled' : ''}>↓</button>
-      <button class="del" aria-label="Видалити дошку">${ICON_TRASH}</button></div>`).join('')}</div>
-    <div class="acts" style="margin-top:14px"><button class="btn" id="b-add">+ Нова дошка</button></div>
-    <div class="note">Торкнись кольорового кола, щоб вибрати колір. Порядок можна міняти стрілками або довгим натиском на дошку вгорі.</div>`,
+      <button class="swatch" style="--c:${b.color}" aria-label="Change color"></button>
+      <input type="text" value="${esc(b.name)}" aria-label="Board name">
+      <button class="mvb" data-d="-1" aria-label="Move up" ${S.boards[0] === b ? 'disabled' : ''}>↑</button>
+      <button class="mvb" data-d="1" aria-label="Move down" ${S.boards[S.boards.length - 1] === b ? 'disabled' : ''}>↓</button>
+      <button class="del" aria-label="Delete board">${ICON_TRASH}</button></div>`).join('')}</div>
+    <div class="acts" style="margin-top:14px"><button class="btn" id="b-add">+ New board</button></div>
+    <div class="note">Tap the color circle to pick a color. Reorder with the arrows, or long-press a board at the top and drag it.</div>`,
   () => {
     $('#b-list').querySelectorAll('.brow').forEach(r => {
       const b = board(r.dataset.id);
@@ -628,7 +636,7 @@ function openBoards() {
         if (j < 0 || j >= S.boards.length) return; [S.boards[i], S.boards[j]] = [S.boards[j], S.boards[i]]; save(); render(); draw(); });
       r.querySelector('.del').onclick = () => {
         const n = S.items.filter(i => i.boardId === b.id).length;
-        if (!confirm(`Видалити дошку «${b.name}»${n ? ` разом із ${n} завдан${n === 1 ? 'ням' : 'нями'}` : ''}?`)) return;
+        if (!confirm(`Delete board «${b.name}»${n ? ` and its ${n} task${n === 1 ? '' : 's'}` : ''}?`)) return;
         S.items.filter(i => i.boardId === b.id && i.gid).forEach(calDelete);
         S.items = S.items.filter(i => i.boardId !== b.id); S.boards = S.boards.filter(x => x !== b);
         save(); render(); draw();
@@ -640,8 +648,8 @@ function openBoards() {
 }
 
 function openColor(b, back) {
-  openSheet(`<div class="sh-h"><h2>Колір: ${esc(b.name)}</h2><button class="x" id="c-back" aria-label="Назад">✕</button></div>
-    ${paletteHTML(b.color)}<div class="acts"><button class="btn primary" id="c-ok">Готово</button></div>`,
+  openSheet(`<div class="sh-h"><h2>Color: ${esc(b.name)}</h2><button class="x" id="c-back" aria-label="Back">✕</button></div>
+    ${paletteHTML(b.color)}<div class="acts"><button class="btn primary" id="c-ok">Done</button></div>`,
   () => { bindPalette($('#sheet-c'), c => { b.color = c; save(); render(); });
     $('#c-ok').onclick = $('#c-back').onclick = () => back(); });
 }
@@ -650,27 +658,27 @@ function openColor(b, back) {
 function openSettings() {
   const st = S.settings;
   openSheet(`
-    <div class="sh-h"><h2>Налаштування</h2><button class="x" data-close aria-label="Закрити">✕</button></div>
-    <label class="tgl"><input type="checkbox" id="s-auto" ${st.autoSave ? 'checked' : ''}><span>Зберігати одразу після диктування, без перевірки</span></label>
+    <div class="sh-h"><h2>Settings</h2><button class="x" data-close aria-label="Close">✕</button></div>
+    <label class="tgl"><input type="checkbox" id="s-auto" ${st.autoSave ? 'checked' : ''}><span>Save right after dictation, without review</span></label>
     <hr>
-    <div class="sh-h" style="margin-bottom:6px"><h2 style="font-size:17px">Google Календар</h2>
-      <span class="status${calReady() ? ' ok' : ''}">${calReady() ? 'Підключено' : 'Не підключено'}</span></div>
+    <div class="sh-h" style="margin-bottom:6px"><h2 style="font-size:17px">Google Calendar</h2>
+      <span class="status${calReady() ? ' ok' : ''}">${calReady() ? 'Connected' : 'Not connected'}</span></div>
     <div class="lbl">Client ID</div>
     <input type="text" id="s-cid" placeholder="xxxx.apps.googleusercontent.com" value="${esc(st.clientId)}" autocomplete="off" spellcheck="false">
-    <div class="acts" style="margin-top:12px"><button class="btn primary" id="s-connect">${calReady() ? 'Перепідключити' : 'Підключити'}</button>
-      ${st.gConnected ? '<button class="btn" id="s-off">Відключити</button>' : ''}</div>
-    <div class="lbl">Тривалість події за замовчуванням</div>
-    <select id="s-dur">${[15, 30, 60, 90, 120].map(v => `<option value="${v}"${+st.duration === v ? ' selected' : ''}>${v} хв</option>`).join('')}</select>
-    <details class="note" style="margin-top:14px"><summary class="link">Як отримати Client ID</summary><ol>
-      <li>Відкрий console.cloud.google.com і створи проєкт.</li>
-      <li>APIs &amp; Services → Library → увімкни Google Calendar API.</li>
-      <li>OAuth consent screen → External, додай свою пошту в Test users.</li>
+    <div class="acts" style="margin-top:12px"><button class="btn primary" id="s-connect">${calReady() ? 'Reconnect' : 'Connect'}</button>
+      ${st.gConnected ? '<button class="btn" id="s-off">Disconnect</button>' : ''}</div>
+    <div class="lbl">Default event duration</div>
+    <select id="s-dur">${[15, 30, 60, 90, 120].map(v => `<option value="${v}"${+st.duration === v ? ' selected' : ''}>${v} min</option>`).join('')}</select>
+    <details class="note" style="margin-top:14px"><summary class="link">How to get a Client ID</summary><ol>
+      <li>Open console.cloud.google.com and create a project.</li>
+      <li>APIs &amp; Services → Library → enable Google Calendar API.</li>
+      <li>OAuth consent screen → External, add your email under Test users.</li>
       <li>Credentials → Create credentials → OAuth client ID → Web application.</li>
-      <li>У Authorized JavaScript origins додай адресу, де відкритий цей додаток: <b>${esc(location.origin)}</b></li>
-      <li>Скопіюй Client ID сюди й натисни «Підключити».</li></ol></details>
+      <li>Under Authorized JavaScript origins, add the address this app runs at: <b>${esc(location.origin)}</b></li>
+      <li>Paste the Client ID here and tap «Connect».</li></ol></details>
     <hr>
-    <button class="btn danger" id="s-clear" style="width:100%;margin-bottom:10px">Видалити всі виконані (${S.items.filter(i => i.done).length})</button>
-    <div class="acts" style="margin-top:0"><button class="btn" id="s-exp">Експорт</button><button class="btn" id="s-imp">Імпорт</button></div>
+    <button class="btn danger" id="s-clear" style="width:100%;margin-bottom:10px">Delete all completed (${S.items.filter(i => i.done).length})</button>
+    <div class="acts" style="margin-top:0"><button class="btn" id="s-exp">Export</button><button class="btn" id="s-imp">Import</button></div>
     <input type="file" id="s-file" accept="application/json" hidden>`,
   () => {
     $('#s-auto').onchange = e => { st.autoSave = e.target.checked; save(); };
@@ -678,14 +686,14 @@ function openSettings() {
     $('#s-cid').onchange = e => { const v = e.target.value.trim(); if (v !== st.clientId) { st.clientId = v; st.gConnected = false; token = null; save(); } };
     $('#s-connect').onclick = async () => {
       st.clientId = $('#s-cid').value.trim(); save();
-      if (!st.clientId) { toast('Встав Client ID'); return; }
-      try { token = null; await getToken(true); toast('Google Календар підключено'); openSettings();
+      if (!st.clientId) { toast('Paste a Client ID first'); return; }
+      try { token = null; await getToken(true); toast('Google Calendar connected'); openSettings();
         S.items.filter(i => i.cal && i.date && !i.gid && !i.done).forEach(syncItem);
-      } catch (e) { toast('Не вдалося підключитися: ' + e.message); }
+      } catch (e) { toast('Could not connect: ' + e.message); }
     };
     if ($('#s-off')) $('#s-off').onclick = () => { st.gConnected = false; token = null; save(); openSettings(); };
-    $('#s-clear').onclick = () => { const d = S.items.filter(i => i.done); if (!d.length) { toast('Виконаних завдань немає'); return; }
-      closeSheet(); removeItems(d, `Видалено виконаних: ${d.length}`); };
+    $('#s-clear').onclick = () => { const d = S.items.filter(i => i.done); if (!d.length) { toast('No completed tasks'); return; }
+      closeSheet(); removeItems(d, `Deleted completed: ${d.length}`); };
     $('#s-exp').onclick = () => {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([JSON.stringify({ boards: S.boards, items: S.items }, null, 2)], { type: 'application/json' }));
@@ -694,9 +702,9 @@ function openSettings() {
     $('#s-imp').onclick = () => $('#s-file').click();
     $('#s-file').onchange = async e => {
       try { const j = JSON.parse(await e.target.files[0].text()); if (!Array.isArray(j.boards) || !Array.isArray(j.items)) throw 0;
-        if (!confirm('Замінити всі поточні дошки й завдання даними з файлу?')) return;
-        S.boards = j.boards; S.items = j.items; save(); render(); closeSheet(); toast('Дані імпортовано');
-      } catch (_) { toast('Файл не схожий на резервну копію Planner'); }
+        if (!confirm('Replace all current boards and tasks with the data from this file?')) return;
+        S.boards = j.boards; S.items = j.items; save(); render(); closeSheet(); toast('Data imported');
+      } catch (_) { toast('This file doesn’t look like a Planner backup'); }
     };
   });
 }
@@ -709,7 +717,7 @@ function gisLoad() {
   return new Promise((res, rej) => {
     if (window.google && google.accounts && google.accounts.oauth2) return res();
     const s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client';
-    s.onload = res; s.onerror = () => rej(new Error('немає зʼєднання з Google')); document.head.appendChild(s);
+    s.onload = res; s.onerror = () => rej(new Error('no connection to Google')); document.head.appendChild(s);
   });
 }
 async function getToken(interactive) {
@@ -724,7 +732,7 @@ async function getToken(interactive) {
         try { sessionStorage.setItem('planner.tok', JSON.stringify({ v: token, exp: tokenExp })); } catch (e) {}
         S.settings.gConnected = true; save(); res(token);
       },
-      error_callback: e => rej(new Error(e.type === 'popup_closed' ? 'вікно закрито' : (e.type || 'помилка')))
+      error_callback: e => rej(new Error(e.type === 'popup_closed' ? 'window closed' : (e.type || 'error')))
     });
     c.requestAccessToken({ prompt: interactive ? 'consent' : '' });
   });
@@ -753,7 +761,7 @@ async function syncItem(it) {
       it.gid = (await r.json()).id;
     } else if (it.gid) { await calDelete(it); }
     save(); render();
-  } catch (e) { toast('Календар: не вдалося синхронізувати', 'Ще раз', () => syncItem(it)); }
+  } catch (e) { toast('Calendar: sync failed', 'Retry', () => syncItem(it)); }
 }
 async function calDelete(it) {
   if (!it.gid || !calReady()) return;
@@ -775,22 +783,22 @@ function templateUrl(it) {
 let rec = null, finalTxt = '', interimTxt = '', cancelled = false;
 function startVoice() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { toast('Голосове введення працює в Chrome на Android'); openEdit(null); return; }
+  if (!SR) { toast('Voice input works in Chrome on Android'); openEdit(null); return; }
   if (rec) return;
   finalTxt = ''; interimTxt = ''; cancelled = false;
-  $('#vtext').textContent = 'Слухаю…'; $('#voice').classList.add('show');
+  $('#vtext').textContent = 'Listening…'; $('#voice').classList.add('show');
   rec = new SR(); rec.lang = 'uk-UA'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
   rec.onresult = e => {
     interimTxt = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const r = e.results[i]; if (r.isFinal) finalTxt += r[0].transcript; else interimTxt += r[0].transcript;
     }
-    $('#vtext').textContent = (finalTxt + interimTxt) || 'Слухаю…';
+    $('#vtext').textContent = (finalTxt + interimTxt) || 'Listening…';
   };
   rec.onerror = e => {
-    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast('Дозволь доступ до мікрофона для цього сайту');
-    else if (e.error === 'no-speech') toast('Нічого не почув. Спробуй ще раз');
-    else if (e.error === 'network') toast('Для розпізнавання мови потрібен інтернет');
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast('Allow microphone access for this site');
+    else if (e.error === 'no-speech') toast('Didn’t catch that. Try again');
+    else if (e.error === 'network') toast('Speech recognition needs an internet connection');
   };
   rec.onend = () => {
     $('#voice').classList.remove('show'); rec = null;
@@ -800,7 +808,7 @@ function startVoice() {
     if (S.settings.autoSave) {
       const it = { id: uid(), created: Date.now(), done: false, ...p, cal: !!(p.date && (p.time || p.boardId === 'events')) };
       S.items.push(it); if (S.active !== 'all') S.active = it.boardId; save(); render(); afterSave(it, false);
-      toast('Додано в «' + board(it.boardId).name + '»', 'Змінити', () => openEdit(it));
+      toast('Added to «' + board(it.boardId).name + '»', 'Edit', () => openEdit(it));
     } else openEdit(null, p);
   };
   try { rec.start(); } catch (e) { rec = null; $('#voice').classList.remove('show'); }
