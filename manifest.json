@@ -1,7 +1,8 @@
 {
-  "name": "Planner",
-  "short_name": "Planner",
-  "description": "Voice-first organizer: task boards with Google Calendar sync",
+  "id": "./",
+  "name": "Wavelist",
+  "short_name": "Wavelist",
+  "description": "Wavelist: voice to-do planner with boards and Google Calendar sync",
   "lang": "en",
   "start_url": "./",
   "scope": "./",

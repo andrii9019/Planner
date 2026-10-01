@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F2F4F9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#141824" media="(prefers-color-scheme: dark)">
-<title>Planner</title>
+<title>Wavelist</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -167,7 +167,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
 <body>
 <div class="app">
   <header>
-    <div><h1 id="title">Planner</h1><div class="sub" id="today"></div></div>
+    <div><h1 id="title">Wavelist</h1><div class="sub" id="today"></div></div>
     <button class="icon-btn" id="btn-settings" data-i18n-aria="settings" aria-label="Settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
     </button>
@@ -298,7 +298,7 @@ const L = {
     export:'Export', import:'Import', paste_client:'Paste a Client ID first', gcal_connected:'Google Calendar connected',
     cant_connect:'Could not connect: ', no_done:'No completed tasks',
     replace_confirm:'Replace all current boards and tasks with the data from this file?', imported:'Data imported',
-    bad_backup:'This file doesn’t look like a Planner backup', no_google:'no connection to Google', win_closed:'window closed', error:'error',
+    bad_backup:'This file doesn’t look like a Wavelist backup', no_google:'no connection to Google', win_closed:'window closed', error:'error',
     sync_failed:'Calendar: sync failed', retry:'Retry', voice_chrome:'Voice input works in Chrome on Android',
     mic_allow:'Allow microphone access for this site', no_speech:'Didn’t catch that. Try again',
     need_net:'Speech recognition needs an internet connection', added_to:'Added to «{b}»', language:'Language', auto_lang:'Automatic (phone)', close:'Close'
@@ -331,7 +331,7 @@ const L = {
     export:'Експорт', import:'Імпорт', paste_client:'Встав Client ID', gcal_connected:'Google Календар підключено',
     cant_connect:'Не вдалося підключитися: ', no_done:'Виконаних завдань немає',
     replace_confirm:'Замінити всі поточні дошки й завдання даними з файлу?', imported:'Дані імпортовано',
-    bad_backup:'Файл не схожий на резервну копію Planner', no_google:'немає зʼєднання з Google', win_closed:'вікно закрито', error:'помилка',
+    bad_backup:'Файл не схожий на резервну копію Wavelist', no_google:'немає зʼєднання з Google', win_closed:'вікно закрито', error:'помилка',
     sync_failed:'Календар: не вдалося синхронізувати', retry:'Ще раз', voice_chrome:'Голосове введення працює в Chrome на Android',
     mic_allow:'Дозволь доступ до мікрофона для цього сайту', no_speech:'Нічого не почув. Спробуй ще раз',
     need_net:'Для розпізнавання мови потрібен інтернет', added_to:'Додано в «{b}»', language:'Мова', auto_lang:'Як у телефоні', close:'Закрити'
@@ -364,7 +364,7 @@ const L = {
     export:'Exportar', import:'Importar', paste_client:'Pega primero un Client ID', gcal_connected:'Google Calendar conectado',
     cant_connect:'No se pudo conectar: ', no_done:'No hay tareas completadas',
     replace_confirm:'¿Reemplazar todos los tableros y tareas actuales con los datos de este archivo?', imported:'Datos importados',
-    bad_backup:'Este archivo no parece una copia de seguridad de Planner', no_google:'sin conexión con Google', win_closed:'ventana cerrada', error:'error',
+    bad_backup:'Este archivo no parece una copia de seguridad de Wavelist', no_google:'sin conexión con Google', win_closed:'ventana cerrada', error:'error',
     sync_failed:'Calendario: error de sincronización', retry:'Reintentar', voice_chrome:'La entrada de voz funciona en Chrome para Android',
     mic_allow:'Permite el acceso al micrófono para este sitio', no_speech:'No te he entendido. Inténtalo de nuevo',
     need_net:'El reconocimiento de voz necesita conexión a internet', added_to:'Añadido a «{b}»', language:'Idioma', auto_lang:'Automático (teléfono)', close:'Cerrar'
@@ -398,7 +398,7 @@ const L = {
     export:'Exportar', import:'Importar', paste_client:'Cole um Client ID primeiro', gcal_connected:'Google Agenda conectado',
     cant_connect:'Não foi possível conectar: ', no_done:'Nenhuma tarefa concluída',
     replace_confirm:'Substituir todos os quadros e tarefas atuais pelos dados deste arquivo?', imported:'Dados importados',
-    bad_backup:'Este arquivo não parece um backup do Planner', no_google:'sem conexão com o Google', win_closed:'janela fechada', error:'erro',
+    bad_backup:'Este arquivo não parece um backup do Wavelist', no_google:'sem conexão com o Google', win_closed:'janela fechada', error:'erro',
     sync_failed:'Agenda: falha na sincronização', retry:'Tentar de novo', voice_chrome:'A entrada de voz funciona no Chrome para Android',
     mic_allow:'Permita o acesso ao microfone para este site', no_speech:'Não entendi. Tente de novo',
     need_net:'O reconhecimento de voz precisa de internet', added_to:'Adicionado a «{b}»', language:'Idioma', auto_lang:'Automático (telefone)', close:'Fechar'
@@ -431,7 +431,7 @@ const L = {
     export:'Ekspor', import:'Impor', paste_client:'Tempel Client ID terlebih dahulu', gcal_connected:'Google Kalender terhubung',
     cant_connect:'Tidak dapat terhubung: ', no_done:'Tidak ada tugas yang selesai',
     replace_confirm:'Ganti semua papan dan tugas saat ini dengan data dari file ini?', imported:'Data diimpor',
-    bad_backup:'File ini sepertinya bukan cadangan Planner', no_google:'tidak ada koneksi ke Google', win_closed:'jendela ditutup', error:'galat',
+    bad_backup:'File ini sepertinya bukan cadangan Wavelist', no_google:'tidak ada koneksi ke Google', win_closed:'jendela ditutup', error:'galat',
     sync_failed:'Kalender: sinkronisasi gagal', retry:'Coba lagi', voice_chrome:'Input suara berfungsi di Chrome untuk Android',
     mic_allow:'Izinkan akses mikrofon untuk situs ini', no_speech:'Tidak terdengar. Coba lagi',
     need_net:'Pengenalan suara memerlukan koneksi internet', added_to:'Ditambahkan ke «{b}»', language:'Bahasa', auto_lang:'Otomatis (ponsel)', close:'Tutup'
@@ -464,7 +464,7 @@ const L = {
     export:'Dışa aktar', import:'İçe aktar', paste_client:'Önce bir Client ID yapıştırın', gcal_connected:'Google Takvim bağlandı',
     cant_connect:'Bağlanılamadı: ', no_done:'Tamamlanmış görev yok',
     replace_confirm:'Mevcut tüm panolar ve görevler bu dosyadaki verilerle değiştirilsin mi?', imported:'Veriler içe aktarıldı',
-    bad_backup:'Bu dosya bir Planner yedeği gibi görünmüyor', no_google:'Google’a bağlantı yok', win_closed:'pencere kapatıldı', error:'hata',
+    bad_backup:'Bu dosya bir Wavelist yedeği gibi görünmüyor', no_google:'Google’a bağlantı yok', win_closed:'pencere kapatıldı', error:'hata',
     sync_failed:'Takvim: senkronizasyon başarısız', retry:'Tekrar dene', voice_chrome:'Sesli giriş Android’de Chrome’da çalışır',
     mic_allow:'Bu site için mikrofon erişimine izin verin', no_speech:'Anlaşılamadı. Tekrar deneyin',
     need_net:'Ses tanıma için internet bağlantısı gerekir', added_to:'«{b}» panosuna eklendi', language:'Dil', auto_lang:'Otomatik (telefon)', close:'Kapat'
@@ -497,7 +497,7 @@ const L = {
     export:'एक्सपोर्ट', import:'इंपोर्ट', paste_client:'पहले Client ID पेस्ट करें', gcal_connected:'Google Calendar कनेक्ट हो गया',
     cant_connect:'कनेक्ट नहीं हो सका: ', no_done:'कोई पूरा कार्य नहीं है',
     replace_confirm:'क्या सभी मौजूदा बोर्ड और कार्य इस फ़ाइल के डेटा से बदल दें?', imported:'डेटा इंपोर्ट हो गया',
-    bad_backup:'यह फ़ाइल Planner का बैकअप नहीं लगती', no_google:'Google से कनेक्शन नहीं है', win_closed:'विंडो बंद हो गई', error:'त्रुटि',
+    bad_backup:'यह फ़ाइल Wavelist का बैकअप नहीं लगती', no_google:'Google से कनेक्शन नहीं है', win_closed:'विंडो बंद हो गई', error:'त्रुटि',
     sync_failed:'कैलेंडर: सिंक नहीं हो सका', retry:'फिर से कोशिश करें', voice_chrome:'वॉइस इनपुट Android पर Chrome में काम करता है',
     mic_allow:'इस साइट के लिए माइक्रोफ़ोन की अनुमति दें', no_speech:'सुनाई नहीं दिया। फिर से कोशिश करें',
     need_net:'आवाज़ पहचानने के लिए इंटरनेट चाहिए', added_to:'«{b}» में जोड़ा गया', language:'भाषा', auto_lang:'अपने-आप (फ़ोन)', close:'बंद करें'
@@ -530,7 +530,7 @@ const L = {
     export:'Xuất', import:'Nhập', paste_client:'Hãy dán Client ID trước', gcal_connected:'Đã kết nối Google Lịch',
     cant_connect:'Không thể kết nối: ', no_done:'Không có việc nào đã xong',
     replace_confirm:'Thay toàn bộ bảng và việc hiện tại bằng dữ liệu từ tệp này?', imported:'Đã nhập dữ liệu',
-    bad_backup:'Tệp này có vẻ không phải bản sao lưu của Planner', no_google:'không có kết nối tới Google', win_closed:'cửa sổ đã đóng', error:'lỗi',
+    bad_backup:'Tệp này có vẻ không phải bản sao lưu của Wavelist', no_google:'không có kết nối tới Google', win_closed:'cửa sổ đã đóng', error:'lỗi',
     sync_failed:'Lịch: đồng bộ thất bại', retry:'Thử lại', voice_chrome:'Nhập bằng giọng nói hoạt động trên Chrome cho Android',
     mic_allow:'Hãy cho phép trang này dùng micrô', no_speech:'Không nghe rõ. Hãy thử lại',
     need_net:'Nhận dạng giọng nói cần kết nối internet', added_to:'Đã thêm vào «{b}»', language:'Ngôn ngữ', auto_lang:'Tự động (theo điện thoại)', close:'Đóng'
@@ -975,7 +975,7 @@ function openSettings() {
     <button class="btn danger" id="s-clear" style="width:100%;margin-bottom:10px">${t('del_all_done')} (${S.items.filter(i => i.done).length})</button>
     <div class="acts" style="margin-top:0"><button class="btn" id="s-exp">${t('export')}</button><button class="btn" id="s-imp">${t('import')}</button></div>
     <input type="file" id="s-file" accept="application/json" hidden>
-    <div class="note" style="text-align:center;margin-top:16px">Planner v2.0</div>`,
+    <div class="note" style="text-align:center;margin-top:16px">Wavelist v2.1</div>`,
   () => {
     $('#s-lang').onchange = e => { st.lang = e.target.value; save(); LANG = pickLang(); applyStatic(); render(); openSettings(); };
     $('#s-auto').onchange = e => { st.autoSave = e.target.checked; save(); };
@@ -994,7 +994,7 @@ function openSettings() {
     $('#s-exp').onclick = () => {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([JSON.stringify({ boards: S.boards, items: S.items }, null, 2)], { type: 'application/json' }));
-      a.download = 'planner-backup-' + ymd(new Date()) + '.json'; a.click();
+      a.download = 'wavelist-backup-' + ymd(new Date()) + '.json'; a.click();
     };
     $('#s-imp').onclick = () => $('#s-file').click();
     $('#s-file').onchange = async e => {
