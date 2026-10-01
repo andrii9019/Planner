@@ -168,29 +168,29 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
 <div class="app">
   <header>
     <div><h1 id="title">Planner</h1><div class="sub" id="today"></div></div>
-    <button class="icon-btn" id="btn-settings" aria-label="Settings">
+    <button class="icon-btn" id="btn-settings" data-i18n-aria="settings" aria-label="Settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
     </button>
   </header>
-  <nav class="tabs" id="tabs" aria-label="Boards"></nav>
+  <nav class="tabs" id="tabs" data-i18n-aria="boards" aria-label="Boards"></nav>
   <main id="list"></main>
 </div>
 
 <div class="dock"><div class="dock-in">
-  <button class="type" id="btn-type" aria-label="Add by typing">
+  <button class="type" id="btn-type" data-i18n-aria="add_typing" aria-label="Add by typing">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
   </button>
   <button class="mic" id="btn-mic">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg>
-    Dictate
+    <span data-i18n="dictate">Dictate</span>
   </button>
 </div></div>
 
-<div class="voice" id="voice" role="dialog" aria-label="Voice input">
+<div class="voice" id="voice" role="dialog" data-i18n-aria="voice_input" aria-label="Voice input">
   <div class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg></div>
-  <div class="vtext" id="vtext">Listening…</div>
-  <div class="vhint">Speak in Ukrainian, e.g. «Купити молоко і хліб» or «Зустріч з Олегом завтра о 15:00»</div>
-  <div class="vacts"><button class="btn" id="v-cancel">Cancel</button><button class="btn primary" id="v-done">Done</button></div>
+  <div class="vtext" id="vtext" data-i18n="listening">Listening…</div>
+  <div class="vhint" data-i18n="vhint">Speak in Ukrainian, e.g. «Купити молоко і хліб» or «Зустріч з Олегом завтра о 15:00»</div>
+  <div class="vacts"><button class="btn" id="v-cancel" data-i18n="cancel">Cancel</button><button class="btn primary" id="v-done" data-i18n="done">Done</button></div>
 </div>
 
 <div class="scrim" id="scrim"></div>
@@ -218,8 +218,8 @@ const COLORS = [
 const nextColor = () => COLORS.find(c => !S.boards.some(b => b.color.toLowerCase() === c.toLowerCase())) || COLORS[S.boards.length % COLORS.length];
 function paletteHTML(sel) {
   const s = (sel || '').toLowerCase(); const custom = s && !COLORS.some(c => c.toLowerCase() === s);
-  return `<div class="pal">${COLORS.map(c => `<button class="sw${c.toLowerCase() === s ? ' on' : ''}" data-c="${c}" style="--c:${c}" aria-label="Color ${c}"></button>`).join('')}
-    <label class="sw custom${custom ? ' on' : ''}" style="--c:${custom ? sel : 'transparent'}" aria-label="Custom color"><input type="color" value="${custom ? sel : '#0FB894'}"></label></div>`;
+  return `<div class="pal">${COLORS.map(c => `<button class="sw${c.toLowerCase() === s ? ' on' : ''}" data-c="${c}" style="--c:${c}" aria-label="${t('color_n', { c })}"></button>`).join('')}
+    <label class="sw custom${custom ? ' on' : ''}" style="--c:${custom ? sel : 'transparent'}" aria-label="${t('custom_color')}"><input type="color" value="${custom ? sel : '#0FB894'}"></label></div>`;
 }
 function bindPalette(root, onPick) {
   const pal = root.querySelector('.pal');
@@ -229,17 +229,17 @@ function bindPalette(root, onPick) {
   inp.oninput = () => { cu.style.setProperty('--c', inp.value); mark(cu); onPick(inp.value); };
 }
 const DEF_BOARDS = [
-  { id: 'todo', name: 'Tasks', color: '#0FB894' },
-  { id: 'progress', name: 'In progress', color: '#F5A524' },
-  { id: 'events', name: 'Events', color: '#E5484D' },
-  { id: 'buy', name: 'Shopping', color: '#3D5AFE' }
+  { id: 'todo', name: null, color: '#0FB894' },
+  { id: 'progress', name: null, color: '#F5A524' },
+  { id: 'events', name: null, color: '#E5484D' },
+  { id: 'buy', name: null, color: '#3D5AFE' }
 ];
 const KEY = 'planner.v1';
 let S = load(); save();
 function load() {
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.boards)) return migrate3(migrate(s)); } catch (e) {}
-  return { v: 3, boards: DEF_BOARDS.map(b => ({ ...b })), items: [], active: 'all',
-    settings: { clientId: '', gConnected: false, autoSave: false, duration: 60 } };
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.boards)) return migrate4(migrate3(migrate(s))); } catch (e) {}
+  return { v: 4, boards: DEF_BOARDS.map(b => ({ ...b })), items: [], active: 'all',
+    settings: { clientId: '', gConnected: false, autoSave: false, duration: 60, lang: 'auto' } };
 }
 function migrate(s) {
   if (s.v >= 2) return s;
@@ -257,9 +257,141 @@ function migrate3(s) {
   s.boards.forEach(b => { const e = EN[b.id]; if (e && b.name === e[0]) b.name = e[1]; });
   s.v = 3; return s;
 }
+function migrate4(s) {
+  if (s.v >= 4) return s;
+  const known = { todo: ['Tasks','Завдання','Tareas','Зробити'], progress: ['In progress','В процесі','En curso'], events: ['Events','Події','Eventos'], buy: ['Shopping','Купити','Compras'] };
+  s.boards.forEach(b => { if (known[b.id] && known[b.id].includes(b.name)) b.name = null; });
+  s.settings = s.settings || {}; if (!s.settings.lang) s.settings.lang = 'auto';
+  s.v = 4; return s;
+}
 const curBoard = () => (S.active !== 'all' && board(S.active)) ? S.active : (S.boards[0] ? S.boards[0].id : null);
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const board = id => S.boards.find(b => b.id === id);
+
+/* ---------- i18n ---------- */
+const L = {
+  en: {
+    settings:'Settings', boards:'Boards', add_typing:'Add by typing', dictate:'Dictate', voice_input:'Voice input', listening:'Listening…',
+    vhint:'Speak in Ukrainian, e.g. «Купити молоко і хліб» or «Зустріч з Олегом завтра о 15:00»',
+    cancel:'Cancel', done:'Done', color_n:'Color {c}', custom_color:'Custom color',
+    board_todo:'Tasks', board_progress:'In progress', board_events:'Events', board_buy:'Shopping',
+    today:'Today', tomorrow:'Tomorrow', yesterday:'Yesterday', all:'All', new_board:'New board', edit:'Edit',
+    no_boards:'<b>No boards yet</b>Tap «+» to create your first one.', empty:'Empty',
+    del_all_done:'Delete all completed', deleted_done:'Deleted completed: {n}',
+    nothing_here:'<b>Nothing here yet</b>Tap «Dictate» and say what needs to be done.',
+    completed:'Completed', swipe_del:'Swipe sideways to delete', move_to:'Move to', delete:'Delete', edit_item:'Edit',
+    moved_to:'Moved to «{b}»', deleted:'Deleted', undo:'Undo', board_name:'Board name', color:'Color', create:'Create',
+    in_cal:'In Google Calendar', calendar:'Calendar', mark_done:'Mark as done', mark_undone:'Mark as not done', done_toast:'Completed',
+    new_task:'New task', task:'Task', what_todo:'What needs to be done?', board:'Board', date:'Date', time:'Time',
+    add_to_cal:'Add to Google Calendar', save:'Save', need_date:'Set a date to add it to the calendar.',
+    auto_sync:'The event will sync automatically.',
+    manual_sync:'After saving, Google Calendar opens so you can confirm the event. Auto-sync can be turned on in Settings.',
+    change_color:'Change color', move_up:'Move up', move_down:'Move down', delete_board:'Delete board',
+    boards_note:'Tap the color circle to pick a color. Reorder with the arrows, or long-press a board at the top and drag it.',
+    confirm_del_board:(b, n) => `Delete board «${b}»${n ? ` and its ${n} task${n === 1 ? '' : 's'}` : ''}?`,
+    color_of:'Color: {b}', back:'Back', autosave:'Save right after dictation, without review',
+    gcal:'Google Calendar', connected:'Connected', not_connected:'Not connected', reconnect:'Reconnect', connect:'Connect', disconnect:'Disconnect',
+    default_dur:'Default event duration', min:'min', how_client:'How to get a Client ID',
+    steps:['Open console.cloud.google.com and create a project.', 'APIs &amp; Services → Library → enable Google Calendar API.',
+      'OAuth consent screen → External, add your email under Test users.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'Under Authorized JavaScript origins, add the address this app runs at: <b>{o}</b>', 'Paste the Client ID here and tap «Connect».'],
+    export:'Export', import:'Import', paste_client:'Paste a Client ID first', gcal_connected:'Google Calendar connected',
+    cant_connect:'Could not connect: ', no_done:'No completed tasks',
+    replace_confirm:'Replace all current boards and tasks with the data from this file?', imported:'Data imported',
+    bad_backup:'This file doesn’t look like a Planner backup', no_google:'no connection to Google', win_closed:'window closed', error:'error',
+    sync_failed:'Calendar: sync failed', retry:'Retry', voice_chrome:'Voice input works in Chrome on Android',
+    mic_allow:'Allow microphone access for this site', no_speech:'Didn’t catch that. Try again',
+    need_net:'Speech recognition needs an internet connection', added_to:'Added to «{b}»', language:'Language', auto_lang:'Automatic (phone)', close:'Close'
+  },
+  uk: {
+    settings:'Налаштування', boards:'Дошки', add_typing:'Додати текстом', dictate:'Надиктувати', voice_input:'Голосове введення', listening:'Слухаю…',
+    vhint:'Наприклад: «Купити молоко і хліб» або «Зустріч з Олегом завтра о 15:00»',
+    cancel:'Скасувати', done:'Готово', color_n:'Колір {c}', custom_color:'Свій колір',
+    board_todo:'Завдання', board_progress:'В процесі', board_events:'Події', board_buy:'Купити',
+    today:'Сьогодні', tomorrow:'Завтра', yesterday:'Вчора', all:'Усі', new_board:'Нова дошка', edit:'Змінити',
+    no_boards:'<b>Немає жодної дошки</b>Натисни «+», щоб створити першу.', empty:'Порожньо',
+    del_all_done:'Видалити всі виконані', deleted_done:'Видалено виконаних: {n}',
+    nothing_here:'<b>Тут порожньо</b>Натисни «Надиктувати» і скажи, що треба зробити.',
+    completed:'Виконано', swipe_del:'Свайп убік видаляє', move_to:'Перемістити', delete:'Видалити', edit_item:'Редагувати',
+    moved_to:'Переміщено в «{b}»', deleted:'Видалено', undo:'Повернути', board_name:'Назва дошки', color:'Колір', create:'Створити',
+    in_cal:'У Google Календарі', calendar:'Календар', mark_done:'Позначити виконаним', mark_undone:'Позначити невиконаним', done_toast:'Виконано',
+    new_task:'Нове завдання', task:'Завдання', what_todo:'Що треба зробити?', board:'Дошка', date:'Дата', time:'Час',
+    add_to_cal:'Додати в Google Календар', save:'Зберегти', need_date:'Щоб додати в календар, вкажи дату.',
+    auto_sync:'Подія синхронізується автоматично.',
+    manual_sync:'Після збереження відкриється Google Календар, щоб підтвердити подію. Автосинхронізацію можна увімкнути в налаштуваннях.',
+    change_color:'Змінити колір', move_up:'Вище', move_down:'Нижче', delete_board:'Видалити дошку',
+    boards_note:'Торкнись кольорового кола, щоб вибрати колір. Порядок можна міняти стрілками або довгим натиском на дошку вгорі.',
+    confirm_del_board:(b, n) => `Видалити дошку «${b}»${n ? ` разом із ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'завданням' : 'завданнями'}` : ''}?`,
+    color_of:'Колір: {b}', back:'Назад', autosave:'Зберігати одразу після диктування, без перевірки',
+    gcal:'Google Календар', connected:'Підключено', not_connected:'Не підключено', reconnect:'Перепідключити', connect:'Підключити', disconnect:'Відключити',
+    default_dur:'Тривалість події за замовчуванням', min:'хв', how_client:'Як отримати Client ID',
+    steps:['Відкрий console.cloud.google.com і створи проєкт.', 'APIs &amp; Services → Library → увімкни Google Calendar API.',
+      'OAuth consent screen → External, додай свою пошту в Test users.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'У Authorized JavaScript origins додай адресу, де відкритий цей додаток: <b>{o}</b>', 'Скопіюй Client ID сюди й натисни «Підключити».'],
+    export:'Експорт', import:'Імпорт', paste_client:'Встав Client ID', gcal_connected:'Google Календар підключено',
+    cant_connect:'Не вдалося підключитися: ', no_done:'Виконаних завдань немає',
+    replace_confirm:'Замінити всі поточні дошки й завдання даними з файлу?', imported:'Дані імпортовано',
+    bad_backup:'Файл не схожий на резервну копію Planner', no_google:'немає зʼєднання з Google', win_closed:'вікно закрито', error:'помилка',
+    sync_failed:'Календар: не вдалося синхронізувати', retry:'Ще раз', voice_chrome:'Голосове введення працює в Chrome на Android',
+    mic_allow:'Дозволь доступ до мікрофона для цього сайту', no_speech:'Нічого не почув. Спробуй ще раз',
+    need_net:'Для розпізнавання мови потрібен інтернет', added_to:'Додано в «{b}»', language:'Мова', auto_lang:'Як у телефоні', close:'Закрити'
+  },
+  es: {
+    settings:'Ajustes', boards:'Tableros', add_typing:'Añadir escribiendo', dictate:'Dictar', voice_input:'Entrada de voz', listening:'Escuchando…',
+    vhint:'Habla en ucraniano, p. ej. «Купити молоко і хліб» o «Зустріч з Олегом завтра о 15:00»',
+    cancel:'Cancelar', done:'Listo', color_n:'Color {c}', custom_color:'Color personalizado',
+    board_todo:'Tareas', board_progress:'En curso', board_events:'Eventos', board_buy:'Compras',
+    today:'Hoy', tomorrow:'Mañana', yesterday:'Ayer', all:'Todo', new_board:'Nuevo tablero', edit:'Editar',
+    no_boards:'<b>Aún no hay tableros</b>Toca «+» para crear el primero.', empty:'Vacío',
+    del_all_done:'Eliminar todas las completadas', deleted_done:'Completadas eliminadas: {n}',
+    nothing_here:'<b>Aquí no hay nada</b>Toca «Dictar» y di lo que hay que hacer.',
+    completed:'Completadas', swipe_del:'Desliza para eliminar', move_to:'Mover a', delete:'Eliminar', edit_item:'Editar',
+    moved_to:'Movido a «{b}»', deleted:'Eliminado', undo:'Deshacer', board_name:'Nombre del tablero', color:'Color', create:'Crear',
+    in_cal:'En Google Calendar', calendar:'Calendario', mark_done:'Marcar como hecha', mark_undone:'Marcar como pendiente', done_toast:'¡Hecho!',
+    new_task:'Nueva tarea', task:'Tarea', what_todo:'¿Qué hay que hacer?', board:'Tablero', date:'Fecha', time:'Hora',
+    add_to_cal:'Añadir a Google Calendar', save:'Guardar', need_date:'Pon una fecha para añadirla al calendario.',
+    auto_sync:'El evento se sincronizará automáticamente.',
+    manual_sync:'Al guardar se abrirá Google Calendar para confirmar el evento. Puedes activar la sincronización automática en Ajustes.',
+    change_color:'Cambiar color', move_up:'Subir', move_down:'Bajar', delete_board:'Eliminar tablero',
+    boards_note:'Toca el círculo de color para elegirlo. Cambia el orden con las flechas o mantén pulsado un tablero arriba y arrástralo.',
+    confirm_del_board:(b, n) => `¿Eliminar el tablero «${b}»${n ? ` y sus ${n} tarea${n === 1 ? '' : 's'}` : ''}?`,
+    color_of:'Color: {b}', back:'Atrás', autosave:'Guardar justo después de dictar, sin revisar',
+    gcal:'Google Calendar', connected:'Conectado', not_connected:'No conectado', reconnect:'Reconectar', connect:'Conectar', disconnect:'Desconectar',
+    default_dur:'Duración predeterminada del evento', min:'min', how_client:'Cómo obtener un Client ID',
+    steps:['Abre console.cloud.google.com y crea un proyecto.', 'APIs &amp; Services → Library → activa Google Calendar API.',
+      'OAuth consent screen → External, añade tu correo en Test users.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'En Authorized JavaScript origins, añade la dirección donde funciona esta app: <b>{o}</b>', 'Pega aquí el Client ID y toca «Conectar».'],
+    export:'Exportar', import:'Importar', paste_client:'Pega primero un Client ID', gcal_connected:'Google Calendar conectado',
+    cant_connect:'No se pudo conectar: ', no_done:'No hay tareas completadas',
+    replace_confirm:'¿Reemplazar todos los tableros y tareas actuales con los datos de este archivo?', imported:'Datos importados',
+    bad_backup:'Este archivo no parece una copia de seguridad de Planner', no_google:'sin conexión con Google', win_closed:'ventana cerrada', error:'error',
+    sync_failed:'Calendario: error de sincronización', retry:'Reintentar', voice_chrome:'La entrada de voz funciona en Chrome para Android',
+    mic_allow:'Permite el acceso al micrófono para este sitio', no_speech:'No te he entendido. Inténtalo de nuevo',
+    need_net:'El reconocimiento de voz necesita conexión a internet', added_to:'Añadido a «{b}»', language:'Idioma', auto_lang:'Automático (teléfono)', close:'Cerrar'
+  }
+};
+const LANG_NAMES = { en: 'English', uk: 'Українська', es: 'Español' };
+const LOCALES = { en: 'en-US', uk: 'uk-UA', es: 'es-ES' };
+let LANG = 'en';
+function pickLang() {
+  const s = S.settings && S.settings.lang;
+  if (s && L[s]) return s;
+  for (const l of (navigator.languages || [navigator.language || 'en'])) { const k = String(l).slice(0, 2).toLowerCase(); if (L[k]) return k; }
+  return 'en';
+}
+function t(k, v) {
+  let s = (L[LANG] && L[LANG][k] !== undefined) ? L[LANG][k] : L.en[k];
+  if (typeof s === 'string' && v) s = s.replace(/\{(\w+)\}/g, (_, x) => v[x] !== undefined ? v[x] : '');
+  return s;
+}
+const DEF_IDS = ['todo', 'progress', 'events', 'buy'];
+const bn = b => b ? (b.name || t('board_' + b.id)) : '';
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+function applyStatic() {
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', t(el.dataset.i18nAria)));
+}
 
 /* ---------- dates ---------- */
 const UA_MONTHS = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
@@ -269,10 +401,10 @@ const WDAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Satu
 function dayDiff(dstr) { const t = new Date(); t.setHours(0,0,0,0); return Math.round((new Date(dstr + 'T00:00') - t) / 864e5); }
 function dateLabel(dstr) {
   const n = dayDiff(dstr);
-  if (n === 0) return 'Today'; if (n === 1) return 'Tomorrow'; if (n === -1) return 'Yesterday';
+  if (n === 0) return t('today'); if (n === 1) return t('tomorrow'); if (n === -1) return t('yesterday');
   const d = new Date(dstr + 'T00:00');
-  if (n > 1 && n < 7) return WDAYS[d.getDay()];
-  return MSHORT[d.getMonth()] + ' ' + d.getDate() + (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : '');
+  if (n > 1 && n < 7) return cap(new Intl.DateTimeFormat(LOCALES[LANG], { weekday: 'long' }).format(d));
+  return new Intl.DateTimeFormat(LOCALES[LANG], { month: 'short', day: 'numeric', year: d.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined }).format(d);
 }
 
 /* ---------- voice parser (Ukrainian) ---------- */
@@ -286,8 +418,7 @@ function parse(raw) {
 
   // explicit board: "на дошку купити", "в дошку стратегічні"
   let m = cut(/\s(?:на|в|у|до)\s+дошк\S*\s+([^\s,.]+(?:\s+[^\s,.]+)?)/);
-  if (m) { const w = m[1]; const UA = { todo: 'завдання', progress: 'в процесі', events: 'події', buy: 'купити' };
-    const b = S.boards.find(b => [b.name.toLowerCase(), UA[b.id]].filter(Boolean).some(n => w.startsWith(n) || n.startsWith(w.split(' ')[0].slice(0, 4))));  if (b) boardId = b.id; }
+  if (m) { const w = m[1]; const b = S.boards.find(b => [bn(b), ...(DEF_IDS.includes(b.id) ? Object.keys(L).map(k => L[k]['board_' + b.id]) : [])].map(x => x.toLowerCase()).some(n => w.startsWith(n) || n.startsWith(w.split(' ')[0].slice(0, 4))));  if (b) boardId = b.id; }
   if (!boardId) {
     const low0 = low.trim();
     if (/^(купити|купи|придбати)\s/.test(low0) && board('buy')) { cut(/\s(купити|купи|придбати)\s/); boardId = 'buy'; }
@@ -343,21 +474,21 @@ function parse(raw) {
 function render() {
   if (S.active !== 'all' && !board(S.active)) S.active = 'all';
   const d = new Date();
-  $('#today').textContent = WDAYS[d.getDay()] + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate();
+  $('#today').textContent = cap(new Intl.DateTimeFormat(LOCALES[LANG], { weekday: 'long', month: 'long', day: 'numeric' }).format(d));
   const openCount = id => S.items.filter(i => i.boardId === id && !i.done).length;
 
   const tabs = $('#tabs');
-  tabs.innerHTML = `<button class="tab${S.active === 'all' ? ' on' : ''}" data-v="all">All</button>` +
+  tabs.innerHTML = `<button class="tab${S.active === 'all' ? ' on' : ''}" data-v="all">${t('all')}</button>` +
     S.boards.map(b => { const n = openCount(b.id);
-      return `<button class="tab${b.id === S.active ? ' on' : ''}" data-v="${b.id}" data-id="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}${n ? `<span class="cnt">${n}</span>` : ''}</button>`; }).join('') +
-    `<button class="tab ghost plus" id="t-add" aria-label="New board">+</button><button class="tab ghost" id="t-edit">Edit</button>`;
+      return `<button class="tab${b.id === S.active ? ' on' : ''}" data-v="${b.id}" data-id="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(bn(b))}${n ? `<span class="cnt">${n}</span>` : ''}</button>`; }).join('') +
+    `<button class="tab ghost plus" id="t-add" aria-label="${t('new_board')}">+</button><button class="tab ghost" id="t-edit">${t('edit')}</button>`;
   tabs.querySelectorAll('[data-v]').forEach(el => el.onclick = () => { if (!tabDragged) go(el.dataset.v); });
   tabs.querySelectorAll('[data-id]').forEach(bindTabDrag);
   $('#t-add').onclick = () => addBoardSheet(); $('#t-edit').onclick = openBoards;
   const on = tabs.querySelector('.on'); if (on) on.scrollIntoView({ inline: 'nearest', block: 'nearest' });
 
   const list = $('#list');
-  if (!S.boards.length) { list.innerHTML = `<div class="empty"><b>No boards yet</b>Tap «+» to create your first one.</div>`; return; }
+  if (!S.boards.length) { list.innerHTML = `<div class="empty">${t('no_boards')}</div>`; return; }
   const sortOpen = arr => arr.filter(i => !i.done).sort((a, b) => {
     if (a.date && b.date) return (a.date + (a.time || '99')).localeCompare(b.date + (b.time || '99'));
     if (a.date) return -1; if (b.date) return 1; return b.created - a.created;
@@ -366,27 +497,27 @@ function render() {
   if (S.active === 'all') {
     list.innerHTML = S.boards.map(b => {
       const its = sortOpen(S.items.filter(i => i.boardId === b.id));
-      return `<section class="grp"><button class="grp-h" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}<span class="n">${its.length || ''}</span></button>
-        ${its.length ? its.map(row).join('') : '<div class="grp-empty">Empty</div>'}</section>`;
+      return `<section class="grp"><button class="grp-h" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(bn(b))}<span class="n">${its.length || ''}</span></button>
+        ${its.length ? its.map(row).join('') : '<div class="grp-empty">' + t('empty') + '</div>'}</section>`;
     }).join('');
     const allDone = S.items.filter(i => i.done && board(i.boardId));
-    if (allDone.length) list.insertAdjacentHTML('beforeend', `<button class="all-clear" id="all-clear">Delete all completed · ${allDone.length}</button>`);
+    if (allDone.length) list.insertAdjacentHTML('beforeend', `<button class="all-clear" id="all-clear">${t('del_all_done')} · ${allDone.length}</button>`);
     list.querySelectorAll('.grp-h').forEach(h => h.onclick = () => go(h.dataset.b, 1));
-    if (allDone.length) $('#all-clear').onclick = () => removeItems(allDone, `Deleted completed: ${allDone.length}`);
+    if (allDone.length) $('#all-clear').onclick = () => removeItems(allDone, t('deleted_done', { n: allDone.length }));
     bindItems(list); return;
   }
 
   const items = S.items.filter(i => i.boardId === S.active);
   const open = sortOpen(items);
   const done = items.filter(i => i.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
-  if (!items.length) { list.innerHTML = `<div class="empty"><b>Nothing here yet</b>Tap «Dictate» and say what needs to be done.</div>`; return; }
+  if (!items.length) { list.innerHTML = `<div class="empty">${t('nothing_here')}</div>`; return; }
   list.innerHTML = open.map(row).join('') +
-    (done.length ? `<details class="donebox"${doneOpen ? ' open' : ''}><summary>Completed · ${done.length}</summary>
-      <div class="done-acts"><span>Swipe sideways to delete</span><button class="clear-done">Delete all completed</button></div>${done.map(row).join('')}</details>` : '');
+    (done.length ? `<details class="donebox"${doneOpen ? ' open' : ''}><summary>${t('completed')} · ${done.length}</summary>
+      <div class="done-acts"><span>${t('swipe_del')}</span><button class="clear-done">${t('del_all_done')}</button></div>${done.map(row).join('')}</details>` : '');
   bindItems(list);
   const db = list.querySelector('.donebox');
   if (db) { db.ontoggle = () => { doneOpen = db.open; };
-    db.querySelector('.clear-done').onclick = () => removeItems(done, `Deleted completed: ${done.length}`); }
+    db.querySelector('.clear-done').onclick = () => removeItems(done, t('deleted_done', { n: done.length })); }
 }
 const views = () => ['all', ...S.boards.map(b => b.id)];
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -408,7 +539,7 @@ let lpFired = false, doneOpen = false;
 function removeItems(arr, msg) {
   if (!arr.length) return;
   S.items = S.items.filter(i => !arr.includes(i)); save(); render();
-  toast(msg, 'Undo', () => { S.items.push(...arr.filter(i => !S.items.includes(i))); save(); render(); });
+  toast(msg, t('undo'), () => { S.items.push(...arr.filter(i => !S.items.includes(i))); save(); render(); });
 }
 function bindItems(root) {
   root.querySelectorAll('.item').forEach(el => {
@@ -428,14 +559,14 @@ function longPress(el, fn) {
   el.addEventListener('contextmenu', e => e.preventDefault());
 }
 function openMove(it) {
-  openSheet(`<div class="sh-h"><h2>Move to</h2><button class="x" data-close aria-label="Close">✕</button></div>
+  openSheet(`<div class="sh-h"><h2>${t('move_to')}</h2><button class="x" data-close aria-label="${t('close')}">✕</button></div>
     <div class="mv-t">${esc(it.title)}</div>
-    <div class="chips big" id="mv">${S.boards.map(b => `<button class="chip${b.id === it.boardId ? ' on' : ''}" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}</button>`).join('')}</div>
-    <div class="acts"><button class="btn danger" id="mv-del">Delete</button><button class="btn" id="mv-edit">Edit</button></div>`,
+    <div class="chips big" id="mv">${S.boards.map(b => `<button class="chip${b.id === it.boardId ? ' on' : ''}" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(bn(b))}</button>`).join('')}</div>
+    <div class="acts"><button class="btn danger" id="mv-del">${t('delete')}</button><button class="btn" id="mv-edit">${t('edit_item')}</button></div>`,
   () => {
     $('#mv').onclick = e => { const c = e.target.closest('.chip'); if (!c) return;
       const from = it.boardId; it.boardId = c.dataset.b; save(); closeSheet(); render();
-      if (from !== it.boardId) toast('Moved to «' + board(it.boardId).name + '»', 'Undo', () => { it.boardId = from; save(); render(); }); };
+      if (from !== it.boardId) toast(t('moved_to', { b: bn(board(it.boardId)) }), t('undo'), () => { it.boardId = from; save(); render(); }); };
     $('#mv-edit').onclick = () => openEdit(it);
     $('#mv-del').onclick = () => deleteItem(it);
   });
@@ -444,7 +575,7 @@ function deleteItem(it) {
   const idx = S.items.indexOf(it); if (idx < 0) return;
   S.items.splice(idx, 1); save(); closeSheet(); render();
   let undone = false;
-  toast('Deleted', 'Undo', () => { undone = true; S.items.splice(idx, 0, it); save(); render(); });
+  toast(t('deleted'), t('undo'), () => { undone = true; S.items.splice(idx, 0, it); save(); render(); });
   setTimeout(() => { if (!undone && it.gid) calDelete(it); }, 4800);
 }
 
@@ -526,16 +657,16 @@ function bindTabDrag(el) {
       el.style.height = el.offsetHeight + 'px'; el.getBoundingClientRect();
       el.style.transition = 'height 160ms ease-out, margin 160ms ease-out, padding 160ms ease-out';
       el.style.height = '0'; el.style.margin = '0'; el.style.paddingTop = el.style.paddingBottom = '0'; el.style.overflow = 'hidden';
-      setTimeout(() => { if (it) removeItems([it], 'Deleted'); }, 160);
+      setTimeout(() => { if (it) removeItems([it], t('deleted')); }, 160);
     }, 150);
   }
 })();
 
 function addBoardSheet(back) {
   let color = nextColor();
-  openSheet(`<div class="sh-h"><h2>New board</h2><button class="x" data-close aria-label="Close">✕</button></div>
-    <input type="text" id="nb" placeholder="Board name"><div class="lbl">Color</div>${paletteHTML(color)}
-    <div class="acts"><button class="btn primary" id="nb-save">Create</button></div>`,
+  openSheet(`<div class="sh-h"><h2>${t('new_board')}</h2><button class="x" data-close aria-label="${t('close')}">✕</button></div>
+    <input type="text" id="nb" placeholder="${t('board_name')}"><div class="lbl">${t('color')}</div>${paletteHTML(color)}
+    <div class="acts"><button class="btn primary" id="nb-save">${t('create')}</button></div>`,
   () => { const i = $('#nb'); bindPalette($('#sheet-c'), c => { color = c; });
     const mk = () => { const v = i.value.trim(); if (!v) { i.focus(); return; }
       const nb = { id: uid(), name: v, color }; S.boards.push(nb); save(); closeSheet(); if (back) back(); else go(nb.id); };
@@ -547,14 +678,14 @@ function row(i) {
     const n = dayDiff(i.date); const cls = (!i.done && n < 0) ? ' late' : (n === 0 ? ' today' : '');
     meta += `<span class="pill${cls}">${dateLabel(i.date)}${i.time ? ', ' + i.time : ''}</span>`;
   }
-  if (i.gid) meta += `<span class="pill" title="In Google Calendar">${ICON_CAL}Calendar</span>`;
+  if (i.gid) meta += `<span class="pill" title="${t('in_cal')}">${ICON_CAL}${t('calendar')}</span>`;
   return `<div class="item${i.done ? ' done' : ''}" data-id="${i.id}">
-    <button class="chk" aria-label="${i.done ? 'Mark as not done' : 'Mark as done'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+    <button class="chk" aria-label="${i.done ? t('mark_undone') : t('mark_done')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
     <button class="body"><div class="t">${esc(i.title)}</div>${meta ? `<div class="meta">${meta}</div>` : ''}</button></div>`;
 }
 function toggleDone(it) {
   it.done = !it.done; it.doneAt = it.done ? Date.now() : null; save(); render();
-  if (it.done) toast('Completed', 'Undo', () => { it.done = false; it.doneAt = null; save(); render(); });
+  if (it.done) toast(t('done_toast'), t('undo'), () => { it.done = false; it.doneAt = null; save(); render(); });
 }
 
 /* ---------- sheet & toast ---------- */
@@ -579,25 +710,25 @@ function openEdit(it, pre) {
   const d = it ? { ...it } : { boardId: curBoard(), title: '', date: null, time: null, cal: false, ...(pre || {}) };
   if (isNew && pre) d.cal = !!(d.date && (d.time || d.boardId === 'events'));
   openSheet(`
-    <div class="sh-h"><h2>${isNew ? 'New task' : 'Task'}</h2><button class="x" data-close aria-label="Close">✕</button></div>
-    <textarea id="f-title" rows="2" placeholder="What needs to be done?">${esc(d.title)}</textarea>
-    <div class="lbl">Board</div>
-    <div class="chips" id="f-boards">${S.boards.map(b => `<button class="chip${b.id === d.boardId ? ' on' : ''}" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(b.name)}</button>`).join('')}</div>
+    <div class="sh-h"><h2>${isNew ? t('new_task') : t('task')}</h2><button class="x" data-close aria-label="${t('close')}">✕</button></div>
+    <textarea id="f-title" rows="2" placeholder="${t('what_todo')}">${esc(d.title)}</textarea>
+    <div class="lbl">${t('board')}</div>
+    <div class="chips" id="f-boards">${S.boards.map(b => `<button class="chip${b.id === d.boardId ? ' on' : ''}" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(bn(b))}</button>`).join('')}</div>
     <div class="row2">
-      <label class="fld"><span>Date</span><input type="date" id="f-date" value="${d.date || ''}"></label>
-      <label class="fld"><span>Time</span><input type="time" id="f-time" value="${d.time || ''}"></label>
+      <label class="fld"><span>${t('date')}</span><input type="date" id="f-date" value="${d.date || ''}"></label>
+      <label class="fld"><span>${t('time')}</span><input type="time" id="f-time" value="${d.time || ''}"></label>
     </div>
-    <label class="tgl"><input type="checkbox" id="f-cal" ${d.cal ? 'checked' : ''}><span>Add to Google Calendar</span></label>
+    <label class="tgl"><input type="checkbox" id="f-cal" ${d.cal ? 'checked' : ''}><span>${t('add_to_cal')}</span></label>
     <div class="note" id="f-calnote"></div>
-    <div class="acts">${isNew ? '' : `<button class="btn danger" id="f-del">Delete</button>`}<button class="btn primary" id="f-save">Save</button></div>`,
+    <div class="acts">${isNew ? '' : `<button class="btn danger" id="f-del">${t('delete')}</button>`}<button class="btn primary" id="f-save">${t('save')}</button></div>`,
   () => {
     let bId = d.boardId;
     const ta = $('#f-title'); if (isNew && !pre) setTimeout(() => ta.focus(), 250);
     $('#f-boards').onclick = e => { const c = e.target.closest('.chip'); if (!c) return; bId = c.dataset.b;
       $('#f-boards').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c)); };
     const note = () => { $('#f-calnote').textContent = !$('#f-cal').checked ? '' :
-      !$('#f-date').value ? 'Set a date to add it to the calendar.' :
-      calReady() ? 'The event will sync automatically.' : 'After saving, Google Calendar opens so you can confirm the event. Auto-sync can be turned on in Settings.'; };
+      !$('#f-date').value ? t('need_date') :
+      calReady() ? t('auto_sync') : t('manual_sync'); };
     ['#f-cal', '#f-date'].forEach(s => $(s).onchange = note); note();
     $('#f-save').onclick = () => {
       const title = ta.value.trim(); if (!title) { ta.focus(); return; }
@@ -618,25 +749,25 @@ function afterSave(rec, gesture) {
 /* ---------- boards manager ---------- */
 function openBoards() {
   const draw = () => openSheet(`
-    <div class="sh-h"><h2>Boards</h2><button class="x" data-close aria-label="Close">✕</button></div>
+    <div class="sh-h"><h2>${t('boards')}</h2><button class="x" data-close aria-label="${t('close')}">✕</button></div>
     <div id="b-list">${S.boards.map(b => `<div class="brow" data-id="${b.id}">
-      <button class="swatch" style="--c:${b.color}" aria-label="Change color"></button>
-      <input type="text" value="${esc(b.name)}" aria-label="Board name">
-      <button class="mvb" data-d="-1" aria-label="Move up" ${S.boards[0] === b ? 'disabled' : ''}>↑</button>
-      <button class="mvb" data-d="1" aria-label="Move down" ${S.boards[S.boards.length - 1] === b ? 'disabled' : ''}>↓</button>
-      <button class="del" aria-label="Delete board">${ICON_TRASH}</button></div>`).join('')}</div>
-    <div class="acts" style="margin-top:14px"><button class="btn" id="b-add">+ New board</button></div>
-    <div class="note">Tap the color circle to pick a color. Reorder with the arrows, or long-press a board at the top and drag it.</div>`,
+      <button class="swatch" style="--c:${b.color}" aria-label="${t('change_color')}"></button>
+      <input type="text" value="${esc(bn(b))}" aria-label="${t('board_name')}">
+      <button class="mvb" data-d="-1" aria-label="${t('move_up')}" ${S.boards[0] === b ? 'disabled' : ''}>↑</button>
+      <button class="mvb" data-d="1" aria-label="${t('move_down')}" ${S.boards[S.boards.length - 1] === b ? 'disabled' : ''}>↓</button>
+      <button class="del" aria-label="${t('delete_board')}">${ICON_TRASH}</button></div>`).join('')}</div>
+    <div class="acts" style="margin-top:14px"><button class="btn" id="b-add">+ ${t('new_board')}</button></div>
+    <div class="note">${t('boards_note')}</div>`,
   () => {
     $('#b-list').querySelectorAll('.brow').forEach(r => {
       const b = board(r.dataset.id);
       r.querySelector('.swatch').onclick = () => openColor(b, draw);
-      r.querySelector('input').onchange = e => { const v = e.target.value.trim(); if (v) { b.name = v; save(); render(); } else e.target.value = b.name; };
+      r.querySelector('input').onchange = e => { const v = e.target.value.trim(); if (v) { b.name = (DEF_IDS.includes(b.id) && v === t('board_' + b.id)) ? null : v; save(); render(); } else e.target.value = bn(b); };
       r.querySelectorAll('.mvb').forEach(x => x.onclick = () => { const i = S.boards.indexOf(b), j = i + +x.dataset.d;
         if (j < 0 || j >= S.boards.length) return; [S.boards[i], S.boards[j]] = [S.boards[j], S.boards[i]]; save(); render(); draw(); });
       r.querySelector('.del').onclick = () => {
         const n = S.items.filter(i => i.boardId === b.id).length;
-        if (!confirm(`Delete board «${b.name}»${n ? ` and its ${n} task${n === 1 ? '' : 's'}` : ''}?`)) return;
+        if (!confirm(t('confirm_del_board')(bn(b), n))) return;
         S.items.filter(i => i.boardId === b.id && i.gid).forEach(calDelete);
         S.items = S.items.filter(i => i.boardId !== b.id); S.boards = S.boards.filter(x => x !== b);
         save(); render(); draw();
@@ -648,8 +779,8 @@ function openBoards() {
 }
 
 function openColor(b, back) {
-  openSheet(`<div class="sh-h"><h2>Color: ${esc(b.name)}</h2><button class="x" id="c-back" aria-label="Back">✕</button></div>
-    ${paletteHTML(b.color)}<div class="acts"><button class="btn primary" id="c-ok">Done</button></div>`,
+  openSheet(`<div class="sh-h"><h2>${t('color_of', { b: esc(bn(b)) })}</h2><button class="x" id="c-back" aria-label="${t('back')}">✕</button></div>
+    ${paletteHTML(b.color)}<div class="acts"><button class="btn primary" id="c-ok">${t('done')}</button></div>`,
   () => { bindPalette($('#sheet-c'), c => { b.color = c; save(); render(); });
     $('#c-ok').onclick = $('#c-back').onclick = () => back(); });
 }
@@ -658,42 +789,42 @@ function openColor(b, back) {
 function openSettings() {
   const st = S.settings;
   openSheet(`
-    <div class="sh-h"><h2>Settings</h2><button class="x" data-close aria-label="Close">✕</button></div>
-    <label class="tgl"><input type="checkbox" id="s-auto" ${st.autoSave ? 'checked' : ''}><span>Save right after dictation, without review</span></label>
+    <div class="sh-h"><h2>${t('settings')}</h2><button class="x" data-close aria-label="${t('close')}">✕</button></div>
+    <div class="lbl" style="margin-top:0">${t('language')}</div>
+    <select id="s-lang"><option value="auto"${(st.lang || 'auto') === 'auto' ? ' selected' : ''}>${t('auto_lang')}</option>${Object.keys(L).map(k => `<option value="${k}"${st.lang === k ? ' selected' : ''}>${LANG_NAMES[k]}</option>`).join('')}</select>
     <hr>
-    <div class="sh-h" style="margin-bottom:6px"><h2 style="font-size:17px">Google Calendar</h2>
-      <span class="status${calReady() ? ' ok' : ''}">${calReady() ? 'Connected' : 'Not connected'}</span></div>
+    <label class="tgl"><input type="checkbox" id="s-auto" ${st.autoSave ? 'checked' : ''}><span>${t('autosave')}</span></label>
+    <hr>
+    <div class="sh-h" style="margin-bottom:6px"><h2 style="font-size:17px">${t('gcal')}</h2>
+      <span class="status${calReady() ? ' ok' : ''}">${calReady() ? t('connected') : t('not_connected')}</span></div>
     <div class="lbl">Client ID</div>
     <input type="text" id="s-cid" placeholder="xxxx.apps.googleusercontent.com" value="${esc(st.clientId)}" autocomplete="off" spellcheck="false">
-    <div class="acts" style="margin-top:12px"><button class="btn primary" id="s-connect">${calReady() ? 'Reconnect' : 'Connect'}</button>
-      ${st.gConnected ? '<button class="btn" id="s-off">Disconnect</button>' : ''}</div>
-    <div class="lbl">Default event duration</div>
-    <select id="s-dur">${[15, 30, 60, 90, 120].map(v => `<option value="${v}"${+st.duration === v ? ' selected' : ''}>${v} min</option>`).join('')}</select>
-    <details class="note" style="margin-top:14px"><summary class="link">How to get a Client ID</summary><ol>
-      <li>Open console.cloud.google.com and create a project.</li>
-      <li>APIs &amp; Services → Library → enable Google Calendar API.</li>
-      <li>OAuth consent screen → External, add your email under Test users.</li>
-      <li>Credentials → Create credentials → OAuth client ID → Web application.</li>
-      <li>Under Authorized JavaScript origins, add the address this app runs at: <b>${esc(location.origin)}</b></li>
-      <li>Paste the Client ID here and tap «Connect».</li></ol></details>
+    <div class="acts" style="margin-top:12px"><button class="btn primary" id="s-connect">${calReady() ? t('reconnect') : t('connect')}</button>
+      ${st.gConnected ? '<button class="btn" id="s-off">' + t('disconnect') + '</button>' : ''}</div>
+    <div class="lbl">${t('default_dur')}</div>
+    <select id="s-dur">${[15, 30, 60, 90, 120].map(v => `<option value="${v}"${+st.duration === v ? ' selected' : ''}>${v} ${t('min')}</option>`).join('')}</select>
+    <details class="note" style="margin-top:14px"><summary class="link">${t('how_client')}</summary><ol>
+      ${t('steps').map(s => `<li>${s.replace('{o}', esc(location.origin))}</li>`).join('')}</ol></details>
     <hr>
-    <button class="btn danger" id="s-clear" style="width:100%;margin-bottom:10px">Delete all completed (${S.items.filter(i => i.done).length})</button>
-    <div class="acts" style="margin-top:0"><button class="btn" id="s-exp">Export</button><button class="btn" id="s-imp">Import</button></div>
-    <input type="file" id="s-file" accept="application/json" hidden>`,
+    <button class="btn danger" id="s-clear" style="width:100%;margin-bottom:10px">${t('del_all_done')} (${S.items.filter(i => i.done).length})</button>
+    <div class="acts" style="margin-top:0"><button class="btn" id="s-exp">${t('export')}</button><button class="btn" id="s-imp">${t('import')}</button></div>
+    <input type="file" id="s-file" accept="application/json" hidden>
+    <div class="note" style="text-align:center;margin-top:16px">Planner v1.9</div>`,
   () => {
+    $('#s-lang').onchange = e => { st.lang = e.target.value; save(); LANG = pickLang(); applyStatic(); render(); openSettings(); };
     $('#s-auto').onchange = e => { st.autoSave = e.target.checked; save(); };
     $('#s-dur').onchange = e => { st.duration = +e.target.value; save(); };
     $('#s-cid').onchange = e => { const v = e.target.value.trim(); if (v !== st.clientId) { st.clientId = v; st.gConnected = false; token = null; save(); } };
     $('#s-connect').onclick = async () => {
       st.clientId = $('#s-cid').value.trim(); save();
-      if (!st.clientId) { toast('Paste a Client ID first'); return; }
-      try { token = null; await getToken(true); toast('Google Calendar connected'); openSettings();
+      if (!st.clientId) { toast(t('paste_client')); return; }
+      try { token = null; await getToken(true); toast(t('gcal_connected')); openSettings();
         S.items.filter(i => i.cal && i.date && !i.gid && !i.done).forEach(syncItem);
-      } catch (e) { toast('Could not connect: ' + e.message); }
+      } catch (e) { toast(t('cant_connect') + e.message); }
     };
     if ($('#s-off')) $('#s-off').onclick = () => { st.gConnected = false; token = null; save(); openSettings(); };
-    $('#s-clear').onclick = () => { const d = S.items.filter(i => i.done); if (!d.length) { toast('No completed tasks'); return; }
-      closeSheet(); removeItems(d, `Deleted completed: ${d.length}`); };
+    $('#s-clear').onclick = () => { const d = S.items.filter(i => i.done); if (!d.length) { toast(t('no_done')); return; }
+      closeSheet(); removeItems(d, t('deleted_done', { n: d.length })); };
     $('#s-exp').onclick = () => {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([JSON.stringify({ boards: S.boards, items: S.items }, null, 2)], { type: 'application/json' }));
@@ -702,9 +833,9 @@ function openSettings() {
     $('#s-imp').onclick = () => $('#s-file').click();
     $('#s-file').onchange = async e => {
       try { const j = JSON.parse(await e.target.files[0].text()); if (!Array.isArray(j.boards) || !Array.isArray(j.items)) throw 0;
-        if (!confirm('Replace all current boards and tasks with the data from this file?')) return;
-        S.boards = j.boards; S.items = j.items; save(); render(); closeSheet(); toast('Data imported');
-      } catch (_) { toast('This file doesn’t look like a Planner backup'); }
+        if (!confirm(t('replace_confirm'))) return;
+        S.boards = j.boards; S.items = j.items; save(); render(); closeSheet(); toast(t('imported'));
+      } catch (_) { toast(t('bad_backup')); }
     };
   });
 }
@@ -717,7 +848,7 @@ function gisLoad() {
   return new Promise((res, rej) => {
     if (window.google && google.accounts && google.accounts.oauth2) return res();
     const s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client';
-    s.onload = res; s.onerror = () => rej(new Error('no connection to Google')); document.head.appendChild(s);
+    s.onload = res; s.onerror = () => rej(new Error(t('no_google'))); document.head.appendChild(s);
   });
 }
 async function getToken(interactive) {
@@ -732,7 +863,7 @@ async function getToken(interactive) {
         try { sessionStorage.setItem('planner.tok', JSON.stringify({ v: token, exp: tokenExp })); } catch (e) {}
         S.settings.gConnected = true; save(); res(token);
       },
-      error_callback: e => rej(new Error(e.type === 'popup_closed' ? 'window closed' : (e.type || 'error')))
+      error_callback: e => rej(new Error(e.type === 'popup_closed' ? t('win_closed') : (e.type || t('error'))))
     });
     c.requestAccessToken({ prompt: interactive ? 'consent' : '' });
   });
@@ -761,7 +892,7 @@ async function syncItem(it) {
       it.gid = (await r.json()).id;
     } else if (it.gid) { await calDelete(it); }
     save(); render();
-  } catch (e) { toast('Calendar: sync failed', 'Retry', () => syncItem(it)); }
+  } catch (e) { toast(t('sync_failed'), t('retry'), () => syncItem(it)); }
 }
 async function calDelete(it) {
   if (!it.gid || !calReady()) return;
@@ -783,22 +914,22 @@ function templateUrl(it) {
 let rec = null, finalTxt = '', interimTxt = '', cancelled = false;
 function startVoice() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { toast('Voice input works in Chrome on Android'); openEdit(null); return; }
+  if (!SR) { toast(t('voice_chrome')); openEdit(null); return; }
   if (rec) return;
   finalTxt = ''; interimTxt = ''; cancelled = false;
-  $('#vtext').textContent = 'Listening…'; $('#voice').classList.add('show');
+  $('#vtext').textContent = t('listening'); $('#voice').classList.add('show');
   rec = new SR(); rec.lang = 'uk-UA'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
   rec.onresult = e => {
     interimTxt = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const r = e.results[i]; if (r.isFinal) finalTxt += r[0].transcript; else interimTxt += r[0].transcript;
     }
-    $('#vtext').textContent = (finalTxt + interimTxt) || 'Listening…';
+    $('#vtext').textContent = (finalTxt + interimTxt) || t('listening');
   };
   rec.onerror = e => {
-    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast('Allow microphone access for this site');
-    else if (e.error === 'no-speech') toast('Didn’t catch that. Try again');
-    else if (e.error === 'network') toast('Speech recognition needs an internet connection');
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast(t('mic_allow'));
+    else if (e.error === 'no-speech') toast(t('no_speech'));
+    else if (e.error === 'network') toast(t('need_net'));
   };
   rec.onend = () => {
     $('#voice').classList.remove('show'); rec = null;
@@ -808,7 +939,7 @@ function startVoice() {
     if (S.settings.autoSave) {
       const it = { id: uid(), created: Date.now(), done: false, ...p, cal: !!(p.date && (p.time || p.boardId === 'events')) };
       S.items.push(it); if (S.active !== 'all') S.active = it.boardId; save(); render(); afterSave(it, false);
-      toast('Added to «' + board(it.boardId).name + '»', 'Edit', () => openEdit(it));
+      toast(t('added_to', { b: bn(board(it.boardId)) }), t('edit_item'), () => openEdit(it));
     } else openEdit(null, p);
   };
   try { rec.start(); } catch (e) { rec = null; $('#voice').classList.remove('show'); }
@@ -820,8 +951,9 @@ $('#btn-type').onclick = () => openEdit(null);
 $('#btn-settings').onclick = openSettings;
 
 /* ---------- boot ---------- */
+LANG = pickLang(); applyStatic();
 render();
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
 if (new URLSearchParams(location.search).get('voice') === '1') {
   history.replaceState(null, '', location.pathname);
   setTimeout(startVoice, 350);
