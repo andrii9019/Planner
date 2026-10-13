@@ -168,6 +168,46 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
 .clear-done{color:var(--rec);font-weight:700;font-size:14px;padding:8px 0}
 .all-clear{display:block;margin:4px auto 0;padding:10px 18px;border-radius:999px;background:var(--surface);color:var(--rec);font-weight:700;font-size:14px}
 .item.swiping{transition:none}
+.daybar{display:flex;align-items:center;justify-content:space-between;padding:0 0 8px}
+.daybar .arr{width:40px;height:40px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-size:22px;color:var(--muted)}
+.dtitle{text-align:center;flex:1}.dtitle b{display:block;font-size:17px}.dtitle span{font-size:12.5px;color:var(--muted);font-weight:700}
+.dtitle span.is-today{color:var(--accent)}
+.tl{position:relative;padding-left:52px;margin-right:2px;-webkit-user-select:none;user-select:none;--hpx:72;touch-action:pan-y}
+.tl .hr{position:relative;height:calc(var(--hpx) * 1px)}
+.tl .hr::before{content:"";position:absolute;left:0;right:0;top:0;border-top:1px solid var(--line)}
+.tl .h30{position:absolute;left:0;right:0;top:50%;border-top:1px dashed color-mix(in srgb,var(--line) 70%,transparent)}
+.tl .q{position:absolute;left:0;width:10px;border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.tl .hl{position:absolute;left:-50px;top:-8px;width:42px;text-align:right;font-size:12px;font-weight:600;color:var(--muted)}
+.tl .hl.m{top:calc(50% - 8px);font-size:10.5px;opacity:.55}
+.tl .hl.f{font-size:10px;opacity:.4;display:none}
+.tl.zx .hl.f{display:block}
+.tl.zm .hl.m,.tl.zs .hl.m,.tl.zm .q,.tl.zs .q,.tl.zs .h30{display:none}
+.tl.zm .hr:not(.h2) .hl:not(.m):not(.f){display:none}
+.tl.zs .hr:not(.h3) .hl:not(.m):not(.f){display:none}
+.tl.zs .hr:not(.h3)::before{border-top-style:dashed;opacity:.5}
+.tl .evs{position:absolute;left:52px;right:0;top:0;bottom:0}
+.tl .ev{top:calc(var(--s) * var(--hpx) * 1px / 60 + 1px);height:max(calc(var(--d) * var(--hpx) * 1px / 60 - 3px),14px)}
+.ev.tiny{padding:0 22px 0 7px;display:flex;align-items:center;border-radius:6px}
+.ev.tiny b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ev.tiny small{display:none}
+.ev.tiny .ck{width:14px;height:14px;top:50%;transform:translateY(-50%);right:4px;border-width:1.5px}
+.tl .nowline{top:calc(var(--now) * var(--hpx) * 1px / 60)}
+.ev{position:absolute;border-radius:10px;padding:6px 26px 6px 9px;overflow:hidden;text-align:left;color:var(--ink);
+ background:linear-gradient(180deg,color-mix(in srgb,var(--c) 30%,var(--surface)),color-mix(in srgb,var(--c) 16%,var(--surface)));box-shadow:inset 3px 0 0 var(--c)}
+.ev b{display:block;font-size:13px;line-height:1.25;overflow-wrap:break-word;hyphens:auto}.ev small{display:block;font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ev.short small{display:inline}
+.ev.short{display:flex;align-items:center;gap:6px;padding-top:0;padding-bottom:0}.ev.short b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto}.ev.short small{white-space:nowrap}
+.ev.done{opacity:.5}.ev.done b{text-decoration:line-through}
+.ev.overdue{box-shadow:inset 3px 0 0 var(--rec),0 0 0 1.5px rgba(229,72,77,.6)}
+.ev .ck{position:absolute;right:6px;top:6px;width:18px;height:18px;border-radius:50%;border:2px solid var(--c);padding:0;display:grid;place-items:center;color:#fff}
+.ev.short .ck{top:50%;transform:translateY(-50%)}
+.ev.done .ck{background:var(--c)}.ev .ck svg{width:11px;height:11px;opacity:0}.ev.done .ck svg{opacity:1}
+.nowline{position:absolute;left:52px;right:0;border-top:2px solid var(--rec);z-index:3;pointer-events:none}
+.nowline::before{content:"";position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:50%;background:var(--rec)}
+.nowline span{position:absolute;left:-54px;top:-10px;font-size:11px;font-weight:800;color:#fff;background:var(--rec);border-radius:6px;padding:1px 5px}
+.day-hint{text-align:center;color:var(--muted);font-size:13px;padding:0 0 6px}
+.zoombar{position:fixed;right:16px;bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:20;display:none}
+.zoombar.show{display:block}
+.zoombar button{width:42px;height:42px;border-radius:50%;background:var(--surface);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--ink)}
+.zoombar button svg{width:18px;height:18px}
 </style>
 </head>
 <body>
@@ -199,6 +239,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
   <div class="vacts"><button class="btn" id="v-cancel" data-i18n="cancel">Cancel</button><button class="btn primary" id="v-done" data-i18n="done">Done</button></div>
 </div>
 
+<div class="zoombar" id="zoombar"><button id="z-fit" data-i18n-aria="whole_day" aria-label="Whole day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button></div>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet"><div class="panel"><div class="grab"></div><div id="sheet-c"></div></div></div>
 <div class="toast" id="toast"><span id="toast-t"></span><button id="toast-a"></button></div>
@@ -270,7 +311,7 @@ function migrate4(s) {
   s.settings = s.settings || {}; if (!s.settings.lang) s.settings.lang = 'auto';
   s.v = 4; return s;
 }
-const curBoard = () => (S.active !== 'all' && board(S.active)) ? S.active : (S.boards[0] ? S.boards[0].id : null);
+const curBoard = () => (S.active !== 'all' && S.active !== 'day' && board(S.active)) ? S.active : (S.boards[0] ? S.boards[0].id : null);
 var schedT; function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} clearTimeout(schedT); schedT = setTimeout(() => { if (typeof scheduleNotifs === 'function') scheduleNotifs(); }, 300); }
 const board = id => S.boards.find(b => b.id === id);
 
@@ -307,7 +348,7 @@ const L = {
     bad_backup:'This file doesn’t look like a Wavelist backup', no_google:'no connection to Google', win_closed:'window closed', error:'error',
     sync_failed:'Calendar: sync failed', retry:'Retry', voice_chrome:'Voice input works in Chrome on Android',
     mic_allow:'Allow microphone access for this site', no_speech:'Didn’t catch that. Try again',
-    need_net:'Speech recognition needs an internet connection', added_to:'Added to «{b}»', language:'Language', auto_lang:'Automatic (phone)', close:'Close', repeat:'Repeat', rep_none:'Don’t repeat', rep_daily:'Every day', rep_weekdays:'Weekdays', rep_weekly:'Every week', rep_monthly:'Every month', next_on:'Next: {d}', backup:'Backup', backup_save:'Save backup copy', backup_restore:'Restore from file', backup_last:'Last backup: {d}', backup_never:'No backups yet', backup_hint:'Save the file to Google Drive, iCloud, Telegram or email. You can then restore it on any phone.', snapshots:'Automatic snapshots', snapshots_hint:'Once a day the app saves a snapshot of your data on this phone and keeps the last 7. Handy if you deleted something by mistake.', snap_tasks:'tasks: {n}', snap_confirm:'Restore data from {d}? Your current data will be saved as a snapshot first.', restored:'Data restored', backup_remind:'Remind me weekly to save a backup', backup_due:'Your last backup was over a week ago', backup_saved:'Backup saved', no_snaps:'No snapshots yet', backup_now:'Save',
+    need_net:'Speech recognition needs an internet connection', added_to:'Added to «{b}»', language:'Language', auto_lang:'Automatic (phone)', close:'Close', zoom_out:'Zoom out', zoom_in:'Zoom in', whole_day:'Whole day', until:'Until', day_events:'Events: {n}', day_hint:'Tap the timeline to add an event', repeat:'Repeat', rep_none:'Don’t repeat', rep_daily:'Every day', rep_weekdays:'Weekdays', rep_weekly:'Every week', rep_monthly:'Every month', next_on:'Next: {d}', backup:'Backup', backup_save:'Save backup copy', backup_restore:'Restore from file', backup_last:'Last backup: {d}', backup_never:'No backups yet', backup_hint:'Save the file to Google Drive, iCloud, Telegram or email. You can then restore it on any phone.', snapshots:'Automatic snapshots', snapshots_hint:'Once a day the app saves a snapshot of your data on this phone and keeps the last 7. Handy if you deleted something by mistake.', snap_tasks:'tasks: {n}', snap_confirm:'Restore data from {d}? Your current data will be saved as a snapshot first.', restored:'Data restored', backup_remind:'Remind me weekly to save a backup', backup_due:'Your last backup was over a week ago', backup_saved:'Backup saved', no_snaps:'No snapshots yet', backup_now:'Save',
     notif:'Notifications', notif_toggle:'Notify me about tasks with a time', remind:'Remind', at_time:'At the time', min_before:'{n} min before', notif_note:'Reminders arrive while the app is open or was used recently. For reliable reminders when it’s closed, turn on Google Calendar sync: events then get calendar alerts.', notif_denied:'Notifications are blocked. Allow them in the browser settings.', notif_unsupported:'This browser doesn’t support notifications', overdue:'Overdue', overdue_n:'Overdue: {n}'
   },
   uk: {
@@ -341,7 +382,7 @@ const L = {
     bad_backup:'Файл не схожий на резервну копію Wavelist', no_google:'немає зʼєднання з Google', win_closed:'вікно закрито', error:'помилка',
     sync_failed:'Календар: не вдалося синхронізувати', retry:'Ще раз', voice_chrome:'Голосове введення працює в Chrome на Android',
     mic_allow:'Дозволь доступ до мікрофона для цього сайту', no_speech:'Нічого не почув. Спробуй ще раз',
-    need_net:'Для розпізнавання мови потрібен інтернет', added_to:'Додано в «{b}»', language:'Мова', auto_lang:'Як у телефоні', close:'Закрити', repeat:'Повторювати', rep_none:'Не повторювати', rep_daily:'Щодня', rep_weekdays:'По буднях', rep_weekly:'Щотижня', rep_monthly:'Щомісяця', next_on:'Наступне: {d}', backup:'Резервна копія', backup_save:'Зберегти резервну копію', backup_restore:'Відновити з файлу', backup_last:'Остання копія: {d}', backup_never:'Копій ще немає', backup_hint:'Збережи файл на Google Диск, в iCloud, Telegram або пошту. Потім його можна відновити на будь-якому телефоні.', snapshots:'Автоматичні знімки', snapshots_hint:'Раз на день додаток зберігає знімок твоїх даних на цьому телефоні й тримає останні 7. Стане в пригоді, якщо щось випадково видалив.', snap_tasks:'завдань: {n}', snap_confirm:'Відновити дані станом на {d}? Поточні дані спершу збережуться як знімок.', restored:'Дані відновлено', backup_remind:'Щотижня нагадувати зробити копію', backup_due:'Остання резервна копія була понад тиждень тому', backup_saved:'Копію збережено', no_snaps:'Знімків ще немає', backup_now:'Зберегти',
+    need_net:'Для розпізнавання мови потрібен інтернет', added_to:'Додано в «{b}»', language:'Мова', auto_lang:'Як у телефоні', close:'Закрити', zoom_out:'Віддалити', zoom_in:'Наблизити', whole_day:'Весь день', until:'До', day_events:'Подій: {n}', day_hint:'Торкнись шкали, щоб додати подію', repeat:'Повторювати', rep_none:'Не повторювати', rep_daily:'Щодня', rep_weekdays:'По буднях', rep_weekly:'Щотижня', rep_monthly:'Щомісяця', next_on:'Наступне: {d}', backup:'Резервна копія', backup_save:'Зберегти резервну копію', backup_restore:'Відновити з файлу', backup_last:'Остання копія: {d}', backup_never:'Копій ще немає', backup_hint:'Збережи файл на Google Диск, в iCloud, Telegram або пошту. Потім його можна відновити на будь-якому телефоні.', snapshots:'Автоматичні знімки', snapshots_hint:'Раз на день додаток зберігає знімок твоїх даних на цьому телефоні й тримає останні 7. Стане в пригоді, якщо щось випадково видалив.', snap_tasks:'завдань: {n}', snap_confirm:'Відновити дані станом на {d}? Поточні дані спершу збережуться як знімок.', restored:'Дані відновлено', backup_remind:'Щотижня нагадувати зробити копію', backup_due:'Остання резервна копія була понад тиждень тому', backup_saved:'Копію збережено', no_snaps:'Знімків ще немає', backup_now:'Зберегти',
     notif:'Сповіщення', notif_toggle:'Нагадувати про завдання з часом', remind:'Нагадати', at_time:'У момент події', min_before:'За {n} хв', notif_note:'Нагадування приходять, поки додаток відкритий або нещодавно використовувався. Щоб вони надійно приходили й тоді, коли він закритий, увімкни синхронізацію з Google Календарем: події отримають нагадування календаря.', notif_denied:'Сповіщення заблоковано. Дозволь їх у налаштуваннях браузера.', notif_unsupported:'Цей браузер не підтримує сповіщення', overdue:'Протерміновано', overdue_n:'Протерміновано: {n}'
   },
   es: {
@@ -375,7 +416,7 @@ const L = {
     bad_backup:'Este archivo no parece una copia de seguridad de Wavelist', no_google:'sin conexión con Google', win_closed:'ventana cerrada', error:'error',
     sync_failed:'Calendario: error de sincronización', retry:'Reintentar', voice_chrome:'La entrada de voz funciona en Chrome para Android',
     mic_allow:'Permite el acceso al micrófono para este sitio', no_speech:'No te he entendido. Inténtalo de nuevo',
-    need_net:'El reconocimiento de voz necesita conexión a internet', added_to:'Añadido a «{b}»', language:'Idioma', auto_lang:'Automático (teléfono)', close:'Cerrar', repeat:'Repetir', rep_none:'No repetir', rep_daily:'Cada día', rep_weekdays:'Días laborables', rep_weekly:'Cada semana', rep_monthly:'Cada mes', next_on:'Siguiente: {d}', backup:'Copia de seguridad', backup_save:'Guardar copia de seguridad', backup_restore:'Restaurar desde archivo', backup_last:'Última copia: {d}', backup_never:'Aún no hay copias', backup_hint:'Guarda el archivo en Google Drive, iCloud, Telegram o el correo. Luego podrás restaurarlo en cualquier teléfono.', snapshots:'Instantáneas automáticas', snapshots_hint:'Una vez al día la app guarda una instantánea de tus datos en este teléfono y conserva las últimas 7. Útil si borraste algo por error.', snap_tasks:'tareas: {n}', snap_confirm:'¿Restaurar los datos del {d}? Tus datos actuales se guardarán antes como instantánea.', restored:'Datos restaurados', backup_remind:'Recordarme cada semana hacer una copia', backup_due:'Tu última copia de seguridad tiene más de una semana', backup_saved:'Copia guardada', no_snaps:'Aún no hay instantáneas', backup_now:'Guardar',
+    need_net:'El reconocimiento de voz necesita conexión a internet', added_to:'Añadido a «{b}»', language:'Idioma', auto_lang:'Automático (teléfono)', close:'Cerrar', zoom_out:'Alejar', zoom_in:'Acercar', whole_day:'Todo el día', until:'Hasta', day_events:'Eventos: {n}', day_hint:'Toca la línea de tiempo para añadir un evento', repeat:'Repetir', rep_none:'No repetir', rep_daily:'Cada día', rep_weekdays:'Días laborables', rep_weekly:'Cada semana', rep_monthly:'Cada mes', next_on:'Siguiente: {d}', backup:'Copia de seguridad', backup_save:'Guardar copia de seguridad', backup_restore:'Restaurar desde archivo', backup_last:'Última copia: {d}', backup_never:'Aún no hay copias', backup_hint:'Guarda el archivo en Google Drive, iCloud, Telegram o el correo. Luego podrás restaurarlo en cualquier teléfono.', snapshots:'Instantáneas automáticas', snapshots_hint:'Una vez al día la app guarda una instantánea de tus datos en este teléfono y conserva las últimas 7. Útil si borraste algo por error.', snap_tasks:'tareas: {n}', snap_confirm:'¿Restaurar los datos del {d}? Tus datos actuales se guardarán antes como instantánea.', restored:'Datos restaurados', backup_remind:'Recordarme cada semana hacer una copia', backup_due:'Tu última copia de seguridad tiene más de una semana', backup_saved:'Copia guardada', no_snaps:'Aún no hay instantáneas', backup_now:'Guardar',
     notif:'Notificaciones', notif_toggle:'Avisarme de las tareas con hora', remind:'Recordar', at_time:'A la hora', min_before:'{n} min antes', notif_note:'Los recordatorios llegan mientras la app está abierta o se usó hace poco. Para recibirlos con la app cerrada, activa la sincronización con Google Calendar: los eventos tendrán avisos del calendario.', notif_denied:'Las notificaciones están bloqueadas. Permítelas en los ajustes del navegador.', notif_unsupported:'Este navegador no admite notificaciones', overdue:'Vencida', overdue_n:'Vencidas: {n}'
   }
   ,
@@ -410,7 +451,7 @@ const L = {
     bad_backup:'Este arquivo não parece um backup do Wavelist', no_google:'sem conexão com o Google', win_closed:'janela fechada', error:'erro',
     sync_failed:'Agenda: falha na sincronização', retry:'Tentar de novo', voice_chrome:'A entrada de voz funciona no Chrome para Android',
     mic_allow:'Permita o acesso ao microfone para este site', no_speech:'Não entendi. Tente de novo',
-    need_net:'O reconhecimento de voz precisa de internet', added_to:'Adicionado a «{b}»', language:'Idioma', auto_lang:'Automático (telefone)', close:'Fechar', repeat:'Repetir', rep_none:'Não repetir', rep_daily:'Todo dia', rep_weekdays:'Dias úteis', rep_weekly:'Toda semana', rep_monthly:'Todo mês', next_on:'Próxima: {d}', backup:'Backup', backup_save:'Salvar cópia de backup', backup_restore:'Restaurar de arquivo', backup_last:'Último backup: {d}', backup_never:'Nenhum backup ainda', backup_hint:'Salve o arquivo no Google Drive, iCloud, Telegram ou e-mail. Depois você pode restaurá-lo em qualquer celular.', snapshots:'Cópias automáticas', snapshots_hint:'Uma vez por dia o app salva uma cópia dos seus dados neste celular e mantém as últimas 7. Útil se você apagou algo sem querer.', snap_tasks:'tarefas: {n}', snap_confirm:'Restaurar os dados de {d}? Seus dados atuais serão salvos antes como cópia.', restored:'Dados restaurados', backup_remind:'Lembrar toda semana de fazer backup', backup_due:'Seu último backup foi há mais de uma semana', backup_saved:'Backup salvo', no_snaps:'Nenhuma cópia ainda', backup_now:'Salvar',
+    need_net:'O reconhecimento de voz precisa de internet', added_to:'Adicionado a «{b}»', language:'Idioma', auto_lang:'Automático (telefone)', close:'Fechar', zoom_out:'Afastar', zoom_in:'Aproximar', whole_day:'Dia inteiro', until:'Até', day_events:'Eventos: {n}', day_hint:'Toque na linha do tempo para adicionar um evento', repeat:'Repetir', rep_none:'Não repetir', rep_daily:'Todo dia', rep_weekdays:'Dias úteis', rep_weekly:'Toda semana', rep_monthly:'Todo mês', next_on:'Próxima: {d}', backup:'Backup', backup_save:'Salvar cópia de backup', backup_restore:'Restaurar de arquivo', backup_last:'Último backup: {d}', backup_never:'Nenhum backup ainda', backup_hint:'Salve o arquivo no Google Drive, iCloud, Telegram ou e-mail. Depois você pode restaurá-lo em qualquer celular.', snapshots:'Cópias automáticas', snapshots_hint:'Uma vez por dia o app salva uma cópia dos seus dados neste celular e mantém as últimas 7. Útil se você apagou algo sem querer.', snap_tasks:'tarefas: {n}', snap_confirm:'Restaurar os dados de {d}? Seus dados atuais serão salvos antes como cópia.', restored:'Dados restaurados', backup_remind:'Lembrar toda semana de fazer backup', backup_due:'Seu último backup foi há mais de uma semana', backup_saved:'Backup salvo', no_snaps:'Nenhuma cópia ainda', backup_now:'Salvar',
     notif:'Notificações', notif_toggle:'Avisar sobre tarefas com horário', remind:'Lembrar', at_time:'No horário', min_before:'{n} min antes', notif_note:'Os lembretes chegam enquanto o app está aberto ou foi usado recentemente. Para recebê-los com o app fechado, ative a sincronização com o Google Agenda: os eventos terão alertas da agenda.', notif_denied:'As notificações estão bloqueadas. Permita-as nas configurações do navegador.', notif_unsupported:'Este navegador não suporta notificações', overdue:'Atrasada', overdue_n:'Atrasadas: {n}'
   },
   id: {
@@ -444,7 +485,7 @@ const L = {
     bad_backup:'File ini sepertinya bukan cadangan Wavelist', no_google:'tidak ada koneksi ke Google', win_closed:'jendela ditutup', error:'galat',
     sync_failed:'Kalender: sinkronisasi gagal', retry:'Coba lagi', voice_chrome:'Input suara berfungsi di Chrome untuk Android',
     mic_allow:'Izinkan akses mikrofon untuk situs ini', no_speech:'Tidak terdengar. Coba lagi',
-    need_net:'Pengenalan suara memerlukan koneksi internet', added_to:'Ditambahkan ke «{b}»', language:'Bahasa', auto_lang:'Otomatis (ponsel)', close:'Tutup', repeat:'Ulangi', rep_none:'Jangan ulangi', rep_daily:'Setiap hari', rep_weekdays:'Hari kerja', rep_weekly:'Setiap minggu', rep_monthly:'Setiap bulan', next_on:'Berikutnya: {d}', backup:'Cadangan', backup_save:'Simpan cadangan', backup_restore:'Pulihkan dari file', backup_last:'Cadangan terakhir: {d}', backup_never:'Belum ada cadangan', backup_hint:'Simpan file ke Google Drive, iCloud, Telegram, atau email. Nanti bisa dipulihkan di ponsel mana pun.', snapshots:'Cuplikan otomatis', snapshots_hint:'Sekali sehari aplikasi menyimpan cuplikan datamu di ponsel ini dan menyimpan 7 yang terakhir. Berguna jika kamu tidak sengaja menghapus sesuatu.', snap_tasks:'tugas: {n}', snap_confirm:'Pulihkan data dari {d}? Data saat ini akan disimpan dulu sebagai cuplikan.', restored:'Data dipulihkan', backup_remind:'Ingatkan setiap minggu untuk mencadangkan', backup_due:'Cadangan terakhirmu sudah lebih dari seminggu lalu', backup_saved:'Cadangan disimpan', no_snaps:'Belum ada cuplikan', backup_now:'Simpan',
+    need_net:'Pengenalan suara memerlukan koneksi internet', added_to:'Ditambahkan ke «{b}»', language:'Bahasa', auto_lang:'Otomatis (ponsel)', close:'Tutup', zoom_out:'Perkecil', zoom_in:'Perbesar', whole_day:'Seharian', until:'Sampai', day_events:'Acara: {n}', day_hint:'Ketuk garis waktu untuk menambah acara', repeat:'Ulangi', rep_none:'Jangan ulangi', rep_daily:'Setiap hari', rep_weekdays:'Hari kerja', rep_weekly:'Setiap minggu', rep_monthly:'Setiap bulan', next_on:'Berikutnya: {d}', backup:'Cadangan', backup_save:'Simpan cadangan', backup_restore:'Pulihkan dari file', backup_last:'Cadangan terakhir: {d}', backup_never:'Belum ada cadangan', backup_hint:'Simpan file ke Google Drive, iCloud, Telegram, atau email. Nanti bisa dipulihkan di ponsel mana pun.', snapshots:'Cuplikan otomatis', snapshots_hint:'Sekali sehari aplikasi menyimpan cuplikan datamu di ponsel ini dan menyimpan 7 yang terakhir. Berguna jika kamu tidak sengaja menghapus sesuatu.', snap_tasks:'tugas: {n}', snap_confirm:'Pulihkan data dari {d}? Data saat ini akan disimpan dulu sebagai cuplikan.', restored:'Data dipulihkan', backup_remind:'Ingatkan setiap minggu untuk mencadangkan', backup_due:'Cadangan terakhirmu sudah lebih dari seminggu lalu', backup_saved:'Cadangan disimpan', no_snaps:'Belum ada cuplikan', backup_now:'Simpan',
     notif:'Notifikasi', notif_toggle:'Ingatkan tugas yang punya waktu', remind:'Ingatkan', at_time:'Tepat waktu', min_before:'{n} mnt sebelumnya', notif_note:'Pengingat muncul saat aplikasi terbuka atau baru saja dipakai. Agar tetap muncul saat aplikasi ditutup, aktifkan sinkronisasi Google Kalender: acara akan mendapat notifikasi kalender.', notif_denied:'Notifikasi diblokir. Izinkan di pengaturan browser.', notif_unsupported:'Browser ini tidak mendukung notifikasi', overdue:'Terlambat', overdue_n:'Terlambat: {n}'
   },
   tr: {
@@ -478,7 +519,7 @@ const L = {
     bad_backup:'Bu dosya bir Wavelist yedeği gibi görünmüyor', no_google:'Google’a bağlantı yok', win_closed:'pencere kapatıldı', error:'hata',
     sync_failed:'Takvim: senkronizasyon başarısız', retry:'Tekrar dene', voice_chrome:'Sesli giriş Android’de Chrome’da çalışır',
     mic_allow:'Bu site için mikrofon erişimine izin verin', no_speech:'Anlaşılamadı. Tekrar deneyin',
-    need_net:'Ses tanıma için internet bağlantısı gerekir', added_to:'«{b}» panosuna eklendi', language:'Dil', auto_lang:'Otomatik (telefon)', close:'Kapat', repeat:'Tekrarla', rep_none:'Tekrarlama', rep_daily:'Her gün', rep_weekdays:'Hafta içi', rep_weekly:'Her hafta', rep_monthly:'Her ay', next_on:'Sonraki: {d}', backup:'Yedekleme', backup_save:'Yedek kopya kaydet', backup_restore:'Dosyadan geri yükle', backup_last:'Son yedek: {d}', backup_never:'Henüz yedek yok', backup_hint:'Dosyayı Google Drive, iCloud, Telegram veya e-postaya kaydedin. Sonra herhangi bir telefonda geri yükleyebilirsiniz.', snapshots:'Otomatik anlık kopyalar', snapshots_hint:'Uygulama günde bir kez verilerinizin anlık kopyasını bu telefonda kaydeder ve son 7 tanesini tutar. Yanlışlıkla bir şey sildiyseniz işe yarar.', snap_tasks:'görev: {n}', snap_confirm:'{d} tarihli veriler geri yüklensin mi? Mevcut verileriniz önce anlık kopya olarak kaydedilecek.', restored:'Veriler geri yüklendi', backup_remind:'Her hafta yedek almayı hatırlat', backup_due:'Son yedeğiniz bir haftadan eski', backup_saved:'Yedek kaydedildi', no_snaps:'Henüz anlık kopya yok', backup_now:'Kaydet',
+    need_net:'Ses tanıma için internet bağlantısı gerekir', added_to:'«{b}» panosuna eklendi', language:'Dil', auto_lang:'Otomatik (telefon)', close:'Kapat', zoom_out:'Uzaklaştır', zoom_in:'Yakınlaştır', whole_day:'Tüm gün', until:'Bitiş', day_events:'Etkinlik: {n}', day_hint:'Etkinlik eklemek için zaman çizelgesine dokunun', repeat:'Tekrarla', rep_none:'Tekrarlama', rep_daily:'Her gün', rep_weekdays:'Hafta içi', rep_weekly:'Her hafta', rep_monthly:'Her ay', next_on:'Sonraki: {d}', backup:'Yedekleme', backup_save:'Yedek kopya kaydet', backup_restore:'Dosyadan geri yükle', backup_last:'Son yedek: {d}', backup_never:'Henüz yedek yok', backup_hint:'Dosyayı Google Drive, iCloud, Telegram veya e-postaya kaydedin. Sonra herhangi bir telefonda geri yükleyebilirsiniz.', snapshots:'Otomatik anlık kopyalar', snapshots_hint:'Uygulama günde bir kez verilerinizin anlık kopyasını bu telefonda kaydeder ve son 7 tanesini tutar. Yanlışlıkla bir şey sildiyseniz işe yarar.', snap_tasks:'görev: {n}', snap_confirm:'{d} tarihli veriler geri yüklensin mi? Mevcut verileriniz önce anlık kopya olarak kaydedilecek.', restored:'Veriler geri yüklendi', backup_remind:'Her hafta yedek almayı hatırlat', backup_due:'Son yedeğiniz bir haftadan eski', backup_saved:'Yedek kaydedildi', no_snaps:'Henüz anlık kopya yok', backup_now:'Kaydet',
     notif:'Bildirimler', notif_toggle:'Saati olan görevleri hatırlat', remind:'Hatırlat', at_time:'Tam zamanında', min_before:'{n} dk önce', notif_note:'Hatırlatıcılar uygulama açıkken veya yakın zamanda kullanıldıysa gelir. Uygulama kapalıyken de güvenilir hatırlatma için Google Takvim senkronizasyonunu açın: etkinlikler takvim uyarısı alır.', notif_denied:'Bildirimler engellendi. Tarayıcı ayarlarından izin verin.', notif_unsupported:'Bu tarayıcı bildirimleri desteklemiyor', overdue:'Gecikmiş', overdue_n:'Gecikmiş: {n}'
   },
   hi: {
@@ -512,7 +553,7 @@ const L = {
     bad_backup:'यह फ़ाइल Wavelist का बैकअप नहीं लगती', no_google:'Google से कनेक्शन नहीं है', win_closed:'विंडो बंद हो गई', error:'त्रुटि',
     sync_failed:'कैलेंडर: सिंक नहीं हो सका', retry:'फिर से कोशिश करें', voice_chrome:'वॉइस इनपुट Android पर Chrome में काम करता है',
     mic_allow:'इस साइट के लिए माइक्रोफ़ोन की अनुमति दें', no_speech:'सुनाई नहीं दिया। फिर से कोशिश करें',
-    need_net:'आवाज़ पहचानने के लिए इंटरनेट चाहिए', added_to:'«{b}» में जोड़ा गया', language:'भाषा', auto_lang:'अपने-आप (फ़ोन)', close:'बंद करें', repeat:'दोहराएँ', rep_none:'न दोहराएँ', rep_daily:'हर दिन', rep_weekdays:'कार्यदिवस', rep_weekly:'हर हफ़्ते', rep_monthly:'हर महीने', next_on:'अगला: {d}', backup:'बैकअप', backup_save:'बैकअप कॉपी सेव करें', backup_restore:'फ़ाइल से रीस्टोर करें', backup_last:'आख़िरी बैकअप: {d}', backup_never:'अभी कोई बैकअप नहीं', backup_hint:'फ़ाइल को Google Drive, iCloud, Telegram या ईमेल में सेव करें। फिर उसे किसी भी फ़ोन पर रीस्टोर कर सकते हैं।', snapshots:'अपने-आप स्नैपशॉट', snapshots_hint:'ऐप दिन में एक बार इस फ़ोन पर आपके डेटा का स्नैपशॉट सेव करता है और आख़िरी 7 रखता है। गलती से कुछ हट जाए तो काम आता है।', snap_tasks:'कार्य: {n}', snap_confirm:'{d} का डेटा रीस्टोर करें? मौजूदा डेटा पहले स्नैपशॉट के रूप में सेव हो जाएगा।', restored:'डेटा रीस्टोर हो गया', backup_remind:'हर हफ़्ते बैकअप की याद दिलाएँ', backup_due:'आपका आख़िरी बैकअप एक हफ़्ते से ज़्यादा पुराना है', backup_saved:'बैकअप सेव हो गया', no_snaps:'अभी कोई स्नैपशॉट नहीं', backup_now:'सेव करें',
+    need_net:'आवाज़ पहचानने के लिए इंटरनेट चाहिए', added_to:'«{b}» में जोड़ा गया', language:'भाषा', auto_lang:'अपने-आप (फ़ोन)', close:'बंद करें', zoom_out:'ज़ूम आउट', zoom_in:'ज़ूम इन', whole_day:'पूरा दिन', until:'तक', day_events:'इवेंट: {n}', day_hint:'इवेंट जोड़ने के लिए टाइमलाइन पर टैप करें', repeat:'दोहराएँ', rep_none:'न दोहराएँ', rep_daily:'हर दिन', rep_weekdays:'कार्यदिवस', rep_weekly:'हर हफ़्ते', rep_monthly:'हर महीने', next_on:'अगला: {d}', backup:'बैकअप', backup_save:'बैकअप कॉपी सेव करें', backup_restore:'फ़ाइल से रीस्टोर करें', backup_last:'आख़िरी बैकअप: {d}', backup_never:'अभी कोई बैकअप नहीं', backup_hint:'फ़ाइल को Google Drive, iCloud, Telegram या ईमेल में सेव करें। फिर उसे किसी भी फ़ोन पर रीस्टोर कर सकते हैं।', snapshots:'अपने-आप स्नैपशॉट', snapshots_hint:'ऐप दिन में एक बार इस फ़ोन पर आपके डेटा का स्नैपशॉट सेव करता है और आख़िरी 7 रखता है। गलती से कुछ हट जाए तो काम आता है।', snap_tasks:'कार्य: {n}', snap_confirm:'{d} का डेटा रीस्टोर करें? मौजूदा डेटा पहले स्नैपशॉट के रूप में सेव हो जाएगा।', restored:'डेटा रीस्टोर हो गया', backup_remind:'हर हफ़्ते बैकअप की याद दिलाएँ', backup_due:'आपका आख़िरी बैकअप एक हफ़्ते से ज़्यादा पुराना है', backup_saved:'बैकअप सेव हो गया', no_snaps:'अभी कोई स्नैपशॉट नहीं', backup_now:'सेव करें',
     notif:'सूचनाएँ', notif_toggle:'समय वाले कार्यों की याद दिलाएँ', remind:'याद दिलाएँ', at_time:'ठीक समय पर', min_before:'{n} मिनट पहले', notif_note:'ऐप खुला हो या हाल में इस्तेमाल हुआ हो, तब रिमाइंडर आते हैं। ऐप बंद होने पर भी भरोसेमंद रिमाइंडर के लिए Google Calendar सिंक चालू करें: इवेंट को कैलेंडर अलर्ट मिलेंगे।', notif_denied:'सूचनाएँ ब्लॉक हैं। ब्राउज़र सेटिंग्स में अनुमति दें।', notif_unsupported:'यह ब्राउज़र सूचनाएँ सपोर्ट नहीं करता', overdue:'समय निकल गया', overdue_n:'समय निकल गया: {n}'
   },
   vi: {
@@ -546,7 +587,7 @@ const L = {
     bad_backup:'Tệp này có vẻ không phải bản sao lưu của Wavelist', no_google:'không có kết nối tới Google', win_closed:'cửa sổ đã đóng', error:'lỗi',
     sync_failed:'Lịch: đồng bộ thất bại', retry:'Thử lại', voice_chrome:'Nhập bằng giọng nói hoạt động trên Chrome cho Android',
     mic_allow:'Hãy cho phép trang này dùng micrô', no_speech:'Không nghe rõ. Hãy thử lại',
-    need_net:'Nhận dạng giọng nói cần kết nối internet', added_to:'Đã thêm vào «{b}»', language:'Ngôn ngữ', auto_lang:'Tự động (theo điện thoại)', close:'Đóng', repeat:'Lặp lại', rep_none:'Không lặp lại', rep_daily:'Mỗi ngày', rep_weekdays:'Ngày thường', rep_weekly:'Mỗi tuần', rep_monthly:'Mỗi tháng', next_on:'Tiếp theo: {d}', backup:'Sao lưu', backup_save:'Lưu bản sao lưu', backup_restore:'Khôi phục từ tệp', backup_last:'Sao lưu gần nhất: {d}', backup_never:'Chưa có bản sao lưu', backup_hint:'Lưu tệp vào Google Drive, iCloud, Telegram hoặc email. Sau đó có thể khôi phục trên bất kỳ điện thoại nào.', snapshots:'Ảnh chụp tự động', snapshots_hint:'Mỗi ngày một lần, ứng dụng lưu ảnh chụp dữ liệu của bạn trên điện thoại này và giữ 7 bản gần nhất. Hữu ích khi bạn lỡ xóa nhầm.', snap_tasks:'việc: {n}', snap_confirm:'Khôi phục dữ liệu từ {d}? Dữ liệu hiện tại sẽ được lưu thành ảnh chụp trước.', restored:'Đã khôi phục dữ liệu', backup_remind:'Nhắc tôi sao lưu mỗi tuần', backup_due:'Bản sao lưu gần nhất đã hơn một tuần', backup_saved:'Đã lưu bản sao lưu', no_snaps:'Chưa có ảnh chụp', backup_now:'Lưu',
+    need_net:'Nhận dạng giọng nói cần kết nối internet', added_to:'Đã thêm vào «{b}»', language:'Ngôn ngữ', auto_lang:'Tự động (theo điện thoại)', close:'Đóng', zoom_out:'Thu nhỏ', zoom_in:'Phóng to', whole_day:'Cả ngày', until:'Đến', day_events:'Sự kiện: {n}', day_hint:'Chạm vào dòng thời gian để thêm sự kiện', repeat:'Lặp lại', rep_none:'Không lặp lại', rep_daily:'Mỗi ngày', rep_weekdays:'Ngày thường', rep_weekly:'Mỗi tuần', rep_monthly:'Mỗi tháng', next_on:'Tiếp theo: {d}', backup:'Sao lưu', backup_save:'Lưu bản sao lưu', backup_restore:'Khôi phục từ tệp', backup_last:'Sao lưu gần nhất: {d}', backup_never:'Chưa có bản sao lưu', backup_hint:'Lưu tệp vào Google Drive, iCloud, Telegram hoặc email. Sau đó có thể khôi phục trên bất kỳ điện thoại nào.', snapshots:'Ảnh chụp tự động', snapshots_hint:'Mỗi ngày một lần, ứng dụng lưu ảnh chụp dữ liệu của bạn trên điện thoại này và giữ 7 bản gần nhất. Hữu ích khi bạn lỡ xóa nhầm.', snap_tasks:'việc: {n}', snap_confirm:'Khôi phục dữ liệu từ {d}? Dữ liệu hiện tại sẽ được lưu thành ảnh chụp trước.', restored:'Đã khôi phục dữ liệu', backup_remind:'Nhắc tôi sao lưu mỗi tuần', backup_due:'Bản sao lưu gần nhất đã hơn một tuần', backup_saved:'Đã lưu bản sao lưu', no_snaps:'Chưa có ảnh chụp', backup_now:'Lưu',
     notif:'Thông báo', notif_toggle:'Nhắc các việc có giờ', remind:'Nhắc', at_time:'Đúng giờ', min_before:'Trước {n} phút', notif_note:'Lời nhắc đến khi ứng dụng đang mở hoặc vừa được dùng. Để nhận nhắc nhở chắc chắn cả khi đã đóng, hãy bật đồng bộ Google Lịch: sự kiện sẽ có thông báo của lịch.', notif_denied:'Thông báo đang bị chặn. Hãy cho phép trong cài đặt trình duyệt.', notif_unsupported:'Trình duyệt này không hỗ trợ thông báo', overdue:'Quá hạn', overdue_n:'Quá hạn: {n}'
   }
 };
@@ -638,7 +679,17 @@ function parse(raw) {
   }
 
   // time
-  const tm = cut(/\s(?:о|об|на)\s+(\d{1,2})(?:[:.\s](\d{2}))?(?:\s*год\S*)?(?:\s+(ранку|дня|вечора|ночі))?\s/) || cut(/\s(\d{1,2}):(\d{2})()\s/);
+  const rg = cut(/\s(?:з|із|зі|від|from)\s+(\d{1,2})(?:[:.](\d{2}))?\s*(?:год\S*\s+)?(?:до|по|to|till|until|-)\s+(\d{1,2})(?:[:.](\d{2}))?(?:\s*год\S*)?(?:\s+(ранку|дня|вечора))?\s/);
+  let end = null;
+  if (rg) {
+    let h1 = +rg[1], m1 = rg[2] ? +rg[2] : 0, h2 = +rg[3], m2 = rg[4] ? +rg[4] : 0; const part = rg[5];
+    if (part === 'вечора' || part === 'дня') { if (h2 < 12) h2 += 12; if (h1 < 12 && h1 + 12 <= h2) h1 += 12; }
+    if (h1 < 24 && h2 < 24 && m1 < 60 && m2 < 60) {
+      time = pad(h1) + ':' + pad(m1); end = pad(h2) + ':' + pad(m2); if (toMin(end) <= toMin(time)) end = null;
+      if (!date) { const now = new Date(); date = (h1 * 60 + m1 > now.getHours() * 60 + now.getMinutes()) ? plus(0) : plus(1); }
+    }
+  }
+  const tm = rg ? null : cut(/\s(?:о|об|на)\s+(\d{1,2})(?:[:.\s](\d{2}))?(?:\s*год\S*)?(?:\s+(ранку|дня|вечора|ночі))?\s/) || cut(/\s(\d{1,2}):(\d{2})()\s/);
   if (tm) {
     let h = +tm[1], mi = tm[2] ? +tm[2] : 0; const part = tm[3];
     if ((part === 'вечора' || (part === 'дня' && h < 12)) && h < 12) h += 12;
@@ -654,12 +705,12 @@ function parse(raw) {
   if (!boardId) boardId = (time && board('events')) ? 'events' : curBoard();
   if (repeat && !date) date = time && (() => { const n = new Date(); return time <= pad(n.getHours()) + ':' + pad(n.getMinutes()); })() ? stepDate(plus(0), repeat) : plus(0);
   if (repeat) date = firstFrom(date, repeat, true);
-  return { title: title || raw.trim(), date, time, boardId, repeat };
+  return { title: title || raw.trim(), date, time, end, boardId, repeat };
 }
 
 /* ---------- render ---------- */
 function render() {
-  if (S.active !== 'all' && !board(S.active)) S.active = 'all';
+  if (S.active !== 'all' && S.active !== 'day' && !board(S.active)) S.active = 'all';
   const d = new Date();
   $('#today').textContent = LANG === 'uk'
     ? cap(new Intl.DateTimeFormat('uk-UA', { weekday: 'long' }).format(d)) + ', ' + new Intl.DateTimeFormat('uk-UA', { month: 'long', day: 'numeric' }).format(d)
@@ -667,11 +718,11 @@ function render() {
   const openCount = id => S.items.filter(i => i.boardId === id && !i.done).length;
 
   const tabs = $('#tabs');
-  tabs.innerHTML = `<button class="tab${S.active === 'all' ? ' on' : ''}" data-v="all">${t('all')}</button>` +
+  tabs.innerHTML = `<button class="tab${S.active === 'all' ? ' on' : ''}" data-v="all">${t('all')}</button><button class="tab${S.active === 'day' ? ' on' : ''}" data-v="day">${t('today')}</button>` +
     S.boards.map(b => { const n = openCount(b.id);
       return `<button class="tab${b.id === S.active ? ' on' : ''}" data-v="${b.id}" data-id="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(bn(b))}${n ? `<span class="cnt${S.items.some(i => i.boardId === b.id && isOverdue(i)) ? ' late' : ''}">${n}</span>` : ''}</button>`; }).join('') +
     `<button class="tab ghost plus" id="t-add" aria-label="${t('new_board')}">+</button><button class="tab ghost" id="t-edit">${t('edit')}</button>`;
-  tabs.querySelectorAll('[data-v]').forEach(el => el.onclick = () => { if (!tabDragged) go(el.dataset.v); });
+  tabs.querySelectorAll('[data-v]').forEach(el => el.onclick = () => { if (tabDragged) return; if (el.dataset.v === 'day') { dayOff = 0; dayScroll = true; } go(el.dataset.v); });
   tabs.querySelectorAll('[data-id]').forEach(bindTabDrag);
   $('#t-add').onclick = () => addBoardSheet(); $('#t-edit').onclick = openBoards;
   const on = tabs.querySelector('.on'); if (on) on.scrollIntoView({ inline: 'nearest', block: 'nearest' });
@@ -683,6 +734,8 @@ function render() {
     if (a.date) return -1; if (b.date) return 1; return b.created - a.created;
   });
 
+  $('#zoombar').classList.toggle('show', S.active === 'day');
+  if (S.active === 'day') { renderDay(list); return; }
   if (S.active === 'all') {
     list.innerHTML = S.boards.map(b => {
       const its = sortOpen(S.items.filter(i => i.boardId === b.id));
@@ -708,7 +761,7 @@ function render() {
   if (db) { db.ontoggle = () => { doneOpen = db.open; };
     db.querySelector('.clear-done').onclick = () => removeItems(done, t('deleted_done', { n: done.length })); }
 }
-const views = () => ['all', ...S.boards.map(b => b.id)];
+const views = () => ['all', 'day', ...S.boards.map(b => b.id)];
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const EASE = 'cubic-bezier(.2,.8,.2,1)';
 function slideIn(dir) {
@@ -718,10 +771,124 @@ function slideIn(dir) {
   l.getBoundingClientRect();
   l.style.transition = `transform 240ms ${EASE}, opacity 180ms ease-out`; l.style.transform = 'translateX(0)'; l.style.opacity = '1';
 }
+/* ---------- day timeline ---------- */
+let dayOff = 0, dayScroll = true, dayScrolled = false, pinchedAt = 0;
+let hpx = 72;
+const HMAX = 600;
+const toMin = s => { const [a, b] = s.split(':'); return +a * 60 + +b; };
+const fromMin = m => pad(Math.floor(m / 60) % 24) + ':' + pad(m % 60);
+const dayStr = () => { const d = new Date(); d.setDate(d.getDate() + dayOff); return ymd(d); };
+function occursOn(i, ds) {
+  if (!i.date) return false; if (i.date === ds) return true;
+  if (!i.repeat || i.done || ds < i.date) return false;
+  let x = i.date, g = 0; while (x < ds && g++ < 800) x = stepDate(x, i.repeat); return x === ds;
+}
+function endMin(i) {
+  const s = toMin(i.time); let e = i.end ? toMin(i.end) : s + (+S.settings.duration || 60);
+  if (e <= s) e = s + (+S.settings.duration || 60); return Math.min(e, 24 * 60);
+}
+function fitPx() { const l = $('#list'); const avail = (l ? l.clientHeight : 600) - 150; return Math.max(14, Math.floor(avail / 24 * 10) / 10); }
+function clampZ(v) { return Math.max(fitPx(), Math.min(HMAX, v)); }
+function applyZoom(tl) {
+  tl = tl || $('#tl'); if (!tl) return;
+  tl.style.setProperty('--hpx', hpx);
+  tl.classList.toggle('zs', hpx < 34); tl.classList.toggle('zm', hpx >= 34 && hpx < 56); tl.classList.toggle('zx', hpx >= 200);
+  tl.querySelectorAll('.ev').forEach(el => {
+    const px = +el.style.getPropertyValue('--d') * hpx / 60, n = +el.dataset.n;
+    el.classList.toggle('tiny', px < 30);
+    el.classList.toggle('short', px >= 30 && px < 54);
+    const sm = el.querySelector('small'); if (sm) sm.style.display = (px < 54 && n > 1) ? 'none' : '';
+  });
+}
+function renderDay(list) {
+  hpx = clampZ(+S.settings.zoom || 72);
+  const ds = dayStr(), isToday = dayOff === 0;
+  const evs = S.items.filter(i => i.time && board(i.boardId) && occursOn(i, ds))
+    .map(i => ({ i, s: toMin(i.time), e: endMin(i) })).sort((a, b) => a.s - b.s || b.e - a.e);
+  let grp = [], end = -1; const groups = [];
+  evs.forEach(x => { if (x.s >= end && grp.length) { groups.push(grp); grp = []; } grp.push(x); end = Math.max(end, x.e); });
+  if (grp.length) groups.push(grp);
+  groups.forEach(G => { const cols = []; G.forEach(x => { let k = cols.findIndex(c => c <= x.s); if (k < 0) { k = cols.length; cols.push(0); } cols[k] = x.e; x.col = k; }); G.forEach(x => x.n = cols.length); });
+  const d = new Date(ds + 'T00:00');
+  const title = cap(new Intl.DateTimeFormat(LOCALES[LANG], { weekday: 'long', day: 'numeric', month: 'long' }).format(d));
+  const rel = Math.abs(dayOff) <= 1 ? dateLabel(ds) : '';
+  let hrs = '';
+  for (let hh = 0; hh < 24; hh++) hrs += `<div class="hr${hh % 2 ? '' : ' h2'}${hh % 3 ? '' : ' h3'}">${hh ? `<span class="hl">${pad(hh)}:00</span>` : ''}<span class="hl m">:30</span><span class="hl f" style="top:calc(25% - 7px)">:15</span><span class="hl f" style="top:calc(75% - 7px)">:45</span><span class="h30"></span><span class="q" style="top:25%"></span><span class="q" style="top:75%"></span></div>`;
+  const CK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const blocks = evs.map(x => {
+    const it = x.i, done = it.done && !it.repeat, dur = x.e - x.s, W = 100 / x.n;
+    const late = isToday && isOverdue(it) && !it.repeat;
+    return `<div class="ev${done ? ' done' : ''}${late ? ' overdue' : ''}" data-id="${it.id}" data-n="${x.n}" style="--c:${board(it.boardId).color};--s:${x.s};--d:${dur};left:calc(${x.col * W}% + 3px);width:calc(${W}% - 6px)"><b>${esc(it.title)}</b><small>${it.time}–${fromMin(x.e)}${it.repeat ? ' · ↻' : ''}</small><button class="ck" aria-label="${done ? t('mark_undone') : t('mark_done')}">${CK}</button></div>`;
+  }).join('');
+  list.innerHTML = `<div class="daybar"><button class="arr" id="d-prev" aria-label="‹">‹</button>
+    <div class="dtitle"><b>${title}</b><span class="${isToday ? 'is-today' : ''}">${rel ? rel + ' · ' : ''}${t('day_events', { n: evs.length })}</span></div>
+    <button class="arr" id="d-next" aria-label="›">›</button></div>
+    ${evs.length ? '' : `<div class="day-hint">${t('day_hint')}</div>`}
+    <div class="tl" id="tl">${hrs}<div class="evs" id="evs">${blocks}</div>${isToday ? '<div class="nowline" id="nowline"><span></span></div>' : ''}</div>`;
+  applyZoom();
+  $('#d-prev').onclick = () => { dayOff--; dayScroll = true; render(); slideIn(-1); };
+  $('#d-next').onclick = () => { dayOff++; dayScroll = true; render(); slideIn(1); };
+  const ev = $('#evs');
+  ev.onclick = e => {
+    if (lpFired) { lpFired = false; return; }
+    if (Date.now() - pinchedAt < 500) return;
+    const blk = e.target.closest('.ev');
+    if (blk) { const it = S.items.find(i => i.id === blk.dataset.id); if (!it) return;
+      if (e.target.closest('.ck')) toggleDone(it); else openEdit(it); return; }
+    const r = ev.getBoundingClientRect(); const step = hpx >= 200 ? 15 : 30;
+    let m = Math.floor((e.clientY - r.top) / hpx * 60 / step) * step; m = Math.max(0, Math.min(m, 23 * 60 + 30));
+    const dur = +S.settings.duration || 60;
+    openEdit(null, { date: ds, time: fromMin(m), end: fromMin(Math.min(m + dur, 23 * 60 + 59)), boardId: board('events') ? 'events' : curBoard(), title: '' });
+  };
+  ev.querySelectorAll('.ev').forEach(el => { const it = S.items.find(i => i.id === el.dataset.id); if (it) longPress(el, () => openMove(it)); });
+  bindPinch($('#tl'), list);
+  placeNow();
+  if (dayScroll) {
+    dayScroll = false; dayScrolled = true;
+    const target = isToday ? (new Date().getHours() * 60 + new Date().getMinutes() - 60) : (evs.length ? evs[0].s - 30 : 8 * 60);
+    requestAnimationFrame(() => { const tl = $('#tl'); if (tl) list.scrollTop = tl.offsetTop + Math.max(0, target) * hpx / 60 - 8; });
+  }
+}
+function zoomTo(nh, anchorY) {
+  const list = $('#list'), tl = $('#tl'); if (!tl) return;
+  nh = clampZ(nh); const lr = list.getBoundingClientRect();
+  const y = anchorY == null ? lr.top + list.clientHeight / 2 : anchorY;
+  const min = (y - lr.top + list.scrollTop - tl.offsetTop) / hpx * 60;
+  hpx = nh; applyZoom(tl);
+  list.scrollTop = tl.offsetTop + min * hpx / 60 - (y - lr.top);
+}
+function saveZoom() { S.settings.zoom = Math.round(hpx * 10) / 10; save(); }
+function bindPinch(tl, list) {
+  let d0 = 0, h0 = 0, on = false;
+  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  tl.addEventListener('touchstart', e => { if (e.touches.length === 2) { on = true; d0 = dist(e.touches); h0 = hpx; pinchedAt = Date.now(); } }, { passive: true });
+  tl.addEventListener('touchmove', e => {
+    if (!on || e.touches.length !== 2) return; e.preventDefault();
+    const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    zoomTo(h0 * dist(e.touches) / d0, my); pinchedAt = Date.now();
+  }, { passive: false });
+  const end = e => { if (on && e.touches.length < 2) { on = false; pinchedAt = Date.now(); saveZoom(); } };
+  tl.addEventListener('touchend', end); tl.addEventListener('touchcancel', end);
+}
+let zPrev = 72;
+$('#z-fit').onclick = () => {
+  const f = fitPx();
+  if (Math.abs(hpx - f) < 1) zoomTo(Math.max(zPrev, 72));
+  else { zPrev = hpx; hpx = f; applyZoom(); $('#list').scrollTop = $('#tl').offsetTop - 8; }
+  saveZoom();
+};
+function placeNow() {
+  const n = $('#nowline'); if (!n) return;
+  const d = new Date(), m = d.getHours() * 60 + d.getMinutes();
+  n.style.setProperty('--now', m); n.querySelector('span').textContent = fromMin(m);
+}
+setInterval(placeNow, 30000);
+
 function go(v, dir) {
   if (dir === undefined) { const vs = views(); dir = Math.sign(vs.indexOf(v) - vs.indexOf(S.active)); }
+  if (v === 'day' && S.active !== 'day') dayScroll = true;
   S.active = v; save(); render();
-  $('#list').scrollTop = 0; slideIn(dir);
+  if (!(v === 'day' && dayScrolled)) $('#list').scrollTop = 0; dayScrolled = false; slideIn(dir);
   const on = $('#tabs .on'); if (on) on.scrollIntoView({ inline: 'center', block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
 }
 let lpFired = false, doneOpen = false;
@@ -889,7 +1056,7 @@ function row(i) {
   let meta = '';
   if (i.date) {
     const n = dayDiff(i.date); const cls = isOverdue(i) ? ' late' : (n === 0 ? ' today' : '');
-    meta += `<span class="pill${cls}">${dateLabel(i.date)}${i.time ? ', ' + i.time : ''}</span>`;
+    meta += `<span class="pill${cls}">${dateLabel(i.date)}${i.time ? ', ' + i.time + (i.end ? '–' + i.end : '') : ''}</span>`;
   }
   if (i.repeat) meta += `<span class="pill">↻ ${t('rep_' + i.repeat)}</span>`;
   if (i.gid) meta += `<span class="pill" title="${t('in_cal')}">${ICON_CAL}${t('calendar')}</span>`;
@@ -938,8 +1105,11 @@ function openEdit(it, pre) {
       <label class="fld"><span>${t('date')}</span><input type="date" id="f-date" value="${d.date || ''}"></label>
       <label class="fld"><span>${t('time')}</span><input type="time" id="f-time" value="${d.time || ''}"></label>
     </div>
-    <label class="fld" style="display:block;margin-top:16px"><span>${t('repeat')}</span>
+    <div class="row2">
+      <label class="fld"><span>${t('until')}</span><input type="time" id="f-end" value="${d.end || ''}"></label>
+      <label class="fld"><span>${t('repeat')}</span>
       <select id="f-rep">${['', ...REPS].map(r => `<option value="${r}"${(d.repeat || '') === r ? ' selected' : ''}>${t(r ? 'rep_' + r : 'rep_none')}</option>`).join('')}</select></label>
+    </div>
     <label class="tgl"><input type="checkbox" id="f-cal" ${d.cal ? 'checked' : ''}><span>${t('add_to_cal')}</span></label>
     <div class="note" id="f-calnote"></div>
     <div class="acts">${isNew ? '' : `<button class="btn danger" id="f-del">${t('delete')}</button>`}<button class="btn primary" id="f-save">${t('save')}</button></div>`,
@@ -958,7 +1128,9 @@ function openEdit(it, pre) {
       const repv = $('#f-rep').value || null;
       let dv = $('#f-date').value || (repv ? ymd(new Date()) : null);
       if (repv && dv) dv = firstFrom(dv, repv, true);
-      Object.assign(rec, { title, boardId: bId, repeat: repv, date: dv, time: dv ? ($('#f-time').value || null) : null });
+      const tv = dv ? ($('#f-time').value || null) : null; let ev2 = tv ? ($('#f-end').value || null) : null;
+      if (ev2 && toMin(ev2) <= toMin(tv)) ev2 = null;
+      Object.assign(rec, { title, boardId: bId, repeat: repv, date: dv, time: tv, end: ev2 });
       if (it && (it.date !== dv || it.time !== rec.time)) rec.notified = null;
       rec.cal = $('#f-cal').checked && !!rec.date;
       if (!it) S.items.push(rec);
@@ -1050,7 +1222,7 @@ function openSettings() {
     <input type="file" id="s-file" accept="application/json,.json" hidden>
     <hr>
     <button class="btn danger" id="s-clear" style="width:100%">${t('del_all_done')} (${S.items.filter(i => i.done).length})</button>
-    <div class="note" style="text-align:center;margin-top:16px">Wavelist v2.5</div>`,
+    <div class="note" style="text-align:center;margin-top:16px">Wavelist v2.9</div>`,
   () => {
     $('#s-lang').onchange = e => { st.lang = e.target.value; save(); LANG = pickLang(); applyStatic(); render(); openSettings(); };
     $('#s-auto').onchange = e => { st.autoSave = e.target.checked; save(); };
@@ -1166,7 +1338,7 @@ function evBody(it) {
 function evBody0(it) {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   if (it.time) {
-    const st = new Date(it.date + 'T' + it.time); const en = new Date(st.getTime() + (S.settings.duration || 60) * 60000);
+    const st = new Date(it.date + 'T' + it.time); const en = new Date(st.getTime() + (endMin(it) - toMin(it.time)) * 60000);
     const f = d => ymd(d) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':00';
     return { summary: it.title, start: { dateTime: f(st), timeZone: tz }, end: { dateTime: f(en), timeZone: tz },
       reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: +S.settings.remind || 0 }] } };
@@ -1199,7 +1371,7 @@ function templateUrl(it) {
   const c = s => s.replace(/[-:]/g, '');
   let dates;
   if (it.time) {
-    const st = new Date(it.date + 'T' + it.time); const en = new Date(st.getTime() + (S.settings.duration || 60) * 60000);
+    const st = new Date(it.date + 'T' + it.time); const en = new Date(st.getTime() + (endMin(it) - toMin(it.time)) * 60000);
     const f = d => ymd(d) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00';
     dates = c(f(st)) + '/' + c(f(en));
   } else { const n = new Date(it.date + 'T00:00'); n.setDate(n.getDate() + 1); dates = c(it.date) + '/' + c(ymd(n)); }
