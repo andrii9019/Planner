@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F4F9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141824" media="(prefers-color-scheme: dark)">
+<title>Wavelist</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F4F9; --surface:#FFFFFF; --ink:#172033; --muted:#6B7488; --line:#E1E5EE;
+  --accent:#0FB894; --accent-ink:#04211B; --rec:#E5484D; --warn:#D9480F;
+  --shadow:0 8px 28px rgba(23,32,51,.10);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#141824; --surface:#1E2433; --ink:#EEF1F8; --muted:#98A1B6; --line:#2C3346;
+    --accent:#2EE6BE; --shadow:0 8px 28px rgba(0,0,0,.35); }
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+body{background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.app{max-width:640px;margin:0 auto;height:100%;display:flex;flex-direction:column;overflow:hidden;overflow:clip}
+header{display:flex;align-items:flex-end;justify-content:space-between;padding:18px 20px 6px}
+header h1{font-size:28px;line-height:1.1;font-weight:800;letter-spacing:-.02em;margin:0}
+header .sub{color:var(--muted);font-size:14px;font-weight:500;margin-top:4px}
+.icon-btn{width:44px;height:44px;border-radius:999px;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow)}
+.icon-btn svg{width:22px;height:22px}
+
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:14px 20px 10px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:999px;
+  background:var(--surface);font-weight:600;font-size:15px;white-space:nowrap;border:1.5px solid transparent}
+.tab .dot,.chip .dot{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.tab.on{background:var(--ink);color:var(--bg)}
+.tab .cnt{font-size:12px;font-weight:700;min-width:20px;height:20px;padding:0 6px;border-radius:999px;display:grid;place-items:center;
+  background:var(--bg);color:var(--ink)}
+.tab.ghost{background:transparent;border-color:var(--line);color:var(--muted)}
+
+main{flex:1;overflow-y:auto;padding:4px 16px 150px}
+.item{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border-radius:20px;padding:14px 14px 14px 12px;margin:8px 0}
+.item.tinted{background:linear-gradient(90deg,color-mix(in srgb,var(--c) 16%,transparent),color-mix(in srgb,var(--c) 3%,transparent) 70%),var(--surface);box-shadow:inset 4px 0 0 var(--c)}
+.item.tinted .chk{border-color:var(--c)}
+.item.tinted.done{opacity:.75}
+.chk{flex:none;width:28px;height:28px;padding:0;border-radius:999px;border:2px solid var(--line);display:grid;place-items:center;margin-top:-1px}
+.chk svg{width:16px;height:16px;opacity:0}
+.item.done .chk{background:var(--c,var(--accent));border-color:var(--c,var(--accent));color:#fff}
+.item.done .chk svg{opacity:1}
+.item.done .t{text-decoration:line-through;color:var(--muted)}
+.body{flex:1;min-width:0;text-align:left;padding:0}
+.t{font-weight:600;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pill{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--bg);color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+.pill.late{color:#fff;background:var(--rec)}
+.item.overdue{box-shadow:0 0 0 1.5px rgba(229,72,77,.7),0 0 18px rgba(229,72,77,.28);background:linear-gradient(90deg,rgba(229,72,77,.12),rgba(229,72,77,.03)),var(--surface)}
+.item.overdue .chk{border-color:rgba(229,72,77,.7)}
+.tab .cnt.late{background:var(--rec);color:#fff}
+.pill.today{color:var(--accent)}
+.pill svg{width:13px;height:13px}
+.empty{text-align:center;color:var(--muted);padding:56px 24px;max-width:34ch;margin:0 auto}
+.empty b{display:block;color:var(--ink);font-size:18px;margin-bottom:6px}
+details.donebox{margin-top:18px}
+details.donebox summary{list-style:none;color:var(--muted);font-weight:600;padding:8px 6px;cursor:pointer}
+details.donebox summary::-webkit-details-marker{display:none}
+
+.dock{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(to top,var(--bg) 70%,transparent)}
+.dock-in{max-width:608px;margin:0 auto;display:flex;gap:10px}
+.mic{flex:1;height:64px;border-radius:999px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;gap:12px;
+  font-size:18px;font-weight:700;box-shadow:0 10px 30px rgba(15,184,148,.35)}
+.mic svg{width:26px;height:26px}
+.mic:active{transform:scale(.98)}
+.type{width:64px;height:64px;border-radius:999px;background:var(--surface);display:grid;place-items:center;box-shadow:var(--shadow)}
+.type svg{width:24px;height:24px}
+
+/* voice overlay */
+.voice{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;z-index:30;text-align:center}
+.voice.show{display:flex}
+.ring{width:132px;height:132px;border-radius:50%;background:var(--rec);display:grid;place-items:center;color:#fff;position:relative}
+.ring svg{width:48px;height:48px}
+.ring::before,.ring::after{content:"";position:absolute;inset:0;border-radius:50%;border:3px solid var(--rec);animation:pulse 1.6s ease-out infinite}
+.ring::after{animation-delay:.8s}
+@keyframes pulse{from{transform:scale(1);opacity:.6}to{transform:scale(1.7);opacity:0}}
+@media (prefers-reduced-motion: reduce){.ring::before,.ring::after{animation:none;opacity:0}}
+.vtext{font-size:24px;font-weight:700;line-height:1.3;margin:40px 0 12px;min-height:3.9em;max-width:22ch;overflow-wrap:anywhere}
+.vhint{color:var(--muted);font-size:14px;max-width:32ch}
+.vacts{display:flex;gap:10px;margin-top:36px;width:100%;max-width:360px}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(10,14,24,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+.scrim.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;transform:translateY(105%);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.sheet.show{transform:none}
+.panel{max-width:640px;margin:0 auto;background:var(--surface);border-radius:28px 28px 0 0;padding:10px 20px calc(20px + env(safe-area-inset-bottom,0px));
+  max-height:88vh;overflow-y:auto}
+.grab{width:40px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 12px}
+.sh-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sh-h h2{margin:0;font-size:20px;font-weight:800}
+.x{width:36px;height:36px;border-radius:999px;background:var(--bg);font-size:15px}
+textarea,input[type=text],input[type=date],input[type=time],select{width:100%;border:1.5px solid var(--line);background:var(--bg);border-radius:18px;padding:12px 14px;font-size:16px}
+textarea{resize:none;font-weight:600;font-size:18px}
+.lbl{font-size:13px;font-weight:700;color:var(--muted);margin:16px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:999px;background:var(--bg);font-weight:600;font-size:14px;border:1.5px solid transparent}
+.chip.on{border-color:var(--c);background:var(--surface)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.fld span{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.tgl{display:flex;align-items:center;gap:12px;margin-top:16px;font-weight:600;cursor:pointer}
+.tgl input{width:22px;height:22px;accent-color:var(--accent)}
+.acts{display:flex;gap:10px;margin-top:22px}
+.btn{height:52px;padding:0 20px;border-radius:999px;font-weight:700;background:var(--bg);flex:1}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--rec);flex:0 0 auto}
+.btn.small{height:40px;flex:0 0 auto;padding:0 16px;font-size:14px}
+.link{color:var(--accent);font-weight:700;padding:8px 0}
+.note{font-size:13.5px;color:var(--muted);margin-top:8px}
+.note ol{padding-left:20px;margin:6px 0}
+.brow{display:flex;align-items:center;gap:8px;margin:8px 0}
+.brow input{flex:1;padding:10px 14px}
+.swatch{width:38px;height:38px;border-radius:999px;flex:none;background:var(--c);border:3px solid var(--surface);box-shadow:0 0 0 1.5px var(--line)}
+.del{width:38px;height:38px;border-radius:999px;flex:none;background:var(--bg);color:var(--rec);display:grid;place-items:center}
+.del svg{width:18px;height:18px}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--bg)}
+.status.ok{color:#12A594}
+hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:999px;font-weight:600;font-size:14.5px;display:flex;gap:14px;align-items:center;
+  transition:all .2s;z-index:60;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{color:var(--accent);font-weight:800;filter:brightness(1.4)}
+.item,.tab,.grp-h{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.item{transition:transform .15s}
+.item.lp{transform:scale(.97)}
+.tab.drag{position:relative;z-index:2;box-shadow:0 0 0 2px var(--accent),var(--shadow)}
+.tab.plus{width:40px;padding:0;justify-content:center;font-size:22px;font-weight:600}
+.grp{margin:4px 0 20px}
+.grp-h{display:flex;align-items:center;gap:9px;width:100%;text-align:left;font-weight:800;font-size:17px;padding:8px 6px 2px}
+.grp-h .dot{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.grp-h .n{color:var(--muted);font-size:14px;font-weight:700}
+.grp-empty{color:var(--muted);font-size:14px;padding:6px 6px 0}
+.mv-t{font-weight:700;font-size:17px;margin-bottom:14px;overflow-wrap:anywhere}
+.chips.big .chip{height:48px;padding:0 18px;font-size:16px}
+.mvb{width:34px;height:38px;border-radius:999px;background:var(--bg);flex:none;font-weight:800}
+.mvb:disabled{opacity:.3}
+.pal{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:6px}
+.sw{aspect-ratio:1;border-radius:50%;background:var(--c);position:relative;border:3px solid var(--surface);box-shadow:0 0 0 1.5px var(--line);cursor:pointer}
+.sw.on{box-shadow:0 0 0 3px var(--ink)}
+.sw.custom{background:conic-gradient(#E5484D,#F5A524,#FFD60A,#30A46C,#0091FF,#8E4EC6,#E5484D);display:grid;place-items:center;overflow:hidden}
+.sw.custom.on{background:var(--c)}
+.sw.custom::after{content:"+";color:#fff;font-weight:800;font-size:18px;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.sw.custom input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+#list{touch-action:pan-y;will-change:transform}
+.done-acts{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 6px 4px;font-size:13px;color:var(--muted)}
+.clear-done{color:var(--rec);font-weight:700;font-size:14px;padding:8px 0}
+.all-clear{display:block;margin:4px auto 0;padding:10px 18px;border-radius:999px;background:var(--surface);color:var(--rec);font-weight:700;font-size:14px}
+.item.swiping{transition:none}
+.daybar{display:flex;align-items:center;justify-content:space-between;padding:0 0 8px}
+.daybar .arr{width:40px;height:40px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-size:22px;color:var(--muted)}
+.dtitle{text-align:center;flex:1}.dtitle b{display:block;font-size:17px}.dtitle span{font-size:12.5px;color:var(--muted);font-weight:700}
+.dtitle span.is-today{color:var(--accent)}
+.tl{position:relative;padding-left:52px;margin-right:2px;-webkit-user-select:none;user-select:none;--hpx:72;touch-action:pan-y}
+.tl .hr{position:relative;height:calc(var(--hpx) * 1px)}
+.tl .hr::before{content:"";position:absolute;left:0;right:0;top:0;border-top:1px solid var(--line)}
+.tl .h30{position:absolute;left:0;right:0;top:50%;border-top:1px dashed color-mix(in srgb,var(--line) 70%,transparent)}
+.tl .q{position:absolute;left:0;width:10px;border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.tl .hl{position:absolute;left:-50px;top:-8px;width:42px;text-align:right;font-size:12px;font-weight:600;color:var(--muted)}
+.tl .hl.m{top:calc(50% - 8px);font-size:10.5px;opacity:.55}
+.tl .hl.f{font-size:10px;opacity:.4;display:none}
+.tl.zx .hl.f{display:block}
+.tl.zm .hl.m,.tl.zs .hl.m,.tl.zm .q,.tl.zs .q,.tl.zs .h30{display:none}
+.tl.zm .hr:not(.h2) .hl:not(.m):not(.f){display:none}
+.tl.zs .hr:not(.h3) .hl:not(.m):not(.f){display:none}
+.tl.zs .hr:not(.h3)::before{border-top-style:dashed;opacity:.5}
+.tl .evs{position:absolute;left:52px;right:calc(max(24%, 68px) + 4px);top:0;bottom:0}
+.tl .lane{position:absolute;right:0;width:max(24%, 68px);top:0;bottom:0;border-radius:10px;background:color-mix(in srgb,var(--line) 28%,transparent);
+ background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--hpx) * 1px - 1px),color-mix(in srgb,var(--line) 80%,transparent) calc(var(--hpx) * 1px - 1px),color-mix(in srgb,var(--line) 80%,transparent) calc(var(--hpx) * 1px))}
+.tl .tapflash{position:absolute;left:52px;right:0;border-radius:10px;border:1.5px dashed var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);
+ display:grid;place-items:center;color:var(--accent);font-weight:800;font-size:18px;z-index:4;pointer-events:none;animation:tf .35s ease-out}
+.tl .lane i{position:absolute;left:0;right:0;text-align:center;font-style:normal;font-size:18px;font-weight:700;line-height:18px;color:color-mix(in srgb,var(--accent) 55%,transparent);top:calc((var(--h) + .5) * var(--hpx) * 1px - 9px);pointer-events:none}
+.tl.zs .lane i,.tl.zm .lane i:nth-child(odd){display:none}
+@keyframes tf{from{opacity:0;transform:scale(.97)}to{opacity:1}}
+.tl .ev{top:calc(var(--s) * var(--hpx) * 1px / 60 + 1px);height:max(calc(var(--d) * var(--hpx) * 1px / 60 - 3px),14px)}
+.ev.tiny{padding:0 22px 0 7px;display:flex;align-items:center;border-radius:6px}
+.ev.tiny b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ev.tiny small{display:none}
+.ev.tiny .ck{width:14px;height:14px;top:50%;transform:translateY(-50%);right:4px;border-width:1.5px}
+.tl .nowline{top:calc(var(--now) * var(--hpx) * 1px / 60)}
+.ev{position:absolute;border-radius:10px;padding:6px 26px 6px 9px;overflow:hidden;text-align:left;color:var(--ink);
+ background:linear-gradient(180deg,color-mix(in srgb,var(--c) 30%,var(--surface)),color-mix(in srgb,var(--c) 16%,var(--surface)));box-shadow:inset 3px 0 0 var(--c)}
+.ev b{display:block;font-size:13px;line-height:1.25;overflow-wrap:break-word;hyphens:auto}.ev small{display:block;font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ev.short small{display:inline}
+.ev.short{display:flex;align-items:center;gap:6px;padding-top:0;padding-bottom:0}.ev.short b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto}.ev.short small{white-space:nowrap}
+.ev.done{opacity:.5}.ev.done b{text-decoration:line-through}
+.ev.overdue{box-shadow:inset 3px 0 0 var(--rec),0 0 0 1.5px rgba(229,72,77,.6)}
+.ev .ck{position:absolute;right:6px;top:6px;width:18px;height:18px;border-radius:50%;border:2px solid var(--c);padding:0;display:grid;place-items:center;color:#fff}
+.ev.short .ck{top:50%;transform:translateY(-50%)}
+.ev.done .ck{background:var(--c)}.ev .ck svg{width:11px;height:11px;opacity:0}.ev.done .ck svg{opacity:1}
+.nowline{position:absolute;left:52px;right:0;border-top:2px solid var(--rec);z-index:3;pointer-events:none}
+.nowline::before{content:"";position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:50%;background:var(--rec)}
+.nowline span{position:absolute;left:-54px;top:-10px;font-size:11px;font-weight:800;color:#fff;background:var(--rec);border-radius:6px;padding:1px 5px}
+.day-hint{text-align:center;color:var(--muted);font-size:13px;padding:0 0 6px}
+.zoombar{position:fixed;right:16px;bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:20;display:none}
+.zoombar.show{display:block}
+.zoombar button{width:42px;height:42px;border-radius:50%;background:var(--surface);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--ink)}
+.zoombar button svg{width:18px;height:18px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div><h1 id="title">Wavelist</h1><div class="sub" id="today"></div></div>
+    <button class="icon-btn" id="btn-settings" data-i18n-aria="settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </header>
+  <nav class="tabs" id="tabs" data-i18n-aria="boards" aria-label="Boards"></nav>
+  <main id="list"></main>
+</div>
+
+<div class="dock"><div class="dock-in">
+  <button class="type" id="btn-type" data-i18n-aria="add_typing" aria-label="Add by typing">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+  <button class="mic" id="btn-mic">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg>
+    <span data-i18n="dictate">Dictate</span>
+  </button>
+</div></div>
+
+<div class="voice" id="voice" role="dialog" data-i18n-aria="voice_input" aria-label="Voice input">
+  <div class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg></div>
+  <div class="vtext" id="vtext" data-i18n="listening">Listening…</div>
+  <div class="vhint" data-i18n="vhint">Speak in Ukrainian, e.g. «Купити молоко і хліб» or «Зустріч з Олегом завтра о 15:00»</div>
+  <div class="vacts"><button class="btn" id="v-cancel" data-i18n="cancel">Cancel</button><button class="btn primary" id="v-done" data-i18n="done">Done</button></div>
+</div>
+
+<div class="zoombar" id="zoombar"><button id="z-fit" data-i18n-aria="whole_day" aria-label="Whole day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button></div>
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet"><div class="panel"><div class="grab"></div><div id="sheet-c"></div></div></div>
+<div class="toast" id="toast"><span id="toast-t"></span><button id="toast-a"></button></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const ICON_CAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
+const ICON_TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
+
+/* ---------- state ---------- */
+const COLORS = [
+  '#E5484D','#FF6B6B','#F76B8A','#E93D82','#D6409F','#AB4ABA',
+  '#8E4EC6','#6E56CF','#5B5BD6','#3D5AFE','#0091FF','#0EA5E9',
+  '#05A2C2','#12A594','#0FB894','#2EE6BE','#30A46C','#46A758',
+  '#84CC16','#BDEE63','#FFD60A','#F5A524','#F76808','#E54D2E',
+  '#AD7F58','#978365','#8D8D86','#6B7488','#475569','#1F2937',
+  '#FDA4AF','#C4B5FD','#93C5FD','#99F6E4','#FDE68A','#FDBA74'
+];
+const nextColor = () => COLORS.find(c => !S.boards.some(b => b.color.toLowerCase() === c.toLowerCase())) || COLORS[S.boards.length % COLORS.length];
+function paletteHTML(sel) {
+  const s = (sel || '').toLowerCase(); const custom = s && !COLORS.some(c => c.toLowerCase() === s);
+  return `<div class="pal">${COLORS.map(c => `<button class="sw${c.toLowerCase() === s ? ' on' : ''}" data-c="${c}" style="--c:${c}" aria-label="${t('color_n', { c })}"></button>`).join('')}
+    <label class="sw custom${custom ? ' on' : ''}" style="--c:${custom ? sel : 'transparent'}" aria-label="${t('custom_color')}"><input type="color" value="${custom ? sel : '#0FB894'}"></label></div>`;
+}
+function bindPalette(root, onPick) {
+  const pal = root.querySelector('.pal');
+  const mark = el => pal.querySelectorAll('.sw').forEach(x => x.classList.toggle('on', x === el));
+  pal.querySelectorAll('button.sw').forEach(b => b.onclick = () => { mark(b); onPick(b.dataset.c); });
+  const cu = pal.querySelector('.custom'), inp = cu.querySelector('input');
+  inp.oninput = () => { cu.style.setProperty('--c', inp.value); mark(cu); onPick(inp.value); };
+}
+const DEF_BOARDS = [
+  { id: 'todo', name: null, color: '#0FB894' },
+  { id: 'progress', name: null, color: '#F5A524' },
+  { id: 'events', name: null, color: '#E5484D' },
+  { id: 'buy', name: null, color: '#3D5AFE' }
+];
+const KEY = 'planner.v1';
+let S = load(); save();
+function load() {
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.boards)) return migrate4(migrate3(migrate(s))); } catch (e) {}
+  return { v: 4, boards: DEF_BOARDS.map(b => ({ ...b })), items: [], active: 'all',
+    settings: { clientId: '', gConnected: false, autoSave: false, duration: 60, lang: 'auto' } };
+}
+function migrate(s) {
+  if (s.v >= 2) return s;
+  const t = s.boards.find(b => b.id === 'todo'); if (t && t.name === 'Зробити') t.name = 'Завдання';
+  const st = s.boards.find(b => b.id === 'strategic');
+  if (st && !s.items.some(i => i.boardId === 'strategic')) s.boards = s.boards.filter(b => b !== st);
+  const order = ['todo', 'progress', 'events', 'buy'];
+  s.boards = [...order.map(id => s.boards.find(b => b.id === id)).filter(Boolean), ...s.boards.filter(b => !order.includes(b.id))];
+  const buy = s.boards.find(b => b.id === 'buy'); if (buy && buy.color === '#12A594') buy.color = '#3D5AFE';
+  s.active = 'all'; s.v = 2; return s;
+}
+function migrate3(s) {
+  if (s.v >= 3) return s;
+  const EN = { todo: ['Завдання', 'Tasks'], progress: ['В процесі', 'In progress'], events: ['Події', 'Events'], buy: ['Купити', 'Shopping'] };
+  s.boards.forEach(b => { const e = EN[b.id]; if (e && b.name === e[0]) b.name = e[1]; });
+  s.v = 3; return s;
+}
+function migrate4(s) {
+  if (s.v >= 4) return s;
+  const known = { todo: ['Tasks','Завдання','Tareas','Зробити'], progress: ['In progress','В процесі','En curso'], events: ['Events','Події','Eventos'], buy: ['Shopping','Купити','Compras'] };
+  s.boards.forEach(b => { if (known[b.id] && known[b.id].includes(b.name)) b.name = null; });
+  s.settings = s.settings || {}; if (!s.settings.lang) s.settings.lang = 'auto';
+  s.v = 4; return s;
+}
+const curBoard = () => (S.active !== 'all' && S.active !== 'day' && board(S.active)) ? S.active : (S.boards[0] ? S.boards[0].id : null);
+var schedT; function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} clearTimeout(schedT); schedT = setTimeout(() => { if (typeof scheduleNotifs === 'function') scheduleNotifs(); }, 300); }
+const board = id => S.boards.find(b => b.id === id);
+
+/* ---------- i18n ---------- */
+const L = {
+  en: {
+    settings:'Settings', boards:'Boards', add_typing:'Add by typing', dictate:'Dictate', voice_input:'Voice input', listening:'Listening…',
+    vhint:'Speak in Ukrainian, e.g. «Купити молоко і хліб» or «Зустріч з Олегом завтра о 15:00»',
+    cancel:'Cancel', done:'Done', color_n:'Color {c}', custom_color:'Custom color',
+    board_todo:'Tasks', board_progress:'In progress', board_events:'Events', board_buy:'Shopping',
+    today:'Today', tomorrow:'Tomorrow', yesterday:'Yesterday', all:'All', new_board:'New board', edit:'Edit',
+    no_boards:'<b>No boards yet</b>Tap «+» to create your first one.', empty:'Empty',
+    del_all_done:'Delete all completed', deleted_done:'Deleted completed: {n}',
+    nothing_here:'<b>Nothing here yet</b>Tap «Dictate» and say what needs to be done.',
+    completed:'Completed', swipe_del:'Swipe sideways to delete', move_to:'Move to', delete:'Delete', edit_item:'Edit',
+    moved_to:'Moved to «{b}»', deleted:'Deleted', undo:'Undo', board_name:'Board name', color:'Color', create:'Create',
+    in_cal:'In Google Calendar', calendar:'Calendar', mark_done:'Mark as done', mark_undone:'Mark as not done', done_toast:'Completed',
+    new_task:'New task', task:'Task', what_todo:'What needs to be done?', board:'Board', date:'Date', time:'Time',
+    add_to_cal:'Add to Google Calendar', save:'Save', need_date:'Set a date to add it to the calendar.',
+    auto_sync:'The event will sync automatically.',
+    manual_sync:'After saving, Google Calendar opens so you can confirm the event. Auto-sync can be turned on in Settings.',
+    change_color:'Change color', move_up:'Move up', move_down:'Move down', delete_board:'Delete board',
+    boards_note:'Tap the color circle to pick a color. Reorder with the arrows, or long-press a board at the top and drag it.',
+    confirm_del_board:(b, n) => `Delete board «${b}»${n ? ` and its ${n} task${n === 1 ? '' : 's'}` : ''}?`,
+    color_of:'Color: {b}', back:'Back', autosave:'Save right after dictation, without review',
+    gcal:'Google Calendar', connected:'Connected', not_connected:'Not connected', reconnect:'Reconnect', connect:'Connect', disconnect:'Disconnect',
+    default_dur:'Default event duration', min:'min', how_client:'How to get a Client ID',
+    steps:['Open console.cloud.google.com and create a project.', 'APIs &amp; Services → Library → enable Google Calendar API.',
+      'OAuth consent screen → External, add your email under Test users.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'Under Authorized JavaScript origins, add the address this app runs at: <b>{o}</b>', 'Paste the Client ID here and tap «Connect».'],
+    export:'Export', import:'Import', paste_client:'Paste a Client ID first', gcal_connected:'Google Calendar connected',
+    cant_connect:'Could not connect: ', no_done:'No completed tasks',
+    replace_confirm:'Replace all current boards and tasks with the data from this file?', imported:'Data imported',
+    bad_backup:'This file doesn’t look like a Wavelist backup', no_google:'no connection to Google', win_closed:'window closed', error:'error',
+    sync_failed:'Calendar: sync failed', retry:'Retry', voice_chrome:'Voice input works in Chrome on Android',
+    mic_allow:'Allow microphone access for this site', no_speech:'Didn’t catch that. Try again',
+    need_net:'Speech recognition needs an internet connection', added_to:'Added to «{b}»', language:'Language', auto_lang:'Automatic (phone)', close:'Close', zoom_out:'Zoom out', zoom_in:'Zoom in', whole_day:'Whole day', until:'Until', day_events:'Events: {n}', day_hint:'Tap the timeline to add an event', repeat:'Repeat', rep_none:'Don’t repeat', rep_daily:'Every day', rep_weekdays:'Weekdays', rep_weekly:'Every week', rep_monthly:'Every month', next_on:'Next: {d}', backup:'Backup', backup_save:'Save backup copy', backup_restore:'Restore from file', backup_last:'Last backup: {d}', backup_never:'No backups yet', backup_hint:'Save the file to Google Drive, iCloud, Telegram or email. You can then restore it on any phone.', snapshots:'Automatic snapshots', snapshots_hint:'Once a day the app saves a snapshot of your data on this phone and keeps the last 7. Handy if you deleted something by mistake.', snap_tasks:'tasks: {n}', snap_confirm:'Restore data from {d}? Your current data will be saved as a snapshot first.', restored:'Data restored', backup_remind:'Remind me weekly to save a backup', backup_due:'Your last backup was over a week ago', backup_saved:'Backup saved', no_snaps:'No snapshots yet', backup_now:'Save',
+    notif:'Notifications', notif_toggle:'Notify me about tasks with a time', remind:'Remind', at_time:'At the time', min_before:'{n} min before', notif_note:'Reminders arrive while the app is open or was used recently. For reliable reminders when it’s closed, turn on Google Calendar sync: events then get calendar alerts.', notif_denied:'Notifications are blocked. Allow them in the browser settings.', notif_unsupported:'This browser doesn’t support notifications', overdue:'Overdue', overdue_n:'Overdue: {n}'
+  },
+  uk: {
+    settings:'Налаштування', boards:'Дошки', add_typing:'Додати текстом', dictate:'Надиктувати', voice_input:'Голосове введення', listening:'Слухаю…',
+    vhint:'Наприклад: «Купити молоко і хліб» або «Зустріч з Олегом завтра о 15:00»',
+    cancel:'Скасувати', done:'Готово', color_n:'Колір {c}', custom_color:'Свій колір',
+    board_todo:'Завдання', board_progress:'В процесі', board_events:'Події', board_buy:'Купити',
+    today:'Сьогодні', tomorrow:'Завтра', yesterday:'Вчора', all:'Усі', new_board:'Нова дошка', edit:'Змінити',
+    no_boards:'<b>Немає жодної дошки</b>Натисни «+», щоб створити першу.', empty:'Порожньо',
+    del_all_done:'Видалити всі виконані', deleted_done:'Видалено виконаних: {n}',
+    nothing_here:'<b>Тут порожньо</b>Натисни «Надиктувати» і скажи, що треба зробити.',
+    completed:'Виконано', swipe_del:'Свайп убік видаляє', move_to:'Перемістити', delete:'Видалити', edit_item:'Редагувати',
+    moved_to:'Переміщено в «{b}»', deleted:'Видалено', undo:'Повернути', board_name:'Назва дошки', color:'Колір', create:'Створити',
+    in_cal:'У Google Календарі', calendar:'Календар', mark_done:'Позначити виконаним', mark_undone:'Позначити невиконаним', done_toast:'Виконано',
+    new_task:'Нове завдання', task:'Завдання', what_todo:'Що треба зробити?', board:'Дошка', date:'Дата', time:'Час',
+    add_to_cal:'Додати в Google Календар', save:'Зберегти', need_date:'Щоб додати в календар, вкажи дату.',
+    auto_sync:'Подія синхронізується автоматично.',
+    manual_sync:'Після збереження відкриється Google Календар, щоб підтвердити подію. Автосинхронізацію можна увімкнути в налаштуваннях.',
+    change_color:'Змінити колір', move_up:'Вище', move_down:'Нижче', delete_board:'Видалити дошку',
+    boards_note:'Торкнись кольорового кола, щоб вибрати колір. Порядок можна міняти стрілками або довгим натиском на дошку вгорі.',
+    confirm_del_board:(b, n) => `Видалити дошку «${b}»${n ? ` разом із ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'завданням' : 'завданнями'}` : ''}?`,
+    color_of:'Колір: {b}', back:'Назад', autosave:'Зберігати одразу після диктування, без перевірки',
+    gcal:'Google Календар', connected:'Підключено', not_connected:'Не підключено', reconnect:'Перепідключити', connect:'Підключити', disconnect:'Відключити',
+    default_dur:'Тривалість події за замовчуванням', min:'хв', how_client:'Як отримати Client ID',
+    steps:['Відкрий console.cloud.google.com і створи проєкт.', 'APIs &amp; Services → Library → увімкни Google Calendar API.',
+      'OAuth consent screen → External, додай свою пошту в Test users.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'У Authorized JavaScript origins додай адресу, де відкритий цей додаток: <b>{o}</b>', 'Скопіюй Client ID сюди й натисни «Підключити».'],
+    export:'Експорт', import:'Імпорт', paste_client:'Встав Client ID', gcal_connected:'Google Календар підключено',
+    cant_connect:'Не вдалося підключитися: ', no_done:'Виконаних завдань немає',
+    replace_confirm:'Замінити всі поточні дошки й завдання даними з файлу?', imported:'Дані імпортовано',
+    bad_backup:'Файл не схожий на резервну копію Wavelist', no_google:'немає зʼєднання з Google', win_closed:'вікно закрито', error:'помилка',
+    sync_failed:'Календар: не вдалося синхронізувати', retry:'Ще раз', voice_chrome:'Голосове введення працює в Chrome на Android',
+    mic_allow:'Дозволь доступ до мікрофона для цього сайту', no_speech:'Нічого не почув. Спробуй ще раз',
+    need_net:'Для розпізнавання мови потрібен інтернет', added_to:'Додано в «{b}»', language:'Мова', auto_lang:'Як у телефоні', close:'Закрити', zoom_out:'Віддалити', zoom_in:'Наблизити', whole_day:'Весь день', until:'До', day_events:'Подій: {n}', day_hint:'Торкнись шкали, щоб додати подію', repeat:'Повторювати', rep_none:'Не повторювати', rep_daily:'Щодня', rep_weekdays:'По буднях', rep_weekly:'Щотижня', rep_monthly:'Щомісяця', next_on:'Наступне: {d}', backup:'Резервна копія', backup_save:'Зберегти резервну копію', backup_restore:'Відновити з файлу', backup_last:'Остання копія: {d}', backup_never:'Копій ще немає', backup_hint:'Збережи файл на Google Диск, в iCloud, Telegram або пошту. Потім його можна відновити на будь-якому телефоні.', snapshots:'Автоматичні знімки', snapshots_hint:'Раз на день додаток зберігає знімок твоїх даних на цьому телефоні й тримає останні 7. Стане в пригоді, якщо щось випадково видалив.', snap_tasks:'завдань: {n}', snap_confirm:'Відновити дані станом на {d}? Поточні дані спершу збережуться як знімок.', restored:'Дані відновлено', backup_remind:'Щотижня нагадувати зробити копію', backup_due:'Остання резервна копія була понад тиждень тому', backup_saved:'Копію збережено', no_snaps:'Знімків ще немає', backup_now:'Зберегти',
+    notif:'Сповіщення', notif_toggle:'Нагадувати про завдання з часом', remind:'Нагадати', at_time:'У момент події', min_before:'За {n} хв', notif_note:'Нагадування приходять, поки додаток відкритий або нещодавно використовувався. Щоб вони надійно приходили й тоді, коли він закритий, увімкни синхронізацію з Google Календарем: події отримають нагадування календаря.', notif_denied:'Сповіщення заблоковано. Дозволь їх у налаштуваннях браузера.', notif_unsupported:'Цей браузер не підтримує сповіщення', overdue:'Протерміновано', overdue_n:'Протерміновано: {n}'
+  },
+  es: {
+    settings:'Ajustes', boards:'Tableros', add_typing:'Añadir escribiendo', dictate:'Dictar', voice_input:'Entrada de voz', listening:'Escuchando…',
+    vhint:'Habla en ucraniano, p. ej. «Купити молоко і хліб» o «Зустріч з Олегом завтра о 15:00»',
+    cancel:'Cancelar', done:'Listo', color_n:'Color {c}', custom_color:'Color personalizado',
+    board_todo:'Tareas', board_progress:'En curso', board_events:'Eventos', board_buy:'Compras',
+    today:'Hoy', tomorrow:'Mañana', yesterday:'Ayer', all:'Todo', new_board:'Nuevo tablero', edit:'Editar',
+    no_boards:'<b>Aún no hay tableros</b>Toca «+» para crear el primero.', empty:'Vacío',
+    del_all_done:'Eliminar todas las completadas', deleted_done:'Completadas eliminadas: {n}',
+    nothing_here:'<b>Aquí no hay nada</b>Toca «Dictar» y di lo que hay que hacer.',
+    completed:'Completadas', swipe_del:'Desliza para eliminar', move_to:'Mover a', delete:'Eliminar', edit_item:'Editar',
+    moved_to:'Movido a «{b}»', deleted:'Eliminado', undo:'Deshacer', board_name:'Nombre del tablero', color:'Color', create:'Crear',
+    in_cal:'En Google Calendar', calendar:'Calendario', mark_done:'Marcar como hecha', mark_undone:'Marcar como pendiente', done_toast:'¡Hecho!',
+    new_task:'Nueva tarea', task:'Tarea', what_todo:'¿Qué hay que hacer?', board:'Tablero', date:'Fecha', time:'Hora',
+    add_to_cal:'Añadir a Google Calendar', save:'Guardar', need_date:'Pon una fecha para añadirla al calendario.',
+    auto_sync:'El evento se sincronizará automáticamente.',
+    manual_sync:'Al guardar se abrirá Google Calendar para confirmar el evento. Puedes activar la sincronización automática en Ajustes.',
+    change_color:'Cambiar color', move_up:'Subir', move_down:'Bajar', delete_board:'Eliminar tablero',
+    boards_note:'Toca el círculo de color para elegirlo. Cambia el orden con las flechas o mantén pulsado un tablero arriba y arrástralo.',
+    confirm_del_board:(b, n) => `¿Eliminar el tablero «${b}»${n ? ` y sus ${n} tarea${n === 1 ? '' : 's'}` : ''}?`,
+    color_of:'Color: {b}', back:'Atrás', autosave:'Guardar justo después de dictar, sin revisar',
+    gcal:'Google Calendar', connected:'Conectado', not_connected:'No conectado', reconnect:'Reconectar', connect:'Conectar', disconnect:'Desconectar',
+    default_dur:'Duración predeterminada del evento', min:'min', how_client:'Cómo obtener un Client ID',
+    steps:['Abre console.cloud.google.com y crea un proyecto.', 'APIs &amp; Services → Library → activa Google Calendar API.',
+      'OAuth consent screen → External, añade tu correo en Test users.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'En Authorized JavaScript origins, añade la dirección donde funciona esta app: <b>{o}</b>', 'Pega aquí el Client ID y toca «Conectar».'],
+    export:'Exportar', import:'Importar', paste_client:'Pega primero un Client ID', gcal_connected:'Google Calendar conectado',
+    cant_connect:'No se pudo conectar: ', no_done:'No hay tareas completadas',
+    replace_confirm:'¿Reemplazar todos los tableros y tareas actuales con los datos de este archivo?', imported:'Datos importados',
+    bad_backup:'Este archivo no parece una copia de seguridad de Wavelist', no_google:'sin conexión con Google', win_closed:'ventana cerrada', error:'error',
+    sync_failed:'Calendario: error de sincronización', retry:'Reintentar', voice_chrome:'La entrada de voz funciona en Chrome para Android',
+    mic_allow:'Permite el acceso al micrófono para este sitio', no_speech:'No te he entendido. Inténtalo de nuevo',
+    need_net:'El reconocimiento de voz necesita conexión a internet', added_to:'Añadido a «{b}»', language:'Idioma', auto_lang:'Automático (teléfono)', close:'Cerrar', zoom_out:'Alejar', zoom_in:'Acercar', whole_day:'Todo el día', until:'Hasta', day_events:'Eventos: {n}', day_hint:'Toca la línea de tiempo para añadir un evento', repeat:'Repetir', rep_none:'No repetir', rep_daily:'Cada día', rep_weekdays:'Días laborables', rep_weekly:'Cada semana', rep_monthly:'Cada mes', next_on:'Siguiente: {d}', backup:'Copia de seguridad', backup_save:'Guardar copia de seguridad', backup_restore:'Restaurar desde archivo', backup_last:'Última copia: {d}', backup_never:'Aún no hay copias', backup_hint:'Guarda el archivo en Google Drive, iCloud, Telegram o el correo. Luego podrás restaurarlo en cualquier teléfono.', snapshots:'Instantáneas automáticas', snapshots_hint:'Una vez al día la app guarda una instantánea de tus datos en este teléfono y conserva las últimas 7. Útil si borraste algo por error.', snap_tasks:'tareas: {n}', snap_confirm:'¿Restaurar los datos del {d}? Tus datos actuales se guardarán antes como instantánea.', restored:'Datos restaurados', backup_remind:'Recordarme cada semana hacer una copia', backup_due:'Tu última copia de seguridad tiene más de una semana', backup_saved:'Copia guardada', no_snaps:'Aún no hay instantáneas', backup_now:'Guardar',
+    notif:'Notificaciones', notif_toggle:'Avisarme de las tareas con hora', remind:'Recordar', at_time:'A la hora', min_before:'{n} min antes', notif_note:'Los recordatorios llegan mientras la app está abierta o se usó hace poco. Para recibirlos con la app cerrada, activa la sincronización con Google Calendar: los eventos tendrán avisos del calendario.', notif_denied:'Las notificaciones están bloqueadas. Permítelas en los ajustes del navegador.', notif_unsupported:'Este navegador no admite notificaciones', overdue:'Vencida', overdue_n:'Vencidas: {n}'
+  }
+  ,
+  pt: {
+    settings:'Configurações', boards:'Quadros', add_typing:'Adicionar digitando', dictate:'Ditar', voice_input:'Entrada de voz', listening:'Ouvindo…',
+    vhint:'Fale em ucraniano, ex.: «Купити молоко і хліб» ou «Зустріч з Олегом завтра о 15:00»',
+    cancel:'Cancelar', done:'Pronto', color_n:'Cor {c}', custom_color:'Cor personalizada',
+    board_todo:'Tarefas', board_progress:'Em andamento', board_events:'Eventos', board_buy:'Compras',
+    today:'Hoje', tomorrow:'Amanhã', yesterday:'Ontem', all:'Tudo', new_board:'Novo quadro', edit:'Editar',
+    no_boards:'<b>Nenhum quadro ainda</b>Toque em «+» para criar o primeiro.', empty:'Vazio',
+    del_all_done:'Excluir todas as concluídas', deleted_done:'Concluídas excluídas: {n}',
+    nothing_here:'<b>Nada aqui ainda</b>Toque em «Ditar» e diga o que precisa ser feito.',
+    completed:'Concluídas', swipe_del:'Deslize para o lado para excluir', move_to:'Mover para', delete:'Excluir', edit_item:'Editar',
+    moved_to:'Movido para «{b}»', deleted:'Excluído', undo:'Desfazer', board_name:'Nome do quadro', color:'Cor', create:'Criar',
+    in_cal:'No Google Agenda', calendar:'Agenda', mark_done:'Marcar como concluída', mark_undone:'Marcar como pendente', done_toast:'Concluída',
+    new_task:'Nova tarefa', task:'Tarefa', what_todo:'O que precisa ser feito?', board:'Quadro', date:'Data', time:'Hora',
+    add_to_cal:'Adicionar ao Google Agenda', save:'Salvar', need_date:'Defina uma data para adicionar à agenda.',
+    auto_sync:'O evento será sincronizado automaticamente.',
+    manual_sync:'Depois de salvar, o Google Agenda abrirá para você confirmar o evento. A sincronização automática pode ser ativada nas Configurações.',
+    change_color:'Mudar cor', move_up:'Mover para cima', move_down:'Mover para baixo', delete_board:'Excluir quadro',
+    boards_note:'Toque no círculo de cor para escolher uma cor. Reordene com as setas ou mantenha pressionado um quadro no topo e arraste.',
+    confirm_del_board:(b, n) => `Excluir o quadro «${b}»${n ? ` e suas ${n} tarefa${n === 1 ? '' : 's'}` : ''}?`,
+    color_of:'Cor: {b}', back:'Voltar', autosave:'Salvar logo após ditar, sem revisar',
+    gcal:'Google Agenda', connected:'Conectado', not_connected:'Não conectado', reconnect:'Reconectar', connect:'Conectar', disconnect:'Desconectar',
+    default_dur:'Duração padrão do evento', min:'min', how_client:'Como obter um Client ID',
+    steps:['Abra console.cloud.google.com e crie um projeto.', 'APIs &amp; Services → Library → ative a Google Calendar API.',
+      'OAuth consent screen → External, adicione seu e-mail em Test users.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'Em Authorized JavaScript origins, adicione o endereço onde este app roda: <b>{o}</b>', 'Cole o Client ID aqui e toque em «Conectar».'],
+    export:'Exportar', import:'Importar', paste_client:'Cole um Client ID primeiro', gcal_connected:'Google Agenda conectado',
+    cant_connect:'Não foi possível conectar: ', no_done:'Nenhuma tarefa concluída',
+    replace_confirm:'Substituir todos os quadros e tarefas atuais pelos dados deste arquivo?', imported:'Dados importados',
+    bad_backup:'Este arquivo não parece um backup do Wavelist', no_google:'sem conexão com o Google', win_closed:'janela fechada', error:'erro',
+    sync_failed:'Agenda: falha na sincronização', retry:'Tentar de novo', voice_chrome:'A entrada de voz funciona no Chrome para Android',
+    mic_allow:'Permita o acesso ao microfone para este site', no_speech:'Não entendi. Tente de novo',
+    need_net:'O reconhecimento de voz precisa de internet', added_to:'Adicionado a «{b}»', language:'Idioma', auto_lang:'Automático (telefone)', close:'Fechar', zoom_out:'Afastar', zoom_in:'Aproximar', whole_day:'Dia inteiro', until:'Até', day_events:'Eventos: {n}', day_hint:'Toque na linha do tempo para adicionar um evento', repeat:'Repetir', rep_none:'Não repetir', rep_daily:'Todo dia', rep_weekdays:'Dias úteis', rep_weekly:'Toda semana', rep_monthly:'Todo mês', next_on:'Próxima: {d}', backup:'Backup', backup_save:'Salvar cópia de backup', backup_restore:'Restaurar de arquivo', backup_last:'Último backup: {d}', backup_never:'Nenhum backup ainda', backup_hint:'Salve o arquivo no Google Drive, iCloud, Telegram ou e-mail. Depois você pode restaurá-lo em qualquer celular.', snapshots:'Cópias automáticas', snapshots_hint:'Uma vez por dia o app salva uma cópia dos seus dados neste celular e mantém as últimas 7. Útil se você apagou algo sem querer.', snap_tasks:'tarefas: {n}', snap_confirm:'Restaurar os dados de {d}? Seus dados atuais serão salvos antes como cópia.', restored:'Dados restaurados', backup_remind:'Lembrar toda semana de fazer backup', backup_due:'Seu último backup foi há mais de uma semana', backup_saved:'Backup salvo', no_snaps:'Nenhuma cópia ainda', backup_now:'Salvar',
+    notif:'Notificações', notif_toggle:'Avisar sobre tarefas com horário', remind:'Lembrar', at_time:'No horário', min_before:'{n} min antes', notif_note:'Os lembretes chegam enquanto o app está aberto ou foi usado recentemente. Para recebê-los com o app fechado, ative a sincronização com o Google Agenda: os eventos terão alertas da agenda.', notif_denied:'As notificações estão bloqueadas. Permita-as nas configurações do navegador.', notif_unsupported:'Este navegador não suporta notificações', overdue:'Atrasada', overdue_n:'Atrasadas: {n}'
+  },
+  id: {
+    settings:'Pengaturan', boards:'Papan', add_typing:'Tambah dengan mengetik', dictate:'Dikte', voice_input:'Input suara', listening:'Mendengarkan…',
+    vhint:'Bicara dalam bahasa Ukraina, mis. «Купити молоко і хліб» atau «Зустріч з Олегом завтра о 15:00»',
+    cancel:'Batal', done:'Selesai', color_n:'Warna {c}', custom_color:'Warna khusus',
+    board_todo:'Tugas', board_progress:'Sedang dikerjakan', board_events:'Acara', board_buy:'Belanja',
+    today:'Hari ini', tomorrow:'Besok', yesterday:'Kemarin', all:'Semua', new_board:'Papan baru', edit:'Ubah',
+    no_boards:'<b>Belum ada papan</b>Ketuk «+» untuk membuat yang pertama.', empty:'Kosong',
+    del_all_done:'Hapus semua yang selesai', deleted_done:'Tugas selesai dihapus: {n}',
+    nothing_here:'<b>Belum ada apa-apa</b>Ketuk «Dikte» dan sebutkan apa yang perlu dilakukan.',
+    completed:'Selesai', swipe_del:'Geser ke samping untuk menghapus', move_to:'Pindahkan ke', delete:'Hapus', edit_item:'Edit',
+    moved_to:'Dipindahkan ke «{b}»', deleted:'Dihapus', undo:'Urungkan', board_name:'Nama papan', color:'Warna', create:'Buat',
+    in_cal:'Di Google Kalender', calendar:'Kalender', mark_done:'Tandai selesai', mark_undone:'Tandai belum selesai', done_toast:'Selesai',
+    new_task:'Tugas baru', task:'Tugas', what_todo:'Apa yang perlu dilakukan?', board:'Papan', date:'Tanggal', time:'Waktu',
+    add_to_cal:'Tambahkan ke Google Kalender', save:'Simpan', need_date:'Tetapkan tanggal untuk menambahkannya ke kalender.',
+    auto_sync:'Acara akan disinkronkan otomatis.',
+    manual_sync:'Setelah disimpan, Google Kalender akan terbuka agar kamu bisa mengonfirmasi acara. Sinkronisasi otomatis bisa diaktifkan di Pengaturan.',
+    change_color:'Ubah warna', move_up:'Naikkan', move_down:'Turunkan', delete_board:'Hapus papan',
+    boards_note:'Ketuk lingkaran warna untuk memilih warna. Ubah urutan dengan panah, atau tekan lama papan di atas lalu seret.',
+    confirm_del_board:(b, n) => `Hapus papan «${b}»${n ? ` beserta ${n} tugasnya` : ''}?`,
+    color_of:'Warna: {b}', back:'Kembali', autosave:'Simpan langsung setelah dikte, tanpa ditinjau',
+    gcal:'Google Kalender', connected:'Terhubung', not_connected:'Tidak terhubung', reconnect:'Hubungkan ulang', connect:'Hubungkan', disconnect:'Putuskan',
+    default_dur:'Durasi acara default', min:'mnt', how_client:'Cara mendapatkan Client ID',
+    steps:['Buka console.cloud.google.com dan buat proyek.', 'APIs &amp; Services → Library → aktifkan Google Calendar API.',
+      'OAuth consent screen → External, tambahkan email kamu di Test users.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'Di Authorized JavaScript origins, tambahkan alamat tempat aplikasi ini berjalan: <b>{o}</b>', 'Tempel Client ID di sini lalu ketuk «Hubungkan».'],
+    export:'Ekspor', import:'Impor', paste_client:'Tempel Client ID terlebih dahulu', gcal_connected:'Google Kalender terhubung',
+    cant_connect:'Tidak dapat terhubung: ', no_done:'Tidak ada tugas yang selesai',
+    replace_confirm:'Ganti semua papan dan tugas saat ini dengan data dari file ini?', imported:'Data diimpor',
+    bad_backup:'File ini sepertinya bukan cadangan Wavelist', no_google:'tidak ada koneksi ke Google', win_closed:'jendela ditutup', error:'galat',
+    sync_failed:'Kalender: sinkronisasi gagal', retry:'Coba lagi', voice_chrome:'Input suara berfungsi di Chrome untuk Android',
+    mic_allow:'Izinkan akses mikrofon untuk situs ini', no_speech:'Tidak terdengar. Coba lagi',
+    need_net:'Pengenalan suara memerlukan koneksi internet', added_to:'Ditambahkan ke «{b}»', language:'Bahasa', auto_lang:'Otomatis (ponsel)', close:'Tutup', zoom_out:'Perkecil', zoom_in:'Perbesar', whole_day:'Seharian', until:'Sampai', day_events:'Acara: {n}', day_hint:'Ketuk garis waktu untuk menambah acara', repeat:'Ulangi', rep_none:'Jangan ulangi', rep_daily:'Setiap hari', rep_weekdays:'Hari kerja', rep_weekly:'Setiap minggu', rep_monthly:'Setiap bulan', next_on:'Berikutnya: {d}', backup:'Cadangan', backup_save:'Simpan cadangan', backup_restore:'Pulihkan dari file', backup_last:'Cadangan terakhir: {d}', backup_never:'Belum ada cadangan', backup_hint:'Simpan file ke Google Drive, iCloud, Telegram, atau email. Nanti bisa dipulihkan di ponsel mana pun.', snapshots:'Cuplikan otomatis', snapshots_hint:'Sekali sehari aplikasi menyimpan cuplikan datamu di ponsel ini dan menyimpan 7 yang terakhir. Berguna jika kamu tidak sengaja menghapus sesuatu.', snap_tasks:'tugas: {n}', snap_confirm:'Pulihkan data dari {d}? Data saat ini akan disimpan dulu sebagai cuplikan.', restored:'Data dipulihkan', backup_remind:'Ingatkan setiap minggu untuk mencadangkan', backup_due:'Cadangan terakhirmu sudah lebih dari seminggu lalu', backup_saved:'Cadangan disimpan', no_snaps:'Belum ada cuplikan', backup_now:'Simpan',
+    notif:'Notifikasi', notif_toggle:'Ingatkan tugas yang punya waktu', remind:'Ingatkan', at_time:'Tepat waktu', min_before:'{n} mnt sebelumnya', notif_note:'Pengingat muncul saat aplikasi terbuka atau baru saja dipakai. Agar tetap muncul saat aplikasi ditutup, aktifkan sinkronisasi Google Kalender: acara akan mendapat notifikasi kalender.', notif_denied:'Notifikasi diblokir. Izinkan di pengaturan browser.', notif_unsupported:'Browser ini tidak mendukung notifikasi', overdue:'Terlambat', overdue_n:'Terlambat: {n}'
+  },
+  tr: {
+    settings:'Ayarlar', boards:'Panolar', add_typing:'Yazarak ekle', dictate:'Dikte et', voice_input:'Sesli giriş', listening:'Dinleniyor…',
+    vhint:'Ukraynaca konuşun, ör. «Купити молоко і хліб» veya «Зустріч з Олегом завтра о 15:00»',
+    cancel:'İptal', done:'Bitti', color_n:'Renk {c}', custom_color:'Özel renk',
+    board_todo:'Görevler', board_progress:'Devam eden', board_events:'Etkinlikler', board_buy:'Alışveriş',
+    today:'Bugün', tomorrow:'Yarın', yesterday:'Dün', all:'Tümü', new_board:'Yeni pano', edit:'Düzenle',
+    no_boards:'<b>Henüz pano yok</b>İlkini oluşturmak için «+» simgesine dokunun.', empty:'Boş',
+    del_all_done:'Tamamlananların hepsini sil', deleted_done:'Silinen tamamlanmış görev: {n}',
+    nothing_here:'<b>Burada henüz bir şey yok</b>«Dikte et»e dokunun ve ne yapılması gerektiğini söyleyin.',
+    completed:'Tamamlanan', swipe_del:'Silmek için yana kaydırın', move_to:'Taşı', delete:'Sil', edit_item:'Düzenle',
+    moved_to:'«{b}» panosuna taşındı', deleted:'Silindi', undo:'Geri al', board_name:'Pano adı', color:'Renk', create:'Oluştur',
+    in_cal:'Google Takvim’de', calendar:'Takvim', mark_done:'Tamamlandı olarak işaretle', mark_undone:'Tamamlanmadı olarak işaretle', done_toast:'Tamamlandı',
+    new_task:'Yeni görev', task:'Görev', what_todo:'Ne yapılması gerekiyor?', board:'Pano', date:'Tarih', time:'Saat',
+    add_to_cal:'Google Takvim’e ekle', save:'Kaydet', need_date:'Takvime eklemek için bir tarih belirleyin.',
+    auto_sync:'Etkinlik otomatik olarak senkronize edilecek.',
+    manual_sync:'Kaydettikten sonra etkinliği onaylamanız için Google Takvim açılır. Otomatik senkronizasyon Ayarlar’dan açılabilir.',
+    change_color:'Rengi değiştir', move_up:'Yukarı taşı', move_down:'Aşağı taşı', delete_board:'Panoyu sil',
+    boards_note:'Renk seçmek için renk dairesine dokunun. Sıralamayı oklarla değiştirin ya da üstteki bir panoya uzun basıp sürükleyin.',
+    confirm_del_board:(b, n) => `«${b}» panosu${n ? ` ve içindeki ${n} görev` : ''} silinsin mi?`,
+    color_of:'Renk: {b}', back:'Geri', autosave:'Dikteden hemen sonra, gözden geçirmeden kaydet',
+    gcal:'Google Takvim', connected:'Bağlı', not_connected:'Bağlı değil', reconnect:'Yeniden bağlan', connect:'Bağlan', disconnect:'Bağlantıyı kes',
+    default_dur:'Varsayılan etkinlik süresi', min:'dk', how_client:'Client ID nasıl alınır',
+    steps:['console.cloud.google.com adresini açın ve bir proje oluşturun.', 'APIs &amp; Services → Library → Google Calendar API’yi etkinleştirin.',
+      'OAuth consent screen → External, e-postanızı Test users bölümüne ekleyin.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'Authorized JavaScript origins bölümüne uygulamanın çalıştığı adresi ekleyin: <b>{o}</b>', 'Client ID’yi buraya yapıştırın ve «Bağlan»a dokunun.'],
+    export:'Dışa aktar', import:'İçe aktar', paste_client:'Önce bir Client ID yapıştırın', gcal_connected:'Google Takvim bağlandı',
+    cant_connect:'Bağlanılamadı: ', no_done:'Tamamlanmış görev yok',
+    replace_confirm:'Mevcut tüm panolar ve görevler bu dosyadaki verilerle değiştirilsin mi?', imported:'Veriler içe aktarıldı',
+    bad_backup:'Bu dosya bir Wavelist yedeği gibi görünmüyor', no_google:'Google’a bağlantı yok', win_closed:'pencere kapatıldı', error:'hata',
+    sync_failed:'Takvim: senkronizasyon başarısız', retry:'Tekrar dene', voice_chrome:'Sesli giriş Android’de Chrome’da çalışır',
+    mic_allow:'Bu site için mikrofon erişimine izin verin', no_speech:'Anlaşılamadı. Tekrar deneyin',
+    need_net:'Ses tanıma için internet bağlantısı gerekir', added_to:'«{b}» panosuna eklendi', language:'Dil', auto_lang:'Otomatik (telefon)', close:'Kapat', zoom_out:'Uzaklaştır', zoom_in:'Yakınlaştır', whole_day:'Tüm gün', until:'Bitiş', day_events:'Etkinlik: {n}', day_hint:'Etkinlik eklemek için zaman çizelgesine dokunun', repeat:'Tekrarla', rep_none:'Tekrarlama', rep_daily:'Her gün', rep_weekdays:'Hafta içi', rep_weekly:'Her hafta', rep_monthly:'Her ay', next_on:'Sonraki: {d}', backup:'Yedekleme', backup_save:'Yedek kopya kaydet', backup_restore:'Dosyadan geri yükle', backup_last:'Son yedek: {d}', backup_never:'Henüz yedek yok', backup_hint:'Dosyayı Google Drive, iCloud, Telegram veya e-postaya kaydedin. Sonra herhangi bir telefonda geri yükleyebilirsiniz.', snapshots:'Otomatik anlık kopyalar', snapshots_hint:'Uygulama günde bir kez verilerinizin anlık kopyasını bu telefonda kaydeder ve son 7 tanesini tutar. Yanlışlıkla bir şey sildiyseniz işe yarar.', snap_tasks:'görev: {n}', snap_confirm:'{d} tarihli veriler geri yüklensin mi? Mevcut verileriniz önce anlık kopya olarak kaydedilecek.', restored:'Veriler geri yüklendi', backup_remind:'Her hafta yedek almayı hatırlat', backup_due:'Son yedeğiniz bir haftadan eski', backup_saved:'Yedek kaydedildi', no_snaps:'Henüz anlık kopya yok', backup_now:'Kaydet',
+    notif:'Bildirimler', notif_toggle:'Saati olan görevleri hatırlat', remind:'Hatırlat', at_time:'Tam zamanında', min_before:'{n} dk önce', notif_note:'Hatırlatıcılar uygulama açıkken veya yakın zamanda kullanıldıysa gelir. Uygulama kapalıyken de güvenilir hatırlatma için Google Takvim senkronizasyonunu açın: etkinlikler takvim uyarısı alır.', notif_denied:'Bildirimler engellendi. Tarayıcı ayarlarından izin verin.', notif_unsupported:'Bu tarayıcı bildirimleri desteklemiyor', overdue:'Gecikmiş', overdue_n:'Gecikmiş: {n}'
+  },
+  hi: {
+    settings:'सेटिंग्स', boards:'बोर्ड', add_typing:'टाइप करके जोड़ें', dictate:'बोलकर लिखें', voice_input:'वॉइस इनपुट', listening:'सुन रहा है…',
+    vhint:'यूक्रेनी में बोलें, जैसे «Купити молоко і хліб» या «Зустріч з Олегом завтра о 15:00»',
+    cancel:'रद्द करें', done:'हो गया', color_n:'रंग {c}', custom_color:'अपना रंग',
+    board_todo:'कार्य', board_progress:'जारी', board_events:'इवेंट', board_buy:'ख़रीदारी',
+    today:'आज', tomorrow:'कल', yesterday:'बीता कल', all:'सभी', new_board:'नया बोर्ड', edit:'बदलें',
+    no_boards:'<b>अभी कोई बोर्ड नहीं है</b>पहला बोर्ड बनाने के लिए «+» पर टैप करें।', empty:'खाली',
+    del_all_done:'सभी पूरे कार्य हटाएँ', deleted_done:'हटाए गए पूरे कार्य: {n}',
+    nothing_here:'<b>यहाँ अभी कुछ नहीं है</b>«बोलकर लिखें» पर टैप करें और बताएँ कि क्या करना है।',
+    completed:'पूरे हुए', swipe_del:'हटाने के लिए बगल में स्वाइप करें', move_to:'यहाँ ले जाएँ', delete:'हटाएँ', edit_item:'संपादित करें',
+    moved_to:'«{b}» में ले जाया गया', deleted:'हटाया गया', undo:'वापस लें', board_name:'बोर्ड का नाम', color:'रंग', create:'बनाएँ',
+    in_cal:'Google Calendar में', calendar:'कैलेंडर', mark_done:'पूरा मार्क करें', mark_undone:'अधूरा मार्क करें', done_toast:'पूरा हुआ',
+    new_task:'नया कार्य', task:'कार्य', what_todo:'क्या करना है?', board:'बोर्ड', date:'तारीख़', time:'समय',
+    add_to_cal:'Google Calendar में जोड़ें', save:'सेव करें', need_date:'कैलेंडर में जोड़ने के लिए तारीख़ चुनें।',
+    auto_sync:'इवेंट अपने-आप सिंक हो जाएगा।',
+    manual_sync:'सेव करने के बाद इवेंट की पुष्टि के लिए Google Calendar खुलेगा। अपने-आप सिंक सेटिंग्स में चालू किया जा सकता है।',
+    change_color:'रंग बदलें', move_up:'ऊपर ले जाएँ', move_down:'नीचे ले जाएँ', delete_board:'बोर्ड हटाएँ',
+    boards_note:'रंग चुनने के लिए रंग वाले गोले पर टैप करें। तीरों से क्रम बदलें, या ऊपर किसी बोर्ड को देर तक दबाकर खींचें।',
+    confirm_del_board:(b, n) => `बोर्ड «${b}»${n ? ` और उसके ${n} कार्य` : ''} हटाएँ?`,
+    color_of:'रंग: {b}', back:'वापस', autosave:'बोलने के तुरंत बाद, बिना जाँचे सेव करें',
+    gcal:'Google Calendar', connected:'कनेक्टेड', not_connected:'कनेक्ट नहीं है', reconnect:'फिर से कनेक्ट करें', connect:'कनेक्ट करें', disconnect:'डिस्कनेक्ट करें',
+    default_dur:'इवेंट की डिफ़ॉल्ट अवधि', min:'मिनट', how_client:'Client ID कैसे पाएँ',
+    steps:['console.cloud.google.com खोलें और एक प्रोजेक्ट बनाएँ।', 'APIs &amp; Services → Library → Google Calendar API चालू करें।',
+      'OAuth consent screen → External, Test users में अपना ईमेल जोड़ें।', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'Authorized JavaScript origins में वह पता जोड़ें जहाँ यह ऐप चलता है: <b>{o}</b>', 'Client ID यहाँ पेस्ट करें और «कनेक्ट करें» पर टैप करें।'],
+    export:'एक्सपोर्ट', import:'इंपोर्ट', paste_client:'पहले Client ID पेस्ट करें', gcal_connected:'Google Calendar कनेक्ट हो गया',
+    cant_connect:'कनेक्ट नहीं हो सका: ', no_done:'कोई पूरा कार्य नहीं है',
+    replace_confirm:'क्या सभी मौजूदा बोर्ड और कार्य इस फ़ाइल के डेटा से बदल दें?', imported:'डेटा इंपोर्ट हो गया',
+    bad_backup:'यह फ़ाइल Wavelist का बैकअप नहीं लगती', no_google:'Google से कनेक्शन नहीं है', win_closed:'विंडो बंद हो गई', error:'त्रुटि',
+    sync_failed:'कैलेंडर: सिंक नहीं हो सका', retry:'फिर से कोशिश करें', voice_chrome:'वॉइस इनपुट Android पर Chrome में काम करता है',
+    mic_allow:'इस साइट के लिए माइक्रोफ़ोन की अनुमति दें', no_speech:'सुनाई नहीं दिया। फिर से कोशिश करें',
+    need_net:'आवाज़ पहचानने के लिए इंटरनेट चाहिए', added_to:'«{b}» में जोड़ा गया', language:'भाषा', auto_lang:'अपने-आप (फ़ोन)', close:'बंद करें', zoom_out:'ज़ूम आउट', zoom_in:'ज़ूम इन', whole_day:'पूरा दिन', until:'तक', day_events:'इवेंट: {n}', day_hint:'इवेंट जोड़ने के लिए टाइमलाइन पर टैप करें', repeat:'दोहराएँ', rep_none:'न दोहराएँ', rep_daily:'हर दिन', rep_weekdays:'कार्यदिवस', rep_weekly:'हर हफ़्ते', rep_monthly:'हर महीने', next_on:'अगला: {d}', backup:'बैकअप', backup_save:'बैकअप कॉपी सेव करें', backup_restore:'फ़ाइल से रीस्टोर करें', backup_last:'आख़िरी बैकअप: {d}', backup_never:'अभी कोई बैकअप नहीं', backup_hint:'फ़ाइल को Google Drive, iCloud, Telegram या ईमेल में सेव करें। फिर उसे किसी भी फ़ोन पर रीस्टोर कर सकते हैं।', snapshots:'अपने-आप स्नैपशॉट', snapshots_hint:'ऐप दिन में एक बार इस फ़ोन पर आपके डेटा का स्नैपशॉट सेव करता है और आख़िरी 7 रखता है। गलती से कुछ हट जाए तो काम आता है।', snap_tasks:'कार्य: {n}', snap_confirm:'{d} का डेटा रीस्टोर करें? मौजूदा डेटा पहले स्नैपशॉट के रूप में सेव हो जाएगा।', restored:'डेटा रीस्टोर हो गया', backup_remind:'हर हफ़्ते बैकअप की याद दिलाएँ', backup_due:'आपका आख़िरी बैकअप एक हफ़्ते से ज़्यादा पुराना है', backup_saved:'बैकअप सेव हो गया', no_snaps:'अभी कोई स्नैपशॉट नहीं', backup_now:'सेव करें',
+    notif:'सूचनाएँ', notif_toggle:'समय वाले कार्यों की याद दिलाएँ', remind:'याद दिलाएँ', at_time:'ठीक समय पर', min_before:'{n} मिनट पहले', notif_note:'ऐप खुला हो या हाल में इस्तेमाल हुआ हो, तब रिमाइंडर आते हैं। ऐप बंद होने पर भी भरोसेमंद रिमाइंडर के लिए Google Calendar सिंक चालू करें: इवेंट को कैलेंडर अलर्ट मिलेंगे।', notif_denied:'सूचनाएँ ब्लॉक हैं। ब्राउज़र सेटिंग्स में अनुमति दें।', notif_unsupported:'यह ब्राउज़र सूचनाएँ सपोर्ट नहीं करता', overdue:'समय निकल गया', overdue_n:'समय निकल गया: {n}'
+  },
+  vi: {
+    settings:'Cài đặt', boards:'Bảng', add_typing:'Thêm bằng cách gõ', dictate:'Đọc chính tả', voice_input:'Nhập bằng giọng nói', listening:'Đang nghe…',
+    vhint:'Nói bằng tiếng Ukraina, ví dụ «Купити молоко і хліб» hoặc «Зустріч з Олегом завтра о 15:00»',
+    cancel:'Hủy', done:'Xong', color_n:'Màu {c}', custom_color:'Màu tùy chỉnh',
+    board_todo:'Việc cần làm', board_progress:'Đang làm', board_events:'Sự kiện', board_buy:'Mua sắm',
+    today:'Hôm nay', tomorrow:'Ngày mai', yesterday:'Hôm qua', all:'Tất cả', new_board:'Bảng mới', edit:'Sửa',
+    no_boards:'<b>Chưa có bảng nào</b>Chạm «+» để tạo bảng đầu tiên.', empty:'Trống',
+    del_all_done:'Xóa tất cả việc đã xong', deleted_done:'Đã xóa việc đã xong: {n}',
+    nothing_here:'<b>Chưa có gì ở đây</b>Chạm «Đọc chính tả» và nói việc cần làm.',
+    completed:'Đã xong', swipe_del:'Vuốt sang bên để xóa', move_to:'Chuyển đến', delete:'Xóa', edit_item:'Chỉnh sửa',
+    moved_to:'Đã chuyển đến «{b}»', deleted:'Đã xóa', undo:'Hoàn tác', board_name:'Tên bảng', color:'Màu', create:'Tạo',
+    in_cal:'Trong Google Lịch', calendar:'Lịch', mark_done:'Đánh dấu đã xong', mark_undone:'Đánh dấu chưa xong', done_toast:'Đã xong',
+    new_task:'Việc mới', task:'Việc', what_todo:'Cần làm gì?', board:'Bảng', date:'Ngày', time:'Giờ',
+    add_to_cal:'Thêm vào Google Lịch', save:'Lưu', need_date:'Hãy đặt ngày để thêm vào lịch.',
+    auto_sync:'Sự kiện sẽ được đồng bộ tự động.',
+    manual_sync:'Sau khi lưu, Google Lịch sẽ mở để bạn xác nhận sự kiện. Có thể bật đồng bộ tự động trong Cài đặt.',
+    change_color:'Đổi màu', move_up:'Lên trên', move_down:'Xuống dưới', delete_board:'Xóa bảng',
+    boards_note:'Chạm vào vòng tròn màu để chọn màu. Sắp xếp lại bằng mũi tên, hoặc nhấn giữ một bảng ở trên cùng rồi kéo.',
+    confirm_del_board:(b, n) => `Xóa bảng «${b}»${n ? ` cùng ${n} việc trong đó` : ''}?`,
+    color_of:'Màu: {b}', back:'Quay lại', autosave:'Lưu ngay sau khi đọc, không cần xem lại',
+    gcal:'Google Lịch', connected:'Đã kết nối', not_connected:'Chưa kết nối', reconnect:'Kết nối lại', connect:'Kết nối', disconnect:'Ngắt kết nối',
+    default_dur:'Thời lượng sự kiện mặc định', min:'phút', how_client:'Cách lấy Client ID',
+    steps:['Mở console.cloud.google.com và tạo một dự án.', 'APIs &amp; Services → Library → bật Google Calendar API.',
+      'OAuth consent screen → External, thêm email của bạn vào Test users.', 'Credentials → Create credentials → OAuth client ID → Web application.',
+      'Trong Authorized JavaScript origins, thêm địa chỉ nơi ứng dụng này chạy: <b>{o}</b>', 'Dán Client ID vào đây rồi chạm «Kết nối».'],
+    export:'Xuất', import:'Nhập', paste_client:'Hãy dán Client ID trước', gcal_connected:'Đã kết nối Google Lịch',
+    cant_connect:'Không thể kết nối: ', no_done:'Không có việc nào đã xong',
+    replace_confirm:'Thay toàn bộ bảng và việc hiện tại bằng dữ liệu từ tệp này?', imported:'Đã nhập dữ liệu',
+    bad_backup:'Tệp này có vẻ không phải bản sao lưu của Wavelist', no_google:'không có kết nối tới Google', win_closed:'cửa sổ đã đóng', error:'lỗi',
+    sync_failed:'Lịch: đồng bộ thất bại', retry:'Thử lại', voice_chrome:'Nhập bằng giọng nói hoạt động trên Chrome cho Android',
+    mic_allow:'Hãy cho phép trang này dùng micrô', no_speech:'Không nghe rõ. Hãy thử lại',
+    need_net:'Nhận dạng giọng nói cần kết nối internet', added_to:'Đã thêm vào «{b}»', language:'Ngôn ngữ', auto_lang:'Tự động (theo điện thoại)', close:'Đóng', zoom_out:'Thu nhỏ', zoom_in:'Phóng to', whole_day:'Cả ngày', until:'Đến', day_events:'Sự kiện: {n}', day_hint:'Chạm vào dòng thời gian để thêm sự kiện', repeat:'Lặp lại', rep_none:'Không lặp lại', rep_daily:'Mỗi ngày', rep_weekdays:'Ngày thường', rep_weekly:'Mỗi tuần', rep_monthly:'Mỗi tháng', next_on:'Tiếp theo: {d}', backup:'Sao lưu', backup_save:'Lưu bản sao lưu', backup_restore:'Khôi phục từ tệp', backup_last:'Sao lưu gần nhất: {d}', backup_never:'Chưa có bản sao lưu', backup_hint:'Lưu tệp vào Google Drive, iCloud, Telegram hoặc email. Sau đó có thể khôi phục trên bất kỳ điện thoại nào.', snapshots:'Ảnh chụp tự động', snapshots_hint:'Mỗi ngày một lần, ứng dụng lưu ảnh chụp dữ liệu của bạn trên điện thoại này và giữ 7 bản gần nhất. Hữu ích khi bạn lỡ xóa nhầm.', snap_tasks:'việc: {n}', snap_confirm:'Khôi phục dữ liệu từ {d}? Dữ liệu hiện tại sẽ được lưu thành ảnh chụp trước.', restored:'Đã khôi phục dữ liệu', backup_remind:'Nhắc tôi sao lưu mỗi tuần', backup_due:'Bản sao lưu gần nhất đã hơn một tuần', backup_saved:'Đã lưu bản sao lưu', no_snaps:'Chưa có ảnh chụp', backup_now:'Lưu',
+    notif:'Thông báo', notif_toggle:'Nhắc các việc có giờ', remind:'Nhắc', at_time:'Đúng giờ', min_before:'Trước {n} phút', notif_note:'Lời nhắc đến khi ứng dụng đang mở hoặc vừa được dùng. Để nhận nhắc nhở chắc chắn cả khi đã đóng, hãy bật đồng bộ Google Lịch: sự kiện sẽ có thông báo của lịch.', notif_denied:'Thông báo đang bị chặn. Hãy cho phép trong cài đặt trình duyệt.', notif_unsupported:'Trình duyệt này không hỗ trợ thông báo', overdue:'Quá hạn', overdue_n:'Quá hạn: {n}'
+  }
+};
+const LANG_NAMES = { en: 'English', uk: 'Українська', es: 'Español', pt: 'Português (Brasil)', id: 'Bahasa Indonesia', tr: 'Türkçe', hi: 'हिन्दी', vi: 'Tiếng Việt' };
+const LOCALES = { en: 'en-US', uk: 'uk-UA', es: 'es-ES', pt: 'pt-BR', id: 'id-ID', tr: 'tr-TR', hi: 'hi-IN', vi: 'vi-VN' };
+let LANG = 'en';
+function pickLang() {
+  const s = S.settings && S.settings.lang;
+  if (s && L[s]) return s;
+  for (const l of (navigator.languages || [navigator.language || 'en'])) { let k = String(l).slice(0, 2).toLowerCase(); if (k === 'in') k = 'id'; if (L[k]) return k; }
+  return 'en';
+}
+function t(k, v) {
+  let s = (L[LANG] && L[LANG][k] !== undefined) ? L[LANG][k] : L.en[k];
+  if (typeof s === 'string' && v) s = s.replace(/\{(\w+)\}/g, (_, x) => v[x] !== undefined ? v[x] : '');
+  return s;
+}
+const DEF_IDS = ['todo', 'progress', 'events', 'buy'];
+const bn = b => b ? (b.name || t('board_' + b.id)) : '';
+const cap = s => s.charAt(0).toLocaleUpperCase(LOCALES[LANG]) + s.slice(1);
+function applyStatic() {
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', t(el.dataset.i18nAria)));
+}
+
+/* ---------- dates ---------- */
+const UA_MONTHS = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MSHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const WDAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function dayDiff(dstr) { const t = new Date(); t.setHours(0,0,0,0); return Math.round((new Date(dstr + 'T00:00') - t) / 864e5); }
+function dateLabel(dstr) {
+  const n = dayDiff(dstr);
+  if (n === 0) return t('today'); if (n === 1) return t('tomorrow'); if (n === -1) return t('yesterday');
+  const d = new Date(dstr + 'T00:00');
+  if (n > 1 && n < 7) return cap(new Intl.DateTimeFormat(LOCALES[LANG], { weekday: 'long' }).format(d));
+  return new Intl.DateTimeFormat(LOCALES[LANG], { month: 'short', day: 'numeric', year: d.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined }).format(d);
+}
+
+/* ---------- voice parser (Ukrainian) ---------- */
+function parse(raw) {
+  let t = ' ' + raw.replace(/[’ʼ`]/g, "'").replace(/\s+/g, ' ') + ' ';
+  let low = t.toLowerCase();
+  let date = null, time = null, boardId = null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const plus = n => { const d = new Date(today); d.setDate(d.getDate() + n); return ymd(d); };
+  const cut = re => { const m = low.match(re); if (m) { t = t.slice(0, m.index) + ' ' + t.slice(m.index + m[0].length); low = t.toLowerCase(); } return m; };
+
+  // explicit board: "на дошку купити", "в дошку стратегічні"
+  let m = cut(/\s(?:на|в|у|до)\s+дошк\S*\s+([^\s,.]+(?:\s+[^\s,.]+)?)/);
+  if (m) { const w = m[1]; const b = S.boards.find(b => [bn(b), ...(DEF_IDS.includes(b.id) ? Object.keys(L).map(k => L[k]['board_' + b.id]) : [])].map(x => x.toLowerCase()).some(n => w.startsWith(n) || n.startsWith(w.split(' ')[0].slice(0, 4))));  if (b) boardId = b.id; }
+  if (!boardId) {
+    const low0 = low.trim();
+    if (/^(купити|купи|придбати)\s/.test(low0) && board('buy')) { cut(/\s(купити|купи|придбати)\s/); boardId = 'buy'; }
+    else if (/^подія\s/.test(low0) && board('events')) { cut(/\sподія\s/); boardId = 'events'; }
+    else if (/^стратегічн/.test(low0) && board('strategic')) { cut(/\sстратегічн\S*(\s+(завдання|ціль|мета))?\s/); boardId = 'strategic'; }
+    else if (/^в процесі\s/.test(low0) && board('progress')) { cut(/\sв процесі\s/); boardId = 'progress'; }
+  }
+  cut(/\s(нагадай(\s+мені)?|треба|потрібно)\s/);
+  let repeat = null;
+  if (cut(/\s(щодня|щоденно|кожн(ий|ого)\s+дня?|кожен\s+день|every\s+day|daily)\s/)) repeat = 'daily';
+  else if (cut(/\s(по\s+буднях|в\s+будні|у\s+будні|щобудня|on\s+weekdays|weekdays)\s/)) repeat = 'weekdays';
+  else if (cut(/\s(щотижня|кожн(ий|ого)\s+тижн[ья]|every\s+week|weekly)\s/)) repeat = 'weekly';
+  else if (cut(/\s(щомісяця|кожн(ий|ого)\s+місяц[ья]|every\s+month|monthly)\s/)) repeat = 'monthly';
+
+  // dates
+  if (cut(/\sпіслязавтра\s/)) date = plus(2);
+  else if (cut(/\sзавтра\s/)) date = plus(1);
+  else if (cut(/\sсьогодні\s/)) date = plus(0);
+  if (!date && (m = cut(/\sчерез\s+(\d+|один|одну|два|дві|три|чотири|п'ять|тиждень)\s*(дн\S*|тижн\S*)?\s/))) {
+    const W = { 'один':1,'одну':1,'два':2,'дві':2,'три':3,'чотири':4,"п'ять":5 };
+    if (m[1] === 'тиждень') date = plus(7);
+    else { const n = W[m[1]] || parseInt(m[1]); date = plus(/тижн/.test(m[2] || '') ? n * 7 : n); }
+  }
+  if (!date && (m = cut(new RegExp('\\s(\\d{1,2})(?:-?го)?\\s+(' + UA_MONTHS.join('|') + ')(?:\\s+(\\d{4}))?\\s')))) {
+    const d = new Date(m[3] ? +m[3] : today.getFullYear(), UA_MONTHS.indexOf(m[2]), +m[1]);
+    if (!m[3] && d < today) d.setFullYear(d.getFullYear() + 1);
+    date = ymd(d);
+  }
+  if (!date && (m = cut(/\s(\d{1,2})[.\/](\d{1,2})(?:[.\/](\d{2,4}))?\s/))) {
+    let y = m[3] ? +m[3] : today.getFullYear(); if (y < 100) y += 2000;
+    const d = new Date(y, +m[2] - 1, +m[1]); if (!m[3] && d < today) d.setFullYear(d.getFullYear() + 1);
+    date = ymd(d);
+  }
+  if (!date && (m = cut(/\s(?:в|у|во)?\s*(?:наступн\S*\s+)?(понеділок|вівторок|середу|четвер|п'ятницю|пятницю|суботу|неділю)\s/))) {
+    const idx = { 'неділю':0,'понеділок':1,'вівторок':2,'середу':3,'четвер':4,"п'ятницю":5,'пятницю':5,'суботу':6 }[m[1]];
+    let n = (idx - today.getDay() + 7) % 7; if (n === 0) n = 7; date = plus(n);
+  }
+
+  // time
+  const rg = cut(/\s(?:з|із|зі|від|from)\s+(\d{1,2})(?:[:.](\d{2}))?\s*(?:год\S*\s+)?(?:до|по|to|till|until|-)\s+(\d{1,2})(?:[:.](\d{2}))?(?:\s*год\S*)?(?:\s+(ранку|дня|вечора))?\s/);
+  let end = null;
+  if (rg) {
+    let h1 = +rg[1], m1 = rg[2] ? +rg[2] : 0, h2 = +rg[3], m2 = rg[4] ? +rg[4] : 0; const part = rg[5];
+    if (part === 'вечора' || part === 'дня') { if (h2 < 12) h2 += 12; if (h1 < 12 && h1 + 12 <= h2) h1 += 12; }
+    if (h1 < 24 && h2 < 24 && m1 < 60 && m2 < 60) {
+      time = pad(h1) + ':' + pad(m1); end = pad(h2) + ':' + pad(m2); if (toMin(end) <= toMin(time)) end = null;
+      if (!date) { const now = new Date(); date = (h1 * 60 + m1 > now.getHours() * 60 + now.getMinutes()) ? plus(0) : plus(1); }
+    }
+  }
+  const tm = rg ? null : cut(/\s(?:о|об|на)\s+(\d{1,2})(?:[:.\s](\d{2}))?(?:\s*год\S*)?(?:\s+(ранку|дня|вечора|ночі))?\s/) || cut(/\s(\d{1,2}):(\d{2})()\s/);
+  if (tm) {
+    let h = +tm[1], mi = tm[2] ? +tm[2] : 0; const part = tm[3];
+    if ((part === 'вечора' || (part === 'дня' && h < 12)) && h < 12) h += 12;
+    if (part === 'ночі' && h === 12) h = 0;
+    if (h < 24 && mi < 60) {
+      time = pad(h) + ':' + pad(mi);
+      if (!date) { const now = new Date(); date = (h * 60 + mi > now.getHours() * 60 + now.getMinutes()) ? plus(0) : plus(1); }
+    }
+  }
+
+  let title = t.replace(/\s+/g, ' ').replace(/\s(о|об|на|в|у|і|та)\s*$/i, ' ').replace(/^[\s,.:;-]+|[\s,.:;-]+$/g, '').trim();
+  title = title.charAt(0).toUpperCase() + title.slice(1);
+  if (!boardId) boardId = (time && board('events')) ? 'events' : curBoard();
+  if (repeat && !date) date = time && (() => { const n = new Date(); return time <= pad(n.getHours()) + ':' + pad(n.getMinutes()); })() ? stepDate(plus(0), repeat) : plus(0);
+  if (repeat) date = firstFrom(date, repeat, true);
+  return { title: title || raw.trim(), date, time, end, boardId, repeat };
+}
+
+/* ---------- render ---------- */
+function render() {
+  if (S.active !== 'all' && S.active !== 'day' && !board(S.active)) S.active = 'all';
+  const d = new Date();
+  $('#today').textContent = LANG === 'uk'
+    ? cap(new Intl.DateTimeFormat('uk-UA', { weekday: 'long' }).format(d)) + ', ' + new Intl.DateTimeFormat('uk-UA', { month: 'long', day: 'numeric' }).format(d)
+    : cap(new Intl.DateTimeFormat(LOCALES[LANG], { weekday: 'long', month: 'long', day: 'numeric' }).format(d));
+  const openCount = id => S.items.filter(i => i.boardId === id && !i.done).length;
+
+  const tabs = $('#tabs');
+  tabs.innerHTML = `<button class="tab${S.active === 'all' ? ' on' : ''}" data-v="all">${t('all')}</button><button class="tab${S.active === 'day' ? ' on' : ''}" data-v="day">${t('today')}</button>` +
+    S.boards.map(b => { const n = openCount(b.id);
+      return `<button class="tab${b.id === S.active ? ' on' : ''}" data-v="${b.id}" data-id="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(bn(b))}${n ? `<span class="cnt${S.items.some(i => i.boardId === b.id && isOverdue(i)) ? ' late' : ''}">${n}</span>` : ''}</button>`; }).join('') +
+    `<button class="tab ghost plus" id="t-add" aria-label="${t('new_board')}">+</button><button class="tab ghost" id="t-edit">${t('edit')}</button>`;
+  tabs.querySelectorAll('[data-v]').forEach(el => el.onclick = () => { if (tabDragged) return; if (el.dataset.v === 'day') { dayOff = 0; dayScroll = true; } go(el.dataset.v); });
+  tabs.querySelectorAll('[data-id]').forEach(bindTabDrag);
+  $('#t-add').onclick = () => addBoardSheet(); $('#t-edit').onclick = openBoards;
+  const on = tabs.querySelector('.on'); if (on) on.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+
+  const list = $('#list');
+  if (!S.boards.length) { list.innerHTML = `<div class="empty">${t('no_boards')}</div>`; return; }
+  const sortOpen = arr => arr.filter(i => !i.done).sort((a, b) => {
+    if (a.date && b.date) return (a.date + (a.time || '99')).localeCompare(b.date + (b.time || '99'));
+    if (a.date) return -1; if (b.date) return 1; return b.created - a.created;
+  });
+
+  $('#zoombar').classList.toggle('show', S.active === 'day');
+  if (S.active === 'day') { renderDay(list); return; }
+  if (S.active === 'all') {
+    list.innerHTML = S.boards.map(b => {
+      const its = sortOpen(S.items.filter(i => i.boardId === b.id));
+      return `<section class="grp"><button class="grp-h" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(bn(b))}<span class="n">${its.length || ''}</span></button>
+        ${its.length ? its.map(row).join('') : '<div class="grp-empty">' + t('empty') + '</div>'}</section>`;
+    }).join('');
+    const allDone = S.items.filter(i => i.done && board(i.boardId));
+    if (allDone.length) list.insertAdjacentHTML('beforeend', `<button class="all-clear" id="all-clear">${t('del_all_done')} · ${allDone.length}</button>`);
+    list.querySelectorAll('.grp-h').forEach(h => h.onclick = () => go(h.dataset.b, 1));
+    if (allDone.length) $('#all-clear').onclick = () => removeItems(allDone, t('deleted_done', { n: allDone.length }));
+    bindItems(list); return;
+  }
+
+  const items = S.items.filter(i => i.boardId === S.active);
+  const open = sortOpen(items);
+  const done = items.filter(i => i.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
+  if (!items.length) { list.innerHTML = `<div class="empty">${t('nothing_here')}</div>`; return; }
+  list.innerHTML = open.map(row).join('') +
+    (done.length ? `<details class="donebox"${doneOpen ? ' open' : ''}><summary>${t('completed')} · ${done.length}</summary>
+      <div class="done-acts"><span>${t('swipe_del')}</span><button class="clear-done">${t('del_all_done')}</button></div>${done.map(row).join('')}</details>` : '');
+  bindItems(list);
+  const db = list.querySelector('.donebox');
+  if (db) { db.ontoggle = () => { doneOpen = db.open; };
+    db.querySelector('.clear-done').onclick = () => removeItems(done, t('deleted_done', { n: done.length })); }
+}
+const views = () => ['all', 'day', ...S.boards.map(b => b.id)];
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const EASE = 'cubic-bezier(.2,.8,.2,1)';
+function slideIn(dir) {
+  const l = $('#list'); if (!dir || reduceMotion()) { l.style.transition = 'none'; l.style.transform = ''; l.style.opacity = ''; return; }
+  const w = l.clientWidth;
+  l.style.transition = 'none'; l.style.transform = `translateX(${dir * w * 0.35}px)`; l.style.opacity = '0';
+  l.getBoundingClientRect();
+  l.style.transition = `transform 240ms ${EASE}, opacity 180ms ease-out`; l.style.transform = 'translateX(0)'; l.style.opacity = '1';
+}
+/* ---------- day timeline ---------- */
+let dayOff = 0, dayScroll = true, dayScrolled = false, pinchedAt = 0;
+let hpx = 72;
+const HMAX = 600;
+const toMin = s => { const [a, b] = s.split(':'); return +a * 60 + +b; };
+const fromMin = m => pad(Math.floor(m / 60) % 24) + ':' + pad(m % 60);
+const dayStr = () => { const d = new Date(); d.setDate(d.getDate() + dayOff); return ymd(d); };
+function occursOn(i, ds) {
+  if (!i.date) return false; if (i.date === ds) return true;
+  if (!i.repeat || i.done || ds < i.date) return false;
+  let x = i.date, g = 0; while (x < ds && g++ < 800) x = stepDate(x, i.repeat); return x === ds;
+}
+function endMin(i) {
+  const s = toMin(i.time); let e = i.end ? toMin(i.end) : s + (+S.settings.duration || 60);
+  if (e <= s) e = s + (+S.settings.duration || 60); return Math.min(e, 24 * 60);
+}
+function fitPx() { const l = $('#list'); const avail = (l ? l.clientHeight : 600) - 150; return Math.max(14, Math.floor(avail / 24 * 10) / 10); }
+function clampZ(v) { return Math.max(fitPx(), Math.min(HMAX, v)); }
+function applyZoom(tl) {
+  tl = tl || $('#tl'); if (!tl) return;
+  tl.style.setProperty('--hpx', hpx);
+  tl.classList.toggle('zs', hpx < 34); tl.classList.toggle('zm', hpx >= 34 && hpx < 56); tl.classList.toggle('zx', hpx >= 200);
+  tl.querySelectorAll('.ev').forEach(el => {
+    const px = +el.style.getPropertyValue('--d') * hpx / 60, n = +el.dataset.n;
+    el.classList.toggle('tiny', px < 30);
+    el.classList.toggle('short', px >= 30 && px < 54);
+    const sm = el.querySelector('small'); if (sm) sm.style.display = (px < 54 && n > 1) ? 'none' : '';
+  });
+}
+function renderDay(list) {
+  hpx = clampZ(+S.settings.zoom || 72);
+  const ds = dayStr(), isToday = dayOff === 0;
+  const evs = S.items.filter(i => i.time && board(i.boardId) && occursOn(i, ds))
+    .map(i => ({ i, s: toMin(i.time), e: endMin(i) })).sort((a, b) => a.s - b.s || b.e - a.e);
+  let grp = [], end = -1; const groups = [];
+  evs.forEach(x => { if (x.s >= end && grp.length) { groups.push(grp); grp = []; } grp.push(x); end = Math.max(end, x.e); });
+  if (grp.length) groups.push(grp);
+  groups.forEach(G => { const cols = []; G.forEach(x => { let k = cols.findIndex(c => c <= x.s); if (k < 0) { k = cols.length; cols.push(0); } cols[k] = x.e; x.col = k; }); G.forEach(x => x.n = cols.length); });
+  const d = new Date(ds + 'T00:00');
+  const title = cap(new Intl.DateTimeFormat(LOCALES[LANG], { weekday: 'long', day: 'numeric', month: 'long' }).format(d));
+  const rel = Math.abs(dayOff) <= 1 ? dateLabel(ds) : '';
+  let hrs = '';
+  for (let hh = 0; hh < 24; hh++) hrs += `<div class="hr${hh % 2 ? '' : ' h2'}${hh % 3 ? '' : ' h3'}">${hh ? `<span class="hl">${pad(hh)}:00</span>` : ''}<span class="hl m">:30</span><span class="hl f" style="top:calc(25% - 7px)">:15</span><span class="hl f" style="top:calc(75% - 7px)">:45</span><span class="h30"></span><span class="q" style="top:25%"></span><span class="q" style="top:75%"></span></div>`;
+  const CK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const blocks = evs.map(x => {
+    const it = x.i, done = it.done && !it.repeat, dur = x.e - x.s, W = 100 / x.n;
+    const late = isToday && isOverdue(it) && !it.repeat;
+    return `<div class="ev${done ? ' done' : ''}${late ? ' overdue' : ''}" data-id="${it.id}" data-n="${x.n}" style="--c:${board(it.boardId).color};--s:${x.s};--d:${dur};left:calc(${x.col * W}% + 3px);width:calc(${W}% - 6px)"><b>${esc(it.title)}</b><small>${it.time}–${fromMin(x.e)}${it.repeat ? ' · ↻' : ''}</small><button class="ck" aria-label="${done ? t('mark_undone') : t('mark_done')}">${CK}</button></div>`;
+  }).join('');
+  list.innerHTML = `<div class="daybar"><button class="arr" id="d-prev" aria-label="‹">‹</button>
+    <div class="dtitle"><b>${title}</b><span class="${isToday ? 'is-today' : ''}">${rel ? rel + ' · ' : ''}${t('day_events', { n: evs.length })}</span></div>
+    <button class="arr" id="d-next" aria-label="›">›</button></div>
+    ${evs.length ? '' : `<div class="day-hint">${t('day_hint')}</div>`}
+    <div class="tl" id="tl">${hrs}<div class="lane">${Array.from({ length: 24 }, (_, k) => `<i style="--h:${k}">+</i>`).join('')}</div><div class="evs" id="evs">${blocks}</div>${isToday ? '<div class="nowline" id="nowline"><span></span></div>' : ''}</div>`;
+  applyZoom();
+  $('#d-prev').onclick = () => { dayOff--; dayScroll = true; render(); slideIn(-1); };
+  $('#d-next').onclick = () => { dayOff++; dayScroll = true; render(); slideIn(1); };
+  const ev = $('#evs'), tlEl = $('#tl');
+  tlEl.onclick = e => {
+    if (lpFired) { lpFired = false; return; }
+    if (Date.now() - pinchedAt < 500) return;
+    const blk = e.target.closest('.ev');
+    if (blk) { const it = S.items.find(i => i.id === blk.dataset.id); if (!it) return;
+      if (e.target.closest('.ck')) toggleDone(it); else openEdit(it); return; }
+    const r = tlEl.getBoundingClientRect(); const step = hpx >= 200 ? 15 : 30;
+    let m = Math.floor((e.clientY - r.top) / hpx * 60 / step) * step; m = Math.max(0, Math.min(m, 23 * 60 + 30));
+    const dur = +S.settings.duration || 60;
+    const fl = document.createElement('div'); fl.className = 'tapflash'; fl.textContent = '+ ' + fromMin(m);
+    fl.style.top = (m * hpx / 60 + 1) + 'px'; fl.style.height = Math.max(dur * hpx / 60 - 3, 20) + 'px'; tlEl.appendChild(fl);
+    setTimeout(() => { fl.remove(); openEdit(null, { date: ds, time: fromMin(m), end: fromMin(Math.min(m + dur, 23 * 60 + 59)), boardId: board('events') ? 'events' : curBoard(), title: '' }); }, 180);
+  };
+  ev.querySelectorAll('.ev').forEach(el => { const it = S.items.find(i => i.id === el.dataset.id); if (it) longPress(el, () => openMove(it)); });
+  bindPinch($('#tl'), list);
+  placeNow();
+  if (dayScroll) {
+    dayScroll = false; dayScrolled = true;
+    const target = isToday ? (new Date().getHours() * 60 + new Date().getMinutes() - 60) : (evs.length ? evs[0].s - 30 : 8 * 60);
+    requestAnimationFrame(() => { const tl = $('#tl'); if (tl) list.scrollTop = tl.offsetTop + Math.max(0, target) * hpx / 60 - 8; });
+  }
+}
+function zoomTo(nh, anchorY) {
+  const list = $('#list'), tl = $('#tl'); if (!tl) return;
+  nh = clampZ(nh); const lr = list.getBoundingClientRect();
+  const y = anchorY == null ? lr.top + list.clientHeight / 2 : anchorY;
+  const min = (y - lr.top + list.scrollTop - tl.offsetTop) / hpx * 60;
+  hpx = nh; applyZoom(tl);
+  list.scrollTop = tl.offsetTop + min * hpx / 60 - (y - lr.top);
+}
+function saveZoom() { S.settings.zoom = Math.round(hpx * 10) / 10; save(); }
+function bindPinch(tl, list) {
+  let d0 = 0, h0 = 0, on = false;
+  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  tl.addEventListener('touchstart', e => { if (e.touches.length === 2) { on = true; d0 = dist(e.touches); h0 = hpx; pinchedAt = Date.now(); } }, { passive: true });
+  tl.addEventListener('touchmove', e => {
+    if (!on || e.touches.length !== 2) return; e.preventDefault();
+    const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    zoomTo(h0 * dist(e.touches) / d0, my); pinchedAt = Date.now();
+  }, { passive: false });
+  const end = e => { if (on && e.touches.length < 2) { on = false; pinchedAt = Date.now(); saveZoom(); } };
+  tl.addEventListener('touchend', end); tl.addEventListener('touchcancel', end);
+}
+let zPrev = 72;
+$('#z-fit').onclick = () => {
+  const f = fitPx();
+  if (Math.abs(hpx - f) < 1) zoomTo(Math.max(zPrev, 72));
+  else { zPrev = hpx; hpx = f; applyZoom(); $('#list').scrollTop = $('#tl').offsetTop - 8; }
+  saveZoom();
+};
+function placeNow() {
+  const n = $('#nowline'); if (!n) return;
+  const d = new Date(), m = d.getHours() * 60 + d.getMinutes();
+  n.style.setProperty('--now', m); n.querySelector('span').textContent = fromMin(m);
+}
+setInterval(placeNow, 30000);
+
+function go(v, dir) {
+  if (dir === undefined) { const vs = views(); dir = Math.sign(vs.indexOf(v) - vs.indexOf(S.active)); }
+  if (v === 'day' && S.active !== 'day') dayScroll = true;
+  S.active = v; save(); render();
+  if (!(v === 'day' && dayScrolled)) $('#list').scrollTop = 0; dayScrolled = false; slideIn(dir);
+  const on = $('#tabs .on'); if (on) on.scrollIntoView({ inline: 'center', block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
+}
+let lpFired = false, doneOpen = false;
+function removeItems(arr, msg) {
+  if (!arr.length) return;
+  S.items = S.items.filter(i => !arr.includes(i)); save(); render();
+  toast(msg, t('undo'), () => { S.items.push(...arr.filter(i => !S.items.includes(i))); save(); render(); });
+}
+function bindItems(root) {
+  root.querySelectorAll('.item').forEach(el => {
+    const it = S.items.find(i => i.id === el.dataset.id);
+    el.querySelector('.chk').onclick = () => { if (lpFired) { lpFired = false; return; } toggleDone(it); };
+    el.querySelector('.body').onclick = () => { if (lpFired) { lpFired = false; return; } openEdit(it); };
+    longPress(el, () => openMove(it));
+  });
+}
+function longPress(el, fn) {
+  let t = null, x = 0, y = 0;
+  el.addEventListener('pointerdown', e => { x = e.clientX; y = e.clientY; lpFired = false; clearTimeout(t);
+    t = setTimeout(() => { lpFired = true; if (navigator.vibrate) navigator.vibrate(15);
+      el.classList.add('lp'); setTimeout(() => el.classList.remove('lp'), 200); fn(); }, 480); });
+  el.addEventListener('pointermove', e => { if (Math.abs(e.clientX - x) > 10 || Math.abs(e.clientY - y) > 10) clearTimeout(t); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => el.addEventListener(ev, () => clearTimeout(t)));
+  el.addEventListener('contextmenu', e => e.preventDefault());
+}
+function openMove(it) {
+  openSheet(`<div class="sh-h"><h2>${t('move_to')}</h2><button class="x" data-close aria-label="${t('close')}">✕</button></div>
+    <div class="mv-t">${esc(it.title)}</div>
+    <div class="chips big" id="mv">${S.boards.map(b => `<button class="chip${b.id === it.boardId ? ' on' : ''}" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(bn(b))}</button>`).join('')}</div>
+    <div class="acts"><button class="btn danger" id="mv-del">${t('delete')}</button><button class="btn" id="mv-edit">${t('edit_item')}</button></div>`,
+  () => {
+    $('#mv').onclick = e => { const c = e.target.closest('.chip'); if (!c) return;
+      const from = it.boardId; it.boardId = c.dataset.b; save(); closeSheet(); render();
+      if (from !== it.boardId) toast(t('moved_to', { b: bn(board(it.boardId)) }), t('undo'), () => { it.boardId = from; save(); render(); }); };
+    $('#mv-edit').onclick = () => openEdit(it);
+    $('#mv-del').onclick = () => deleteItem(it);
+  });
+}
+function deleteItem(it) {
+  const idx = S.items.indexOf(it); if (idx < 0) return;
+  S.items.splice(idx, 1); save(); closeSheet(); render();
+  let undone = false;
+  toast(t('deleted'), t('undo'), () => { undone = true; S.items.splice(idx, 0, it); save(); render(); });
+  setTimeout(() => { if (!undone && it.gid) calDelete(it); }, 4800);
+}
+
+/* tab reorder: long press, then drag */
+let tabDragged = false;
+function bindTabDrag(el) {
+  let t = null, sx = 0, sy = 0, drag = false, base = 0;
+  const sib = d => { const s = d > 0 ? el.nextElementSibling : el.previousElementSibling; return s && s.dataset.id ? s : null; };
+  el.addEventListener('touchstart', e => { const p = e.touches[0]; sx = p.clientX; sy = p.clientY; drag = false; tabDragged = false; clearTimeout(t);
+    t = setTimeout(() => { drag = true; tabDragged = true; base = sx; el.classList.add('drag'); if (navigator.vibrate) navigator.vibrate(15); }, 420); }, { passive: true });
+  el.addEventListener('touchmove', e => {
+    const p = e.touches[0];
+    if (!drag) { if (Math.abs(p.clientX - sx) > 8 || Math.abs(p.clientY - sy) > 8) clearTimeout(t); return; }
+    e.preventDefault();
+    let dx = p.clientX - base; const nx = sib(1), pv = sib(-1);
+    if (nx && dx > nx.offsetWidth / 2) { el.parentNode.insertBefore(nx, el); base += nx.offsetWidth + 8; dx = p.clientX - base; }
+    else if (pv && dx < -pv.offsetWidth / 2) { el.parentNode.insertBefore(el, pv); base -= pv.offsetWidth + 8; dx = p.clientX - base; }
+    el.style.transform = `translateX(${dx}px)`;
+  }, { passive: false });
+  const end = () => { clearTimeout(t); if (!drag) return; drag = false;
+    const ids = [...$('#tabs').querySelectorAll('[data-id]')].map(x => x.dataset.id);
+    S.boards.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id)); save(); render();
+    setTimeout(() => { tabDragged = false; }, 60); };
+  el.addEventListener('touchend', end); el.addEventListener('touchcancel', end);
+  el.addEventListener('contextmenu', e => e.preventDefault());
+}
+
+/* swipe between boards: content follows the finger, then snaps */
+(() => {
+  const m = $('#list');
+  let sx = 0, sy = 0, dx = 0, mode = null, on = false, busy = false, px = 0, pt = 0, vel = 0, tgt = null;
+  const set = (x, t) => { m.style.transition = t || 'none'; m.style.transform = x ? `translateX(${x}px)` : 'translateX(0)';
+    m.style.opacity = String(1 - Math.min(Math.abs(x) / m.clientWidth, 1) * 0.5); };
+  const back = () => set(0, `transform 220ms ${EASE}, opacity 220ms ${EASE}`);
+  m.addEventListener('touchstart', e => {
+    on = e.touches.length === 1 && !busy; if (!on) return;
+    sx = px = e.touches[0].clientX; sy = e.touches[0].clientY; pt = performance.now(); dx = 0; vel = 0; mode = null;
+    tgt = e.target.closest('.item.done');
+  }, { passive: true });
+  m.addEventListener('touchmove', e => {
+    if (!on) return; const x = e.touches[0].clientX, y = e.touches[0].clientY;
+    if (!mode) {
+      if (Math.abs(x - sx) > 10 && Math.abs(x - sx) > Math.abs(y - sy) * 1.2) { mode = 'h'; sx = x; px = x; }
+      else if (Math.abs(y - sy) > 10) { mode = 'v'; on = false; }
+      return;
+    }
+    if (lpFired) { on = false; back(); return; }
+    const now = performance.now(); if (now > pt) vel = 0.7 * ((x - px) / (now - pt)) + 0.3 * vel; px = x; pt = now;
+    dx = x - sx;
+    if (tgt) { tgt.classList.add('swiping'); tgt.style.transform = `translateX(${dx}px)`;
+      tgt.style.opacity = String(1 - Math.min(Math.abs(dx) / tgt.offsetWidth, 1) * 0.7); return; }
+    const vs = views(), i = vs.indexOf(S.active);
+    if ((dx > 0 && i === 0) || (dx < 0 && i === vs.length - 1)) dx *= 0.25;
+    set(dx);
+  }, { passive: true });
+  const end = () => {
+    if (!on || mode !== 'h') { on = false; return; } on = false;
+    if (tgt) { swipeItemEnd(tgt, dx, vel); tgt = null; return; }
+    const vs = views(), dir = dx < 0 ? 1 : -1, j = vs.indexOf(S.active) + dir, w = m.clientWidth;
+    const fling = Math.abs(vel) > 0.35 && Math.sign(vel) === -dir && Math.abs(dx) > 24;
+    if (j < 0 || j >= vs.length || !(Math.abs(dx) > w * 0.28 || fling)) { back(); return; }
+    busy = true;
+    const dur = Math.max(90, Math.min(170, (w - Math.abs(dx)) / Math.max(Math.abs(vel), 1.2)));
+    set(-dir * w, `transform ${dur}ms cubic-bezier(.3,.6,.4,1), opacity ${dur}ms linear`);
+    setTimeout(() => { go(vs[j], dir); busy = false; }, dur);
+  };
+  m.addEventListener('touchend', end);
+  m.addEventListener('touchcancel', () => { if (on && mode === 'h') { if (tgt) swipeItemEnd(tgt, 0, 0); else back(); } on = false; tgt = null; });
+  function swipeItemEnd(el, dx, vel) {
+    const w = el.offsetWidth, fling = Math.abs(vel) > 0.4 && Math.sign(vel) === Math.sign(dx) && Math.abs(dx) > 30;
+    el.classList.remove('swiping');
+    if (!(Math.abs(dx) > w * 0.35 || fling)) {
+      el.style.transition = `transform 220ms ${EASE}, opacity 220ms ${EASE}`; el.style.transform = ''; el.style.opacity = ''; return;
+    }
+    const it = S.items.find(i => i.id === el.dataset.id);
+    el.style.transition = 'transform 150ms ease-out, opacity 150ms linear';
+    el.style.transform = `translateX(${Math.sign(dx) * w}px)`; el.style.opacity = '0';
+    setTimeout(() => {
+      el.style.height = el.offsetHeight + 'px'; el.getBoundingClientRect();
+      el.style.transition = 'height 160ms ease-out, margin 160ms ease-out, padding 160ms ease-out';
+      el.style.height = '0'; el.style.margin = '0'; el.style.paddingTop = el.style.paddingBottom = '0'; el.style.overflow = 'hidden';
+      setTimeout(() => { if (it) removeItems([it], t('deleted')); }, 160);
+    }, 150);
+  }
+})();
+
+function addBoardSheet(back) {
+  let color = nextColor();
+  openSheet(`<div class="sh-h"><h2>${t('new_board')}</h2><button class="x" data-close aria-label="${t('close')}">✕</button></div>
+    <input type="text" id="nb" placeholder="${t('board_name')}"><div class="lbl">${t('color')}</div>${paletteHTML(color)}
+    <div class="acts"><button class="btn primary" id="nb-save">${t('create')}</button></div>`,
+  () => { const i = $('#nb'); bindPalette($('#sheet-c'), c => { color = c; });
+    const mk = () => { const v = i.value.trim(); if (!v) { i.focus(); return; }
+      const nb = { id: uid(), name: v, color }; S.boards.push(nb); save(); closeSheet(); if (back) back(); else go(nb.id); };
+    $('#nb-save').onclick = mk; i.onkeydown = e => { if (e.key === 'Enter') mk(); }; });
+}
+const REPS = ['daily', 'weekdays', 'weekly', 'monthly'];
+const RRULE = { daily: 'FREQ=DAILY', weekdays: 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR', weekly: 'FREQ=WEEKLY', monthly: 'FREQ=MONTHLY' };
+function stepDate(ds, r) {
+  const d = new Date(ds + 'T00:00');
+  if (r === 'monthly') { const day = d.getDate(); d.setDate(1); d.setMonth(d.getMonth() + 1);
+    d.setDate(Math.min(day, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate())); }
+  else { d.setDate(d.getDate() + (r === 'weekly' ? 7 : 1)); if (r === 'weekdays') while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1); }
+  return ymd(d);
+}
+function firstFrom(ds, r, includeSelf) {
+  const today = ymd(new Date()); let x = includeSelf ? ds : stepDate(ds, r);
+  if (r === 'weekdays' && includeSelf) { const d = new Date(x + 'T00:00'); if (d.getDay() === 0 || d.getDay() === 6) x = stepDate(x, r); }
+  let g = 0; while (x < today && g++ < 4000) x = stepDate(x, r); return x;
+}
+function rollRepeats() {
+  let ch = false; const today = ymd(new Date());
+  S.items.forEach(i => { if (i.repeat && !i.done && i.date && i.date < today) { i.date = firstFrom(i.date, i.repeat, false); i.notified = null; ch = true; } });
+  if (ch) save(); return ch;
+}
+function isOverdue(i) {
+  if (i.done || !i.date) return false;
+  const n = dayDiff(i.date); if (n < 0) return true; if (n > 0 || !i.time) return false;
+  const d = new Date(); return i.time < pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+function row(i) {
+  let meta = '';
+  if (i.date) {
+    const n = dayDiff(i.date); const cls = isOverdue(i) ? ' late' : (n === 0 ? ' today' : '');
+    meta += `<span class="pill${cls}">${dateLabel(i.date)}${i.time ? ', ' + i.time + (i.end ? '–' + i.end : '') : ''}</span>`;
+  }
+  if (i.repeat) meta += `<span class="pill">↻ ${t('rep_' + i.repeat)}</span>`;
+  if (i.gid) meta += `<span class="pill" title="${t('in_cal')}">${ICON_CAL}${t('calendar')}</span>`;
+  const bc = (board(i.boardId) || {}).color;
+  return `<div class="item${bc ? ' tinted' : ''}${i.done ? ' done' : ''}${isOverdue(i) ? ' overdue' : ''}" data-id="${i.id}"${bc ? ` style="--c:${bc}"` : ''}>
+    <button class="chk" aria-label="${i.done ? t('mark_undone') : t('mark_done')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+    <button class="body"><div class="t">${esc(i.title)}</div>${meta ? `<div class="meta">${meta}</div>` : ''}</button></div>`;
+}
+function toggleDone(it) {
+  if (it.repeat && it.date && !it.done) {
+    const prev = it.date; it.date = firstFrom(it.date, it.repeat, false); it.notified = null; save(); render();
+    toast(t('next_on', { d: dateLabel(it.date) + (it.time ? ', ' + it.time : '') }), t('undo'), () => { it.date = prev; save(); render(); });
+    return;
+  }
+  it.done = !it.done; it.doneAt = it.done ? Date.now() : null; save(); render();
+  if (it.done) toast(t('done_toast'), t('undo'), () => { it.done = false; it.doneAt = null; save(); render(); });
+}
+
+/* ---------- sheet & toast ---------- */
+function openSheet(html, mount) {
+  $('#sheet-c').innerHTML = html; $('#scrim').classList.add('show'); $('#sheet').classList.add('show');
+  $('#sheet-c').querySelectorAll('[data-close]').forEach(b => b.onclick = closeSheet);
+  if (mount) mount();
+}
+function closeSheet() { $('#scrim').classList.remove('show'); $('#sheet').classList.remove('show'); }
+$('#scrim').onclick = closeSheet;
+let tt;
+function toast(msg, action, fn) {
+  $('#toast-t').textContent = msg; const a = $('#toast-a');
+  a.style.display = action ? '' : 'none'; a.textContent = action || '';
+  a.onclick = () => { $('#toast').classList.remove('show'); fn && fn(); };
+  $('#toast').classList.add('show'); clearTimeout(tt); tt = setTimeout(() => $('#toast').classList.remove('show'), action ? 4500 : 2800);
+}
+
+/* ---------- edit ---------- */
+function openEdit(it, pre) {
+  const isNew = !it;
+  const d = it ? { ...it } : { boardId: curBoard(), title: '', date: null, time: null, cal: false, ...(pre || {}) };
+  if (isNew && pre) d.cal = !!(d.date && (d.time || d.boardId === 'events'));
+  openSheet(`
+    <div class="sh-h"><h2>${isNew ? t('new_task') : t('task')}</h2><button class="x" data-close aria-label="${t('close')}">✕</button></div>
+    <textarea id="f-title" rows="2" placeholder="${t('what_todo')}">${esc(d.title)}</textarea>
+    <div class="lbl">${t('board')}</div>
+    <div class="chips" id="f-boards">${S.boards.map(b => `<button class="chip${b.id === d.boardId ? ' on' : ''}" data-b="${b.id}" style="--c:${b.color}"><span class="dot"></span>${esc(bn(b))}</button>`).join('')}</div>
+    <div class="row2">
+      <label class="fld"><span>${t('date')}</span><input type="date" id="f-date" value="${d.date || ''}"></label>
+      <label class="fld"><span>${t('time')}</span><input type="time" id="f-time" value="${d.time || ''}"></label>
+    </div>
+    <div class="row2">
+      <label class="fld"><span>${t('until')}</span><input type="time" id="f-end" value="${d.end || ''}"></label>
+      <label class="fld"><span>${t('repeat')}</span>
+      <select id="f-rep">${['', ...REPS].map(r => `<option value="${r}"${(d.repeat || '') === r ? ' selected' : ''}>${t(r ? 'rep_' + r : 'rep_none')}</option>`).join('')}</select></label>
+    </div>
+    <label class="tgl"><input type="checkbox" id="f-cal" ${d.cal ? 'checked' : ''}><span>${t('add_to_cal')}</span></label>
+    <div class="note" id="f-calnote"></div>
+    <div class="acts">${isNew ? '' : `<button class="btn danger" id="f-del">${t('delete')}</button>`}<button class="btn primary" id="f-save">${t('save')}</button></div>`,
+  () => {
+    let bId = d.boardId;
+    const ta = $('#f-title'); if (isNew && !pre) setTimeout(() => ta.focus(), 250);
+    $('#f-boards').onclick = e => { const c = e.target.closest('.chip'); if (!c) return; bId = c.dataset.b;
+      $('#f-boards').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c)); };
+    const note = () => { $('#f-calnote').textContent = !$('#f-cal').checked ? '' :
+      !$('#f-date').value ? t('need_date') :
+      calReady() ? t('auto_sync') : t('manual_sync'); };
+    ['#f-cal', '#f-date'].forEach(s => $(s).onchange = note); note();
+    $('#f-save').onclick = () => {
+      const title = ta.value.trim(); if (!title) { ta.focus(); return; }
+      const rec = it || { id: uid(), created: Date.now(), done: false };
+      const repv = $('#f-rep').value || null;
+      let dv = $('#f-date').value || (repv ? ymd(new Date()) : null);
+      if (repv && dv) dv = firstFrom(dv, repv, true);
+      const tv = dv ? ($('#f-time').value || null) : null; let ev2 = tv ? ($('#f-end').value || null) : null;
+      if (ev2 && toMin(ev2) <= toMin(tv)) ev2 = null;
+      Object.assign(rec, { title, boardId: bId, repeat: repv, date: dv, time: tv, end: ev2 });
+      if (it && (it.date !== dv || it.time !== rec.time)) rec.notified = null;
+      rec.cal = $('#f-cal').checked && !!rec.date;
+      if (!it) S.items.push(rec);
+      save(); closeSheet(); render(); afterSave(rec, true);
+    };
+    if (!isNew) $('#f-del').onclick = () => deleteItem(it);
+  });
+}
+function afterSave(rec, gesture) {
+  if (calReady()) { if (rec.cal || rec.gid) syncItem(rec); }
+  else if (rec.cal && gesture && !rec.linkOpened) { rec.linkOpened = true; save(); window.open(templateUrl(rec), '_blank'); }
+}
+
+/* ---------- boards manager ---------- */
+function openBoards() {
+  const draw = () => openSheet(`
+    <div class="sh-h"><h2>${t('boards')}</h2><button class="x" data-close aria-label="${t('close')}">✕</button></div>
+    <div id="b-list">${S.boards.map(b => `<div class="brow" data-id="${b.id}">
+      <button class="swatch" style="--c:${b.color}" aria-label="${t('change_color')}"></button>
+      <input type="text" value="${esc(bn(b))}" aria-label="${t('board_name')}">
+      <button class="mvb" data-d="-1" aria-label="${t('move_up')}" ${S.boards[0] === b ? 'disabled' : ''}>↑</button>
+      <button class="mvb" data-d="1" aria-label="${t('move_down')}" ${S.boards[S.boards.length - 1] === b ? 'disabled' : ''}>↓</button>
+      <button class="del" aria-label="${t('delete_board')}">${ICON_TRASH}</button></div>`).join('')}</div>
+    <div class="acts" style="margin-top:14px"><button class="btn" id="b-add">+ ${t('new_board')}</button></div>
+    <div class="note">${t('boards_note')}</div>`,
+  () => {
+    $('#b-list').querySelectorAll('.brow').forEach(r => {
+      const b = board(r.dataset.id);
+      r.querySelector('.swatch').onclick = () => openColor(b, draw);
+      r.querySelector('input').onchange = e => { const v = e.target.value.trim(); if (v) { b.name = (DEF_IDS.includes(b.id) && v === t('board_' + b.id)) ? null : v; save(); render(); } else e.target.value = bn(b); };
+      r.querySelectorAll('.mvb').forEach(x => x.onclick = () => { const i = S.boards.indexOf(b), j = i + +x.dataset.d;
+        if (j < 0 || j >= S.boards.length) return; [S.boards[i], S.boards[j]] = [S.boards[j], S.boards[i]]; save(); render(); draw(); });
+      r.querySelector('.del').onclick = () => {
+        const n = S.items.filter(i => i.boardId === b.id).length;
+        if (!confirm(t('confirm_del_board')(bn(b), n))) return;
+        S.items.filter(i => i.boardId === b.id && i.gid).forEach(calDelete);
+        S.items = S.items.filter(i => i.boardId !== b.id); S.boards = S.boards.filter(x => x !== b);
+        save(); render(); draw();
+      };
+    });
+    $('#b-add').onclick = () => addBoardSheet(() => { render(); draw(); });
+  });
+  draw();
+}
+
+function openColor(b, back) {
+  openSheet(`<div class="sh-h"><h2>${t('color_of', { b: esc(bn(b)) })}</h2><button class="x" id="c-back" aria-label="${t('back')}">✕</button></div>
+    ${paletteHTML(b.color)}<div class="acts"><button class="btn primary" id="c-ok">${t('done')}</button></div>`,
+  () => { bindPalette($('#sheet-c'), c => { b.color = c; save(); render(); });
+    $('#c-ok').onclick = $('#c-back').onclick = () => back(); });
+}
+
+/* ---------- settings ---------- */
+function openSettings() {
+  const st = S.settings;
+  openSheet(`
+    <div class="sh-h"><h2>${t('settings')}</h2><button class="x" data-close aria-label="${t('close')}">✕</button></div>
+    <div class="lbl" style="margin-top:0">${t('language')}</div>
+    <select id="s-lang"><option value="auto"${(st.lang || 'auto') === 'auto' ? ' selected' : ''}>${t('auto_lang')}</option>${Object.keys(L).map(k => `<option value="${k}"${st.lang === k ? ' selected' : ''}>${LANG_NAMES[k]}</option>`).join('')}</select>
+    <hr>
+    <label class="tgl"><input type="checkbox" id="s-auto" ${st.autoSave ? 'checked' : ''}><span>${t('autosave')}</span></label>
+    <hr>
+    <h2 style="font-size:17px;margin:0 0 4px">${t('notif')}</h2>
+    <label class="tgl"><input type="checkbox" id="s-notif" ${st.notify && notifPerm() === 'granted' ? 'checked' : ''}><span>${t('notif_toggle')}</span></label>
+    <div class="lbl">${t('remind')}</div>
+    <select id="s-remind">${[0, 5, 10, 15, 30, 60].map(v => `<option value="${v}"${(+st.remind || 0) === v ? ' selected' : ''}>${v ? t('min_before', { n: v }) : t('at_time')}</option>`).join('')}</select>
+    <div class="note">${t('notif_note')}</div>
+    <hr>
+    <div class="sh-h" style="margin-bottom:6px"><h2 style="font-size:17px">${t('gcal')}</h2>
+      <span class="status${calReady() ? ' ok' : ''}">${calReady() ? t('connected') : t('not_connected')}</span></div>
+    <div class="lbl">Client ID</div>
+    <input type="text" id="s-cid" placeholder="xxxx.apps.googleusercontent.com" value="${esc(st.clientId)}" autocomplete="off" spellcheck="false">
+    <div class="acts" style="margin-top:12px"><button class="btn primary" id="s-connect">${calReady() ? t('reconnect') : t('connect')}</button>
+      ${st.gConnected ? '<button class="btn" id="s-off">' + t('disconnect') + '</button>' : ''}</div>
+    <div class="lbl">${t('default_dur')}</div>
+    <select id="s-dur">${[15, 30, 60, 90, 120].map(v => `<option value="${v}"${+st.duration === v ? ' selected' : ''}>${v} ${t('min')}</option>`).join('')}</select>
+    <details class="note" style="margin-top:14px"><summary class="link">${t('how_client')}</summary><ol>
+      ${t('steps').map(s => `<li>${s.replace('{o}', esc(location.origin))}</li>`).join('')}</ol></details>
+    <hr>
+    <h2 style="font-size:17px;margin:0 0 4px">${t('backup')}</h2>
+    <div class="note" style="margin-top:0">${st.backupAt ? t('backup_last', { d: fmtStamp(st.backupAt) }) : t('backup_never')}</div>
+    <button class="btn primary" id="s-exp" style="width:100%;margin-top:12px">${t('backup_save')}</button>
+    <button class="btn" id="s-imp" style="width:100%;margin-top:10px">${t('backup_restore')}</button>
+    <div class="note">${t('backup_hint')}</div>
+    <label class="tgl"><input type="checkbox" id="s-brem" ${st.backupRemind !== false ? 'checked' : ''}><span>${t('backup_remind')}</span></label>
+    <div class="lbl">${t('snapshots')}</div>
+    <div id="s-snaps">${snapList()}</div>
+    <div class="note">${t('snapshots_hint')}</div>
+    <input type="file" id="s-file" accept="application/json,.json" hidden>
+    <hr>
+    <button class="btn danger" id="s-clear" style="width:100%">${t('del_all_done')} (${S.items.filter(i => i.done).length})</button>
+    <div class="note" style="text-align:center;margin-top:16px">Wavelist v3.1</div>`,
+  () => {
+    $('#s-lang').onchange = e => { st.lang = e.target.value; save(); LANG = pickLang(); applyStatic(); render(); openSettings(); };
+    $('#s-auto').onchange = e => { st.autoSave = e.target.checked; save(); };
+    $('#s-notif').onchange = async e => {
+      if (!e.target.checked) { st.notify = false; save(); scheduleNotifs(); return; }
+      if (!('Notification' in window)) { e.target.checked = false; toast(t('notif_unsupported')); return; }
+      let p = Notification.permission; if (p === 'default') p = await Notification.requestPermission();
+      if (p !== 'granted') { e.target.checked = false; st.notify = false; save(); toast(t('notif_denied')); return; }
+      st.notify = true; save(); scheduleNotifs();
+    };
+    $('#s-remind').onchange = e => { st.remind = +e.target.value; save(); scheduleNotifs(); S.items.filter(i => i.gid).forEach(syncItem); };
+    $('#s-dur').onchange = e => { st.duration = +e.target.value; save(); };
+    $('#s-cid').onchange = e => { const v = e.target.value.trim(); if (v !== st.clientId) { st.clientId = v; st.gConnected = false; token = null; save(); } };
+    $('#s-connect').onclick = async () => {
+      st.clientId = $('#s-cid').value.trim(); save();
+      if (!st.clientId) { toast(t('paste_client')); return; }
+      try { token = null; await getToken(true); toast(t('gcal_connected')); openSettings();
+        S.items.filter(i => i.cal && i.date && !i.gid && !i.done).forEach(syncItem);
+      } catch (e) { toast(t('cant_connect') + e.message); }
+    };
+    if ($('#s-off')) $('#s-off').onclick = () => { st.gConnected = false; token = null; save(); openSettings(); };
+    $('#s-clear').onclick = () => { const d = S.items.filter(i => i.done); if (!d.length) { toast(t('no_done')); return; }
+      closeSheet(); removeItems(d, t('deleted_done', { n: d.length })); };
+    $('#s-exp').onclick = async () => { if (await saveBackup()) openSettings(); };
+    $('#s-brem').onchange = e => { st.backupRemind = e.target.checked; save(); };
+    $('#s-imp').onclick = () => $('#s-file').click();
+    $('#s-file').onchange = async e => {
+      try { const j = JSON.parse(await e.target.files[0].text()); if (!Array.isArray(j.boards) || !Array.isArray(j.items)) throw 0;
+        if (!confirm(t('replace_confirm'))) return;
+        restoreData(j); closeSheet(); toast(t('imported'));
+      } catch (_) { toast(t('bad_backup')); }
+      e.target.value = '';
+    };
+    $('#s-snaps').querySelectorAll('[data-snap]').forEach(b => b.onclick = () => {
+      const sn = getSnaps()[+b.dataset.snap]; if (!sn) return;
+      if (!confirm(t('snap_confirm', { d: fmtStamp(sn.t) }))) return;
+      restoreData(sn.data); closeSheet(); toast(t('restored'));
+    });
+  });
+}
+
+/* ---------- backup ---------- */
+const SNAP_KEY = 'planner.snaps';
+const fmtStamp = ts => new Date(ts).toLocaleString(LOCALES[LANG], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+const dataOf = () => ({ app: 'wavelist', v: 1, savedAt: new Date().toISOString(), boards: S.boards, items: S.items });
+function getSnaps() { try { return JSON.parse(localStorage.getItem(SNAP_KEY)) || []; } catch (e) { return []; } }
+function putSnaps(a) { try { localStorage.setItem(SNAP_KEY, JSON.stringify(a)); } catch (e) { if (a.length > 2) putSnaps(a.slice(0, a.length - 1)); } }
+function takeSnap(force) {
+  if (!S.items.length && !force) return;
+  const a = getSnaps(), body = JSON.stringify({ boards: S.boards, items: S.items });
+  if (!force && a[0] && (ymd(new Date(a[0].t)) === ymd(new Date()) || JSON.stringify(a[0].data) === body)) return;
+  a.unshift({ t: Date.now(), data: JSON.parse(body) }); putSnaps(a.slice(0, 7));
+}
+function snapList() {
+  const a = getSnaps(); if (!a.length) return `<div class="note" style="margin-top:0">${t('no_snaps')}</div>`;
+  return `<div class="chips">${a.map((s, k) => `<button class="chip" data-snap="${k}">${fmtStamp(s.t)} · ${t('snap_tasks', { n: s.data.items.length })}</button>`).join('')}</div>`;
+}
+function restoreData(j) {
+  takeSnap(true);
+  S.boards = j.boards; S.items = j.items; if (!board(S.active)) S.active = 'all'; save(); render();
+}
+async function saveBackup() {
+  const name = 'wavelist-backup-' + ymd(new Date()) + '.json';
+  const blob = new Blob([JSON.stringify(dataOf(), null, 2)], { type: 'application/json' });
+  const done = () => { S.settings.backupAt = Date.now(); save(); toast(t('backup_saved')); return true; };
+  try {
+    const file = new File([blob], name, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); return done(); }
+  } catch (e) { if (e && e.name === 'AbortError') return false; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  return done();
+}
+let backupNagged = false;
+function backupNag() {
+  const st = S.settings; if (backupNagged || st.backupRemind === false || S.items.length < 3) return;
+  const since = Date.now() - (st.backupAt || st.firstUse || 0);
+  if (!st.backupAt && !st.firstUse) { st.firstUse = Date.now(); save(); return; }
+  if (since > 7 * 864e5) { backupNagged = true; setTimeout(() => toast(t('backup_due'), t('backup_now'), saveBackup), 1500); }
+}
+
+/* ---------- Google Calendar ---------- */
+let token = null, tokenExp = 0;
+try { const t = JSON.parse(sessionStorage.getItem('planner.tok')); if (t && t.exp > Date.now()) { token = t.v; tokenExp = t.exp; } } catch (e) {}
+const calReady = () => !!(S.settings.clientId && S.settings.gConnected);
+function gisLoad() {
+  return new Promise((res, rej) => {
+    if (window.google && google.accounts && google.accounts.oauth2) return res();
+    const s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client';
+    s.onload = res; s.onerror = () => rej(new Error(t('no_google'))); document.head.appendChild(s);
+  });
+}
+async function getToken(interactive) {
+  if (token && Date.now() < tokenExp - 60000) return token;
+  await gisLoad();
+  return new Promise((res, rej) => {
+    const c = google.accounts.oauth2.initTokenClient({
+      client_id: S.settings.clientId, scope: 'https://www.googleapis.com/auth/calendar.events',
+      callback: r => {
+        if (r.error) return rej(new Error(r.error));
+        token = r.access_token; tokenExp = Date.now() + r.expires_in * 1000;
+        try { sessionStorage.setItem('planner.tok', JSON.stringify({ v: token, exp: tokenExp })); } catch (e) {}
+        S.settings.gConnected = true; save(); res(token);
+      },
+      error_callback: e => rej(new Error(e.type === 'popup_closed' ? t('win_closed') : (e.type || t('error'))))
+    });
+    c.requestAccessToken({ prompt: interactive ? 'consent' : '' });
+  });
+}
+function evBody(it) {
+  const b = evBody0(it); if (it.repeat) b.recurrence = ['RRULE:' + RRULE[it.repeat]]; return b;
+}
+function evBody0(it) {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if (it.time) {
+    const st = new Date(it.date + 'T' + it.time); const en = new Date(st.getTime() + (endMin(it) - toMin(it.time)) * 60000);
+    const f = d => ymd(d) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':00';
+    return { summary: it.title, start: { dateTime: f(st), timeZone: tz }, end: { dateTime: f(en), timeZone: tz },
+      reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: +S.settings.remind || 0 }] } };
+  }
+  const n = new Date(it.date + 'T00:00'); n.setDate(n.getDate() + 1);
+  return { summary: it.title, start: { date: it.date }, end: { date: ymd(n) } };
+}
+const API = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
+async function syncItem(it) {
+  if (!calReady()) return;
+  try {
+    const tk = await getToken(false);
+    if (it.cal && it.date) {
+      const r = await fetch(API + (it.gid ? '/' + it.gid : ''), { method: it.gid ? 'PATCH' : 'POST',
+        headers: { Authorization: 'Bearer ' + tk, 'Content-Type': 'application/json' }, body: JSON.stringify(evBody(it)) });
+      if ((r.status === 404 || r.status === 410) && it.gid) { it.gid = null; return syncItem(it); }
+      if (r.status === 401) { token = null; throw new Error('auth'); }
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      it.gid = (await r.json()).id;
+    } else if (it.gid) { await calDelete(it); }
+    save(); render();
+  } catch (e) { toast(t('sync_failed'), t('retry'), () => syncItem(it)); }
+}
+async function calDelete(it) {
+  if (!it.gid || !calReady()) return;
+  try { const tk = await getToken(false); await fetch(API + '/' + it.gid, { method: 'DELETE', headers: { Authorization: 'Bearer ' + tk } }); it.gid = null; save(); }
+  catch (e) {}
+}
+function templateUrl(it) {
+  const c = s => s.replace(/[-:]/g, '');
+  let dates;
+  if (it.time) {
+    const st = new Date(it.date + 'T' + it.time); const en = new Date(st.getTime() + (endMin(it) - toMin(it.time)) * 60000);
+    const f = d => ymd(d) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00';
+    dates = c(f(st)) + '/' + c(f(en));
+  } else { const n = new Date(it.date + 'T00:00'); n.setDate(n.getDate() + 1); dates = c(it.date) + '/' + c(ymd(n)); }
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(it.title) + '&dates=' + dates + (it.repeat ? '&recur=' + encodeURIComponent('RRULE:' + RRULE[it.repeat]) : '');
+}
+
+/* ---------- voice ---------- */
+let rec = null, finalTxt = '', interimTxt = '', cancelled = false;
+function startVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast(t('voice_chrome')); openEdit(null); return; }
+  if (rec) return;
+  finalTxt = ''; interimTxt = ''; cancelled = false;
+  $('#vtext').textContent = t('listening'); $('#voice').classList.add('show');
+  rec = new SR(); rec.lang = 'uk-UA'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+  rec.onresult = e => {
+    interimTxt = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const r = e.results[i]; if (r.isFinal) finalTxt += r[0].transcript; else interimTxt += r[0].transcript;
+    }
+    $('#vtext').textContent = (finalTxt + interimTxt) || t('listening');
+  };
+  rec.onerror = e => {
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast(t('mic_allow'));
+    else if (e.error === 'no-speech') toast(t('no_speech'));
+    else if (e.error === 'network') toast(t('need_net'));
+  };
+  rec.onend = () => {
+    $('#voice').classList.remove('show'); rec = null;
+    const text = (finalTxt || interimTxt).trim();
+    if (cancelled || !text) return;
+    const p = parse(text);
+    if (S.settings.autoSave) {
+      const it = { id: uid(), created: Date.now(), done: false, ...p, cal: !!(p.date && (p.time || p.boardId === 'events')) };
+      S.items.push(it); if (S.active !== 'all') S.active = it.boardId; save(); render(); afterSave(it, false);
+      toast(t('added_to', { b: bn(board(it.boardId)) }), t('edit_item'), () => openEdit(it));
+    } else openEdit(null, p);
+  };
+  try { rec.start(); } catch (e) { rec = null; $('#voice').classList.remove('show'); }
+}
+$('#btn-mic').onclick = startVoice;
+$('#v-done').onclick = () => rec && rec.stop();
+$('#v-cancel').onclick = () => { cancelled = true; rec ? rec.abort() : $('#voice').classList.remove('show'); };
+$('#btn-type').onclick = () => openEdit(null);
+$('#btn-settings').onclick = openSettings;
+
+/* ---------- reminders & overdue refresh ---------- */
+const notifPerm = () => ('Notification' in window) ? Notification.permission : 'denied';
+let nTimers = [];
+function fireAt(i) {
+  if (!i.date) return null;
+  const at = new Date(i.date + 'T' + (i.time || '09:00'));
+  return at.getTime() - (i.time ? (+S.settings.remind || 0) * 60000 : 0);
+}
+async function notify(i) {
+  const body = dateLabel(i.date) + (i.time ? ', ' + i.time : '') + ' · ' + bn(board(i.boardId));
+  const opts = { body, tag: i.id, icon: 'icon-192.png', badge: 'icon-192.png', data: { url: location.href.split('?')[0] } };
+  try { const r = await navigator.serviceWorker.ready; await r.showNotification(i.title, opts); }
+  catch (e) { try { new Notification(i.title, opts); } catch (_) {} }
+}
+function scheduleNotifs() {
+  nTimers.forEach(clearTimeout); nTimers = [];
+  if (!S.settings.notify || notifPerm() !== 'granted') return;
+  const now = Date.now();
+  S.items.forEach(i => {
+    const at = fireAt(i); if (i.done || at == null || i.notified === at) return;
+    if (at <= now) { if (now - at < 6 * 3600e3) { i.notified = at; save(); notify(i); } return; }
+    if (at - now < 2 ** 31 - 1) nTimers.push(setTimeout(() => { if (!i.done && S.items.includes(i)) { i.notified = at; save(); notify(i); } }, at - now));
+  });
+}
+let lateSig = '';
+function overdueTick(force) {
+  if (rollRepeats()) force = true;
+  const sig = S.items.filter(isOverdue).map(i => i.id).join(',');
+  if ((force || sig !== lateSig) && !document.querySelector('.tab.drag') && !$('#voice').classList.contains('show')) { lateSig = sig; render(); }
+}
+setInterval(overdueTick, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { overdueTick(true); scheduleNotifs(); } });
+
+/* ---------- boot ---------- */
+LANG = pickLang(); applyStatic();
+rollRepeats(); render(); lateSig = S.items.filter(isOverdue).map(i => i.id).join(','); scheduleNotifs(); takeSnap(); backupNag();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
+if (new URLSearchParams(location.search).get('voice') === '1') {
+  history.replaceState(null, '', location.pathname);
+  setTimeout(startVoice, 350);
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { render(); takeSnap(); } });
+</script>
+</body>
+</html>
