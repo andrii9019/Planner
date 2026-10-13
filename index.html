@@ -185,7 +185,12 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
 .tl.zm .hr:not(.h2) .hl:not(.m):not(.f){display:none}
 .tl.zs .hr:not(.h3) .hl:not(.m):not(.f){display:none}
 .tl.zs .hr:not(.h3)::before{border-top-style:dashed;opacity:.5}
-.tl .evs{position:absolute;left:52px;right:0;top:0;bottom:0}
+.tl .evs{position:absolute;left:52px;right:40px;top:0;bottom:0}
+.tl .lane{position:absolute;right:0;width:36px;top:0;bottom:0;border-radius:10px;background:color-mix(in srgb,var(--line) 28%,transparent);
+ background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--hpx) * 1px - 1px),color-mix(in srgb,var(--line) 80%,transparent) calc(var(--hpx) * 1px - 1px),color-mix(in srgb,var(--line) 80%,transparent) calc(var(--hpx) * 1px))}
+.tl .tapflash{position:absolute;left:52px;right:0;border-radius:10px;border:1.5px dashed var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);
+ display:grid;place-items:center;color:var(--accent);font-weight:800;font-size:18px;z-index:4;pointer-events:none;animation:tf .35s ease-out}
+@keyframes tf{from{opacity:0;transform:scale(.97)}to{opacity:1}}
 .tl .ev{top:calc(var(--s) * var(--hpx) * 1px / 60 + 1px);height:max(calc(var(--d) * var(--hpx) * 1px / 60 - 3px),14px)}
 .ev.tiny{padding:0 22px 0 7px;display:flex;align-items:center;border-radius:6px}
 .ev.tiny b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ev.tiny small{display:none}
@@ -824,21 +829,23 @@ function renderDay(list) {
     <div class="dtitle"><b>${title}</b><span class="${isToday ? 'is-today' : ''}">${rel ? rel + ' · ' : ''}${t('day_events', { n: evs.length })}</span></div>
     <button class="arr" id="d-next" aria-label="›">›</button></div>
     ${evs.length ? '' : `<div class="day-hint">${t('day_hint')}</div>`}
-    <div class="tl" id="tl">${hrs}<div class="evs" id="evs">${blocks}</div>${isToday ? '<div class="nowline" id="nowline"><span></span></div>' : ''}</div>`;
+    <div class="tl" id="tl">${hrs}<div class="lane"></div><div class="evs" id="evs">${blocks}</div>${isToday ? '<div class="nowline" id="nowline"><span></span></div>' : ''}</div>`;
   applyZoom();
   $('#d-prev').onclick = () => { dayOff--; dayScroll = true; render(); slideIn(-1); };
   $('#d-next').onclick = () => { dayOff++; dayScroll = true; render(); slideIn(1); };
-  const ev = $('#evs');
-  ev.onclick = e => {
+  const ev = $('#evs'), tlEl = $('#tl');
+  tlEl.onclick = e => {
     if (lpFired) { lpFired = false; return; }
     if (Date.now() - pinchedAt < 500) return;
     const blk = e.target.closest('.ev');
     if (blk) { const it = S.items.find(i => i.id === blk.dataset.id); if (!it) return;
       if (e.target.closest('.ck')) toggleDone(it); else openEdit(it); return; }
-    const r = ev.getBoundingClientRect(); const step = hpx >= 200 ? 15 : 30;
+    const r = tlEl.getBoundingClientRect(); const step = hpx >= 200 ? 15 : 30;
     let m = Math.floor((e.clientY - r.top) / hpx * 60 / step) * step; m = Math.max(0, Math.min(m, 23 * 60 + 30));
     const dur = +S.settings.duration || 60;
-    openEdit(null, { date: ds, time: fromMin(m), end: fromMin(Math.min(m + dur, 23 * 60 + 59)), boardId: board('events') ? 'events' : curBoard(), title: '' });
+    const fl = document.createElement('div'); fl.className = 'tapflash'; fl.textContent = '+ ' + fromMin(m);
+    fl.style.top = (m * hpx / 60 + 1) + 'px'; fl.style.height = Math.max(dur * hpx / 60 - 3, 20) + 'px'; tlEl.appendChild(fl);
+    setTimeout(() => { fl.remove(); openEdit(null, { date: ds, time: fromMin(m), end: fromMin(Math.min(m + dur, 23 * 60 + 59)), boardId: board('events') ? 'events' : curBoard(), title: '' }); }, 180);
   };
   ev.querySelectorAll('.ev').forEach(el => { const it = S.items.find(i => i.id === el.dataset.id); if (it) longPress(el, () => openMove(it)); });
   bindPinch($('#tl'), list);
@@ -1222,7 +1229,7 @@ function openSettings() {
     <input type="file" id="s-file" accept="application/json,.json" hidden>
     <hr>
     <button class="btn danger" id="s-clear" style="width:100%">${t('del_all_done')} (${S.items.filter(i => i.done).length})</button>
-    <div class="note" style="text-align:center;margin-top:16px">Wavelist v2.9</div>`,
+    <div class="note" style="text-align:center;margin-top:16px">Wavelist v3.0</div>`,
   () => {
     $('#s-lang').onchange = e => { st.lang = e.target.value; save(); LANG = pickLang(); applyStatic(); render(); openSettings(); };
     $('#s-auto').onchange = e => { st.autoSave = e.target.checked; save(); };
