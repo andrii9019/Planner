@@ -217,7 +217,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
 .nowline{position:absolute;left:52px;right:0;border-top:2px solid var(--rec);z-index:3;pointer-events:none}
 .nowline::before{content:"";position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:50%;background:var(--rec)}
 .nowline span{position:absolute;left:-54px;top:-10px;font-size:11px;font-weight:800;color:#fff;background:var(--rec);border-radius:6px;padding:1px 5px}
-.ut{display:flex;gap:8px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ut{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;touch-action:pan-x pan-y;padding:0 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .ut::-webkit-scrollbar{display:none}
 .uc{flex:none;display:flex;align-items:center;gap:8px;height:36px;max-width:240px;padding:0 14px 0 8px;border-radius:999px;font-weight:600;font-size:14px;color:var(--ink);
  background:linear-gradient(90deg,color-mix(in srgb,var(--c) 20%,transparent),color-mix(in srgb,var(--c) 6%,transparent)),var(--surface);box-shadow:inset 3px 0 0 var(--c);-webkit-user-select:none;user-select:none}
@@ -1077,7 +1077,7 @@ function bindTabDrag(el) {
     m.style.opacity = String(1 - Math.min(Math.abs(x) / m.clientWidth, 1) * 0.5); };
   const back = () => set(0, `transform 220ms ${EASE}, opacity 220ms ${EASE}`);
   m.addEventListener('touchstart', e => {
-    on = e.touches.length === 1 && !busy; if (!on) return;
+    on = e.touches.length === 1 && !busy && !e.target.closest('.ut'); if (!on) return;
     sx = px = e.touches[0].clientX; sy = e.touches[0].clientY; pt = performance.now(); dx = 0; vel = 0; mode = null;
     tgt = e.target.closest('.item.done');
   }, { passive: true });
@@ -1356,7 +1356,7 @@ function openSettings() {
     <input type="file" id="s-file" accept="application/json,.json" hidden>
     <hr>
     <button class="btn danger" id="s-clear" style="width:100%">${t('del_all_done')} (${S.items.filter(i => i.done).length})</button>
-    <div class="note" style="text-align:center;margin-top:16px">Wavelist v3.6</div>`,
+    <div class="note" style="text-align:center;margin-top:16px">Wavelist v3.7</div>`,
   () => {
     $('#s-lang').onchange = e => { st.lang = e.target.value; save(); LANG = pickLang(); applyStatic(); render(); openSettings(); };
     $('#s-auto').onchange = e => { st.autoSave = e.target.checked; save(); };
