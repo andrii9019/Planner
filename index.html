@@ -217,6 +217,15 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
 .nowline{position:absolute;left:52px;right:0;border-top:2px solid var(--rec);z-index:3;pointer-events:none}
 .nowline::before{content:"";position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:50%;background:var(--rec)}
 .nowline span{position:absolute;left:-54px;top:-10px;font-size:11px;font-weight:800;color:#fff;background:var(--rec);border-radius:6px;padding:1px 5px}
+.ut{display:flex;gap:8px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ut::-webkit-scrollbar{display:none}
+.uc{flex:none;display:flex;align-items:center;gap:8px;height:36px;max-width:240px;padding:0 14px 0 8px;border-radius:999px;font-weight:600;font-size:14px;color:var(--ink);
+ background:linear-gradient(90deg,color-mix(in srgb,var(--c) 20%,transparent),color-mix(in srgb,var(--c) 6%,transparent)),var(--surface);box-shadow:inset 3px 0 0 var(--c);-webkit-user-select:none;user-select:none}
+.uc span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uc .uck{flex:none;width:20px;height:20px;border-radius:50%;border:2px solid var(--c);display:grid;place-items:center;padding:0;color:#fff}
+.uc .uck svg{width:11px;height:11px;opacity:0}
+.uc.done{opacity:.55}.uc.done span{text-decoration:line-through}.uc.done .uck{background:var(--c)}.uc.done .uck svg{opacity:1}
+.uc.late{box-shadow:inset 3px 0 0 var(--rec),0 0 0 1.5px rgba(229,72,77,.6)}
 .day-hint{text-align:center;color:var(--muted);font-size:13px;padding:0 0 6px}
 .zoombar{position:fixed;right:16px;bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:20;display:none}
 .zoombar.show{display:block}
@@ -825,24 +834,37 @@ function renderDay(list) {
   if (grp.length) groups.push(grp);
   groups.forEach(G => { const cols = []; G.forEach(x => { let k = cols.findIndex(c => c <= x.s); if (k < 0) { k = cols.length; cols.push(0); } cols[k] = x.e; x.col = k; }); G.forEach(x => x.n = cols.length); });
   const d = new Date(ds + 'T00:00');
-  const title = cap(new Intl.DateTimeFormat(LOCALES[LANG], { weekday: 'long', day: 'numeric', month: 'long' }).format(d));
+  const title = LANG === 'uk'
+    ? cap(new Intl.DateTimeFormat('uk-UA', { weekday: 'long' }).format(d)) + ', ' + new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long' }).format(d)
+    : cap(new Intl.DateTimeFormat(LOCALES[LANG], { weekday: 'long', day: 'numeric', month: 'long' }).format(d));
   const rel = Math.abs(dayOff) <= 1 ? dateLabel(ds) : '';
   let hrs = '';
   for (let hh = 0; hh < 24; hh++) hrs += `<div class="hr${hh % 2 ? '' : ' h2'}${hh % 3 ? '' : ' h3'}">${hh ? `<span class="hl">${pad(hh)}:00</span>` : ''}<span class="hl m">:30</span><span class="hl f" style="top:calc(25% - 7px)">:15</span><span class="hl f" style="top:calc(75% - 7px)">:45</span><span class="h30"></span><span class="q" style="top:25%"></span><span class="q" style="top:75%"></span></div>`;
   const CK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const unt = S.items.filter(i => !i.time && board(i.boardId) && (occursOn(i, ds) || (isToday && !i.repeat && !i.done && i.date && i.date < ds)))
+    .sort((a, b) => (a.date || '').localeCompare(b.date || '') || a.created - b.created);
+  const untHtml = unt.length ? `<div class="ut" id="ut">${unt.map(i => {
+    const dn = i.repeat ? (i.doneOn || []).includes(ds) : i.done, late = !dn && i.date < ds;
+    return `<div class="uc${dn ? ' done' : ''}${late ? ' late' : ''}" data-id="${i.id}" style="--c:${board(i.boardId).color}"><button class="uck" aria-label="${dn ? t('mark_undone') : t('mark_done')}">${CK}</button><span>${esc(i.title)}</span></div>`; }).join('')}</div>` : '';
   const blocks = evs.map(x => {
     const it = x.i, done = it.repeat ? (it.doneOn || []).includes(ds) : it.done, dur = x.e - x.s, W = 100 / x.n;
     const late = isToday && isOverdue(it) && !it.repeat;
     return `<div class="ev${done ? ' done' : ''}${late ? ' overdue' : ''}" data-id="${it.id}" data-n="${x.n}" style="--c:${board(it.boardId).color};--s:${x.s};--d:${dur};left:calc(${x.col * W}% + 3px);width:calc(${W}% - 6px)"><b>${esc(it.title)}</b><small>${it.time}–${fromMin(x.e)}${it.repeat ? ' · ↻' : ''}</small><button class="ck" aria-label="${done ? t('mark_undone') : t('mark_done')}">${CK}</button><span class="rh t"></span><span class="rh b"></span></div>`;
   }).join('');
   list.innerHTML = `<div class="daybar"><button class="arr" id="d-prev" aria-label="‹">‹</button>
-    <div class="dtitle"><b>${title}</b><span class="${isToday ? 'is-today' : ''}">${rel ? rel + ' · ' : ''}${t('day_events', { n: evs.length })}</span></div>
+    <div class="dtitle"><b>${title}</b><span class="${isToday ? 'is-today' : ''}">${rel ? rel + ' · ' : ''}${t('day_events', { n: evs.length + unt.length })}</span></div>
     <button class="arr" id="d-next" aria-label="›">›</button></div>
-    ${evs.length ? '' : `<div class="day-hint">${t('day_hint')}</div>`}
+    ${untHtml}${evs.length ? '' : `<div class="day-hint">${t('day_hint')}</div>`}
     <div class="tl" id="tl">${hrs}<div class="lane">${Array.from({ length: 24 }, (_, k) => `<i style="--h:${k}">+</i>`).join('')}</div><div class="evs" id="evs">${blocks}</div>${isToday ? '<div class="nowline" id="nowline"><span></span></div>' : ''}</div>`;
   applyZoom();
   $('#d-prev').onclick = () => { dayOff--; dayScroll = true; render(); slideIn(-1); };
   $('#d-next').onclick = () => { dayOff++; dayScroll = true; render(); slideIn(1); };
+  list.querySelectorAll('.uc').forEach(c => {
+    const it = S.items.find(i => i.id === c.dataset.id); if (!it) return;
+    c.onclick = e => { if (lpFired) { lpFired = false; return; }
+      if (e.target.closest('.uck')) { if (it.repeat) toggleOcc(it, ds); else toggleDone(it); } else openEdit(it); };
+    longPress(c, () => openMove(it));
+  });
   const ev = $('#evs'), tlEl = $('#tl');
   tlEl.onclick = e => {
     if (lpFired) { lpFired = false; return; }
@@ -1334,7 +1356,7 @@ function openSettings() {
     <input type="file" id="s-file" accept="application/json,.json" hidden>
     <hr>
     <button class="btn danger" id="s-clear" style="width:100%">${t('del_all_done')} (${S.items.filter(i => i.done).length})</button>
-    <div class="note" style="text-align:center;margin-top:16px">Wavelist v3.5</div>`,
+    <div class="note" style="text-align:center;margin-top:16px">Wavelist v3.6</div>`,
   () => {
     $('#s-lang').onchange = e => { st.lang = e.target.value; save(); LANG = pickLang(); applyStatic(); render(); openSettings(); };
     $('#s-auto').onchange = e => { st.autoSave = e.target.checked; save(); };
